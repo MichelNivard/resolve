@@ -15,8 +15,14 @@ export function parseIpynb(ipynb) {
       let parsedYaml = null;
       let isAcademicArticle = false;
 
-      // Check if this is a YAML header
-      if (rawText.trim().startsWith('---\n') && rawText.trim().endsWith('\n---')) {
+      // First check metadata for existing parsed data
+      if (c.metadata?.isYamlHeader) {
+        isYamlHeader = true;
+        parsedYaml = c.metadata.parsedYaml;
+        isAcademicArticle = c.metadata.isAcademicArticle;
+      }
+      // If no metadata or parsing needed, try to parse
+      else if (rawText.trim().startsWith('---\n') && rawText.trim().endsWith('\n---')) {
         isYamlHeader = true;
         try {
           // Extract YAML content between --- markers
@@ -33,12 +39,37 @@ export function parseIpynb(ipynb) {
         }
       }
 
+      // For YAML headers, use stored formatted YAML if available
+      let source;
+      if (c.metadata?.formattedYaml) {
+        // Ensure each line is a separate element, with opening fence on its own line
+        source = ['---\n', ...c.metadata.formattedYaml.split('\n').map(line => line + '\n'), '---\n'];
+      } else if (parsedYaml) {
+        const yamlStr = yaml.dump(parsedYaml, {
+          lineWidth: -1,
+          noRefs: true,
+          indent: 2,
+          flowLevel: -1
+        });
+        source = ['---\n', ...yamlStr.split('\n').map(line => line + '\n'), '---\n'];
+      } else {
+        source = rawText.split('\n').map(line => line + '\n');
+      }
+
+      // Return both the parsed and formatted versions
       cells.push({ 
         type: 'raw', 
         content: rawText,
         isYamlHeader,
         parsedYaml,
-        isAcademicArticle
+        isAcademicArticle,
+        tiptapContent: c.metadata?.tiptapContent || null,
+        formattedYaml: c.metadata?.formattedYaml || yaml.dump(parsedYaml, {
+          lineWidth: -1,
+          noRefs: true,
+          indent: 2,
+          flowLevel: -1
+        })
       });
     } else if (c.cell_type === 'markdown') {
       cells.push({
@@ -77,21 +108,47 @@ export function serializeIpynb({ yaml: yamlObj, cells }) {
 
   // Then add the cells as they appear in the input
   cells.forEach(cell => {
-    const { type, content, code, execution_count, outputs, tiptapContent, isYamlHeader, parsedYaml, isAcademicArticle } = cell;
+    const { type, content, code, execution_count, outputs, tiptapContent, isYamlHeader, parsedYaml, isAcademicArticle, formattedYaml } = cell;
     
     if (type === 'raw') {
-      const metadata = {};
+      const metadata = {
+        tiptapContent: tiptapContent || null
+      };
+      
       if (isYamlHeader) {
         metadata.isYamlHeader = true;
         metadata.parsedYaml = parsedYaml;
         metadata.isAcademicArticle = isAcademicArticle;
+
+        // For YAML headers, use stored formatted YAML if available
+        let source;
+        if (formattedYaml) {
+          // Ensure each line is a separate element, with opening fence on its own line
+          source = ['---\n', ...formattedYaml.split('\n').map(line => line + '\n'), '---\n'];
+        } else if (parsedYaml) {
+          const yamlStr = yaml.dump(parsedYaml, {
+            lineWidth: -1,
+            noRefs: true,
+            indent: 2,
+            flowLevel: -1
+          });
+          source = ['---\n', ...yamlStr.split('\n').map(line => line + '\n'), '---\n'];
+        } else {
+          source = content.split('\n').map(line => line + '\n');
+        }
+        
+        serializedCells.push({
+          cell_type: 'raw',
+          metadata,
+          source
+        });
+      } else {
+        serializedCells.push({
+          cell_type: 'raw',
+          metadata,
+          source: content.split('\n').map(line => line + '\n')
+        });
       }
-      
-      serializedCells.push({
-        cell_type: 'raw',
-        metadata,
-        source: content.split('\n')
-      });
     } else if (type === 'markdown') {
       // For markdown cells, handle table lines specially
       const lines = content.split('\n');

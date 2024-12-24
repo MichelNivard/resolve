@@ -206,6 +206,55 @@ Raw cell implementation:
 - Raw text handling
 - Format preservation
 
+### Raw Cell and YAML Handling
+
+The editor implements sophisticated handling of raw cells, with special support for YAML headers in academic articles:
+
+#### Raw Cell Architecture
+```
+RawCell/
+├── rawCell.js              # Core raw cell implementation
+├── rawCell.css             # Styling for raw cells
+└── utils/
+    ├── ipynbUtils.js      # YAML parsing and serialization
+    └── notebookConversionUtils.js  # Conversion between formats
+```
+
+#### YAML Header Features
+- **Dual Storage**: YAML content is stored in both parsed and formatted forms
+  - `parsedYaml`: JavaScript object for programmatic access
+  - `formattedYaml`: Preserves user formatting and comments
+  - `content`: Raw string content for the cell
+
+#### State Management
+1. **Editing Flow**:
+   - YAML content is displayed in a popup editor
+   - Changes are parsed in real-time for validation
+   - Both parsed and formatted versions are updated simultaneously
+
+2. **Persistence**:
+   - Formatted YAML is preserved through save/load cycles
+   - Stored in cell metadata to maintain formatting
+   - Fallback to auto-formatting if no formatted version exists
+
+3. **View Modes**:
+   - Edit: Shows raw YAML in formatted text editor
+   - View: Renders as academic article header
+   - Seamless switching between modes preserves edits
+
+#### Implementation Details
+```javascript
+// Raw cell structure
+{
+  type: 'raw',
+  content: string,          // Raw content
+  isYamlHeader: boolean,    // YAML header flag
+  parsedYaml: Object,      // Parsed YAML object
+  formattedYaml: string,   // Formatted YAML text
+  isAcademicArticle: boolean
+}
+```
+
 ### `frontend/src/utils/api.js`
 Backend API integration:
 ```javascript

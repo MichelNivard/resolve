@@ -81,21 +81,46 @@ export const fetchRepositories = async (token) => {
 export const fetchNotebooksInRepo = async (token, repository) => {
   try {
     const [owner, repo] = repository.split('/');
-    const response = await fetch(`https://api.github.com/repos/${owner}/${repo}/git/trees/main?recursive=1`, {
+    
+    // First, get the default branch
+    const repoResponse = await fetch(`https://api.github.com/repos/${owner}/${repo}`, {
       headers: {
         'Authorization': `Bearer ${token}`,
         'Accept': 'application/vnd.github.v3+json'
       }
     });
 
-    if (!response.ok) {
-      throw new Error('Failed to fetch notebooks');
+    if (!repoResponse.ok) {
+      console.error('Failed to fetch repository info:', await repoResponse.text());
+      return [];
     }
 
-    const data = await response.json();
-    return data.tree
+    const repoData = await repoResponse.json();
+    const defaultBranch = repoData.default_branch;
+
+    // Then get the tree using the default branch
+    const treeResponse = await fetch(
+      `https://api.github.com/repos/${owner}/${repo}/git/trees/${defaultBranch}?recursive=1`,
+      {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Accept': 'application/vnd.github.v3+json'
+        }
+      }
+    );
+
+    if (!treeResponse.ok) {
+      console.error('Failed to fetch tree:', await treeResponse.text());
+      return [];
+    }
+
+    const data = await treeResponse.json();
+    const notebooks = data.tree
       .filter(item => item.type === 'blob' && item.path.endsWith('.ipynb'))
       .map(item => item.path);
+
+    console.log('Found notebooks:', notebooks);
+    return notebooks;
   } catch (error) {
     console.error('Error fetching notebooks:', error);
     return [];

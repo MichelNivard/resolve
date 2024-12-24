@@ -16,6 +16,7 @@ import './TableStyles.css';
 import { TrackChangeExtension } from '../../utils/TrackChanges';
 import { CommentMark } from '../../utils/CommentMark';
 import { RawCell } from '../../rawCell';
+import '../../rawCell.css'
 import { CodeCell } from '../../codeCell';
 import { suggestionFactory } from '../Citation/suggestion';
 import { ipynbToTiptapDoc } from '../../utils/notebookConversionUtils';
@@ -48,15 +49,7 @@ const EditorWrapper = ({
     extensions: extensions || [
       StarterKit,
       RawCell.configure({
-        handleClick: (node, pos) => {
-          // Toggle display mode when clicking on academic YAML cells
-          if (node.attrs.isAcademicArticle) {
-            editor.chain()
-              .setNodeAttribute(pos, 'displayMode', 
-                node.attrs.displayMode === 'edit' ? 'view' : 'edit')
-              .run();
-          }
-        }
+        // Remove handleClick configuration since we're handling it in the node view
       }),
       CodeCell,
       Underline,
@@ -94,10 +87,19 @@ const EditorWrapper = ({
   useEffect(() => {
     const loadNotebooks = async () => {
       if (token && selectedRepo?.fullName) {
-        const notebookList = await fetchNotebooksInRepo(token, selectedRepo.fullName);
-        setNotebooks(notebookList);
-        // Clear the file path when changing repositories
-        setFilePath('');
+        try {
+          console.log('Loading notebooks for repository:', selectedRepo.fullName);
+          const notebookList = await fetchNotebooksInRepo(token, selectedRepo.fullName);
+          console.log('Loaded notebooks:', notebookList);
+          setNotebooks(notebookList);
+          // Only clear the file path if we successfully loaded notebooks
+          if (notebookList && notebookList.length > 0) {
+            setFilePath('');
+          }
+        } catch (error) {
+          console.error('Failed to load notebooks:', error);
+          // Don't clear notebooks on error to maintain existing state
+        }
       }
     };
 

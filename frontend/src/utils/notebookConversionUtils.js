@@ -47,7 +47,8 @@ export function ipynbToTiptapDoc(ipynb, editor) {
           content: cell.content,
           isYamlHeader: cell.isYamlHeader || false,
           parsedYaml: cell.parsedYaml || null,
-          isAcademicArticle: cell.isAcademicArticle || false
+          isAcademicArticle: cell.isAcademicArticle || false,
+          tiptapContent: cell.tiptapContent || null
         }
       });
     } else if (cell.type === 'markdown') {
@@ -262,7 +263,9 @@ export function tiptapDocToIpynb(editor, originalIpynb) {
         content: node.attrs.content,
         isYamlHeader: node.attrs.isYamlHeader,
         parsedYaml: node.attrs.parsedYaml,
-        isAcademicArticle: node.attrs.isAcademicArticle
+        formattedYaml: node.attrs.formattedYaml, // Add formattedYaml
+        isAcademicArticle: node.attrs.isAcademicArticle,
+        tiptapContent: node.attrs.tiptapContent
       });
     } else if (node.type === 'codeCell') {
       // Flush current markdown cell
