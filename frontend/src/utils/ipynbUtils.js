@@ -42,8 +42,14 @@ export function parseIpynb(ipynb) {
       // For YAML headers, use stored formatted YAML if available
       let source;
       if (c.metadata?.formattedYaml) {
-        // Ensure each line is a separate element, with opening fence on its own line
-        source = ['---\n', ...c.metadata.formattedYaml.split('\n').map(line => line + '\n'), '---\n'];
+        // Split into lines and handle each line's ending
+        const lines = c.metadata.formattedYaml.split('\n');
+        source = [
+          '---\n',
+          ...lines.slice(0, -1).map(line => line + '\n'),
+          lines[lines.length - 1] + '\n',
+          '---'
+        ];
       } else if (parsedYaml) {
         const yamlStr = yaml.dump(parsedYaml, {
           lineWidth: -1,
@@ -51,9 +57,20 @@ export function parseIpynb(ipynb) {
           indent: 2,
           flowLevel: -1
         });
-        source = ['---\n', ...yamlStr.split('\n').map(line => line + '\n'), '---\n'];
+        const lines = yamlStr.split('\n');
+        source = [
+          '---\n',
+          ...lines.slice(0, -1).map(line => line + '\n'),
+          lines[lines.length - 1] + '\n',
+          '---'
+        ];
       } else {
-        source = rawText.split('\n').map(line => line + '\n');
+        // For raw content, preserve line endings but ensure proper newlines
+        const lines = rawText.split('\n');
+        source = [
+          ...lines.slice(0, -1).map(line => line + '\n'),
+          lines[lines.length - 1] + '\n'
+        ];
       }
 
       // Return both the parsed and formatted versions
@@ -123,8 +140,14 @@ export function serializeIpynb({ yaml: yamlObj, cells }) {
         // For YAML headers, use stored formatted YAML if available
         let source;
         if (formattedYaml) {
-          // Ensure each line is a separate element, with opening fence on its own line
-          source = ['---\n', ...formattedYaml.split('\n').map(line => line + '\n'), '---\n'];
+          // Split into lines and handle each line's ending
+          const lines = formattedYaml.split('\n');
+          source = [
+            '---\n',
+            ...lines.slice(0, -1).map(line => line + '\n'),
+            lines[lines.length - 1] + '\n',
+            '---'
+          ];
         } else if (parsedYaml) {
           const yamlStr = yaml.dump(parsedYaml, {
             lineWidth: -1,
@@ -132,9 +155,20 @@ export function serializeIpynb({ yaml: yamlObj, cells }) {
             indent: 2,
             flowLevel: -1
           });
-          source = ['---\n', ...yamlStr.split('\n').map(line => line + '\n'), '---\n'];
+          const lines = yamlStr.split('\n');
+          source = [
+            '---\n',
+            ...lines.slice(0, -1).map(line => line + '\n'),
+            lines[lines.length - 1] + '\n',
+            '---'
+          ];
         } else {
-          source = content.split('\n').map(line => line + '\n');
+          // For raw content, preserve line endings but ensure proper newlines
+          const lines = content.split('\n');
+          source = [
+            ...lines.slice(0, -1).map(line => line + '\n'),
+            lines[lines.length - 1] + '\n'
+          ];
         }
         
         serializedCells.push({

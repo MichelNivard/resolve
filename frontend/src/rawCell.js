@@ -5,7 +5,8 @@ import './rawCell.css'
 function tryParseYaml(content) {
   try {
     if (content.trim().startsWith('---') && content.trim().endsWith('---')) {
-      const yamlContent = content.replace(/^---\n/, '').replace(/\n---$/, '');
+      // Extract YAML content between fences, preserving internal whitespace
+      const yamlContent = content.replace(/^---\n/, '').replace(/\n?---$/, '');
       const parsedYaml = yaml.load(yamlContent);
       
       if (parsedYaml) {
@@ -15,13 +16,13 @@ function tryParseYaml(content) {
           noRefs: true,
           indent: 2,
           flowLevel: -1
-        });
+        }).trim(); // Trim any trailing whitespace from the formatted YAML
         return {
           parsed: parsedYaml,
           formatted: formattedYaml
         };
       }
-      return { parsed: parsedYaml || {}, formatted: yamlContent };
+      return { parsed: parsedYaml || {}, formatted: yamlContent.trim() };
     }
   } catch (e) {
     console.error('Failed to parse YAML:', e);
@@ -171,9 +172,17 @@ export const RawCell = Node.create({
             console.log('Input event with content:', newContent);
             const parsed = tryParseYaml(newContent);
             console.log('Parsed content on input:', parsed);
+            
+            // Ensure proper YAML formatting when updating
+            let content = newContent;
+            if (parsed?.parsed) {
+              // If it's valid YAML, ensure proper fence formatting
+              content = `---\n${parsed.formatted}---`;
+            }
+            
             editor.chain()
               .updateAttributes('rawCell', {
-                content: newContent,
+                content,
                 parsedYaml: parsed?.parsed || null,
                 formattedYaml: parsed?.formatted || null
               })

@@ -258,12 +258,19 @@ export function tiptapDocToIpynb(editor, originalIpynb) {
     } else if (node.type === 'rawCell') {
       // Flush current markdown cell first
       flushMarkdownCell();
+      
+      // For YAML cells, ensure we preserve the exact formatting
+      let content = node.attrs.content;
+      if (node.attrs.isYamlHeader && node.attrs.formattedYaml) {
+        content = `---\n${node.attrs.formattedYaml}---`;
+      }
+      
       cells.push({ 
         type: 'raw', 
-        content: node.attrs.content,
+        content,
         isYamlHeader: node.attrs.isYamlHeader,
         parsedYaml: node.attrs.parsedYaml,
-        formattedYaml: node.attrs.formattedYaml, // Add formattedYaml
+        formattedYaml: node.attrs.formattedYaml,
         isAcademicArticle: node.attrs.isAcademicArticle,
         tiptapContent: node.attrs.tiptapContent
       });
