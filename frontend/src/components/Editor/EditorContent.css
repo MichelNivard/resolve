@@ -1,0 +1,452 @@
+/* General Editor Styling */
+.ProseMirror {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  font-size: 14px; /* Slightly larger for better readability */
+  line-height: 1.8; /* Better spacing between lines */
+  color: #2d2d2d; /* Neutral dark gray */
+  font-weight: 200;
+  background: #ffffff; /* Clean white background */
+  padding: 1rem 2rem; /* Consistent padding inside editor */
+  border-radius: 8px; /* Rounded corners for a modern look */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05); /* Subtle shadow for floating effect */
+  height: auto;
+  min-height: 100%;
+  overflow: visible;
+}
+
+.ProseMirror:focus {
+  outline: none;
+}
+
+/* Remove duplicate container styles - these are now in App.css */
+
+  ins {
+    color: rgb(21, 115, 204);
+    text-decoration: underline;
+  }
+  
+  del {
+    color: #e21111;
+    text-decoration: line-through;
+  }
+
+
+  
+
+  
+  .bubble-menu-container {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background-color: white;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 4px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    z-index: 2000;
+  }
+
+  .bubble-menu-button {
+    border: none;
+    background: none;
+    padding: 4px 8px;
+    margin: 0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    border-radius: 3px;
+    font-size: 12px;
+    color: #666;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+
+  .bubble-menu-button:hover {
+    background-color: #f0f0f0;
+  }
+
+  .bubble-menu-button.accept {
+    background-color: #4CAF50;
+    color: white;
+  }
+
+  .bubble-menu-button.accept:hover {
+    background-color: #45a049;
+  }
+
+  .bubble-menu-button.reject {
+    background-color: #f44336;
+    color: white;
+  }
+
+  .bubble-menu-button.reject:hover {
+    background-color: #da190b;
+  }
+
+  .bubble-menu-icon-button {
+    border: none;
+    background: none;
+    padding: 4px;
+    margin: 0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 3px;
+    color: #666;
+    transition: all 0.2s;
+  }
+
+  .bubble-menu-icon-button:hover {
+    background-color: #f0f0f0;
+    color: #333;
+  }
+
+  .comment-input-container {
+    display: flex;
+    align-items: center;
+    gap: 0;
+  }
+
+  .comment-input {
+    border: none;
+    padding: 4px;
+    font-size: 14px;
+    width: 200px;
+    font-family: inherit;
+    margin: 0;
+  }
+
+  .comment-input:focus {
+    outline: none;
+  }
+
+  .bubble-menu-input {
+    padding: 4px 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    width: 150px;
+  }
+
+  .bubble-menu-icon-button {
+    background: none;
+    border: none;
+    padding: 4px;
+    cursor: pointer;
+    color: #666;
+    transition: color 0.2s ease;
+  }
+
+  .bubble-menu-icon-button:hover {
+    color: #000;
+  }
+
+  .bubble-menu-icon-button:first-child:hover {
+    color: #4CAF50;
+  }
+
+  .bubble-menu-icon-button:last-child:hover {
+    color: #f44336;
+  }
+
+ /* buttomns on app.js header */
+
+
+/* Common styles for all controls */
+.file-input,
+.repo-select.glass-select,
+.glass-button {
+  box-sizing: border-box;
+  height: 36px;
+  padding: 0 16px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 6px;
+  background: #fff;
+  font-size: 12px;
+  color: #333;
+  display: inline-flex;
+  align-items: center;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.file-input {
+  min-width: 200px;
+}
+
+.repo-select.glass-select {
+  min-width: 250px;
+  cursor: pointer;
+  padding-right: 32px;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23333' d='M2.9 4h6.2L6 8 2.9 4z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+}
+
+.glass-button {
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background-color: #f8f9fa;
+  min-width: 120px;
+  justify-content: center;
+  padding: 0 20px;
+  font-weight: 500;
+}
+
+.glass-button:hover {
+  background-color: #e9ecef;
+}
+
+.glass-button:active {
+  background-color: #dee2e6;
+}
+
+/* File controls container */
+.file-controls {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  height: 36px;
+}
+
+.load-button {
+  display: inline-block;
+  padding: 0 16px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 6px;
+  background: #fff;
+  font-size: 14px;
+  color: #333;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  line-height: 34px;
+}
+
+.load-button:hover {
+  background-color: #e9ecef;
+}
+
+.load-button:active {
+  background-color: #dee2e6;
+}
+
+.repo-select.glass-select {
+  padding: 0 16px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 6px;
+  background: #fff;
+  font-size: 14px;
+  color: #333;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  cursor: pointer;
+  min-width: 250px;
+  padding-right: 32px; /* Space for the dropdown arrow */
+  appearance: none; /* Remove default arrow */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23333' d='M2.9 4h6.2L6 8 2.9 4z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  line-height: 34px;
+}
+
+.repo-select.glass-select:focus {
+  outline: none;
+  border-color: rgba(0, 0, 0, 0.2);
+}
+
+.repo-select.glass-select option {
+  padding: 8px;
+}
+
+.comment-input-container {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.comment-input {
+  border: none;
+  padding: 4px;
+  font-size: 14px;
+  width: 200px;
+  font-family: inherit;
+}
+
+.comment-input:focus {
+  outline: none;
+}
+
+.comment-input-buttons {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.comment-mark {
+  position: relative;
+  cursor: pointer;
+  padding: 0 2px;
+  border-radius:12px;
+  border: 1px solid var(--comment-border, #E7F1FF);;
+  background-color: var(--comment-background, #E7F1FF);
+  display: inline;
+  transition: all 0.2s ease;
+}
+
+.comment-mark.highlight {
+  background-color: var(--comment-highlight-background, #C4DDFF);
+  color: inherit;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.comment-mark::after {
+  content: attr(data-username);
+  position: absolute;
+  top: -24px;
+  left: 7%;
+  transform: translateX(-50%);
+  border-radius: 2px;
+  border: none;
+  background-color: var(--comment-border, #94C1FF);
+  color: #333;
+  padding: 2px 4px;
+  font-size: 11px;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+  white-space: nowrap;
+  display: inline;
+  z-index: 1000;
+}
+
+/* Comment mark themes in editor */
+.ProseMirror .comment-theme-red {
+  background-color: var(--comment-red-background);
+}
+
+.ProseMirror .comment-theme-red:hover {
+  background-color: var(--comment-red-hover);
+}
+
+.ProseMirror .comment-theme-blue {
+  background-color: var(--comment-blue-background);
+}
+
+.ProseMirror .comment-theme-blue:hover {
+  background-color: var(--comment-blue-hover);
+}
+
+.ProseMirror .comment-theme-yellow {
+  background-color: var(--comment-yellow-background);
+}
+
+.ProseMirror .comment-theme-yellow:hover {
+  background-color: var(--comment-yellow-hover);
+}
+
+.ProseMirror .comment-theme-green {
+  background-color: var(--comment-green-background);
+}
+
+.ProseMirror .comment-theme-green:hover {
+  background-color: var(--comment-green-hover);
+}
+
+/* Override Tippy.js tooltip styles */
+ .tippy-box {
+  background: white !important; /* Set the background color to white */
+  border: 0px solid #ccc; /* Optional: Add a subtle border */
+  border-radius: 2px; /* Smooth rounded corners */
+
+  padding: 2px; /* Adjust padding */
+}
+
+.tippy-arrow {
+  color: white !important; /* Match the background color of the bubble */
+}
+
+.app-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.app-header {
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header-title {
+  font-size: 1.5rem;
+  margin: 0;
+  color: #333;
+}
+
+.app-main {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+}
+
+.content-container {
+  height: 100%;
+  overflow: hidden;
+}
+
+.editor-with-sidebar {
+  display: flex;
+  height: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.editor-container {
+  flex: 1;
+  position: relative;
+  overflow: auto;
+}
+
+.editor-main {
+  height: 100%;
+  padding: 1rem;
+}
+
+.editor-content-container {
+  max-width: 900px;
+  margin: 0 auto;
+  background: white;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.notification {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  background: rgb(20, 124, 13);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  width: 300px;
+  z-index: 1000;
+}
+
+.notification.error {
+  background: rgba(255, 0, 0, 0.1);
+  color: #d32f2f;
+}
