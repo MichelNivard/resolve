@@ -1,5 +1,69 @@
-# Jupyter Notebook Editor with GitHub Integration
+# Resolve: a WYSIWYGJupyter Notebook Editor with GitHub Integration
+
+This is resolve, a work in progress WYSIWYGJupyter Notebook Editor with GitHub Integration. The substantive **GOAL** is to have a single page application that allows users to edit notebooks hosted on GitHub, which can be ran and maintained on a shoestrong budget as no data is stored on server, credentialig is done trough GitHub OAuth, the backend is a set of serverless functions on vercel, and the files are stored in GitHub repositories.
+
+## table of contents
+
+- [Technical Documentation](#technical-documentation)
+- [Project Structure](#project-structure)
+- [File-by-File Documentation](#file-by-file-documentation)
+- [Usage](#usage)
+- [Contributing](#contributing)
+- [License](#license)
+
+
 ## Technical Documentation
+
+The project is a Jupyter Notebook Editor with GitHub Integration, structured into two main directories:
+
+- **Backend**: Express.js server with API endpoints for authentication, file management, and user operations
+- **Frontend**: React-based application with advanced editing capabilities
+
+The technical **GOAL** is for the backend to eventally become a set of serverless functions on vercel, while the frontend remains a single page application.
+
+
+### Key Components
+
+#### Backend Highlights
+1. **Authentication**
+   - GitHub OAuth implementation
+   - Secure token management
+   - HTTP-only cookie handling
+
+2. **File Management**
+   - GitHub repository file fetching
+   - File saving and locking mechanisms
+   - User-specific operations
+
+#### Frontend Highlights
+1. **Editor Core**
+   - TipTap-based rich text editor
+   - Jupyter notebook cell types (code, markdown, raw)
+   - Dynamic repository and notebook selection
+
+2. **Advanced Features**
+   - Track changes
+   - Inline commenting
+   - Citation management
+   - Syntax highlighting
+   - Math equation support
+
+### Technical Capabilities
+- Cross-platform notebook editing
+- GitHub integration
+- Real-time collaboration tools
+- Comprehensive text and code formatting
+- Secure authentication workflow
+
+### Technology Stack
+- **Backend**: Node.js, Express.js
+- **Frontend**: React, TipTap
+- **Authentication**: GitHub OAuth
+- **Version Control**: GitHub API integration
+
+The documentation provides an in-depth, file-by-file breakdown of the project's technical implementation.
+
+
 
 ### Project Structure
 
@@ -820,4 +884,7 @@ REACT_APP_GITHUB_SCOPE=   # Required GitHub permissions
 
 ### License
 
-This project is licensed under the MIT License.
+I intend to lycence ths project fairly openly, I am undicided whether to use the MIT license or a more permissive license like the Apache 2.0 license. Given I will incure hosting costs, I want t make sure the project is free to use while leaving me room to fund developmen in some way.
+
+
+
