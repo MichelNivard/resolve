@@ -46,14 +46,19 @@ function App() {
       if (token) {
         try {
           const repos = await fetchRepositories(token);
-          console.log('Loaded repositories:', repos);
+          console.log('Raw repositories:', repos);
           
           // Filter and set repositories
-          const validRepos = repos.filter(repo => repo.fullName && repo.owner?.login);
+          const validRepos = repos.filter(repo => {
+            console.log('Checking repo:', repo);
+            return repo.fullName && repo.owner?.login;
+          });
+          console.log('Valid repositories:', validRepos);
           setRepositories(validRepos);
           
           // If user has valid repositories, select the first one by default
           if (validRepos.length > 0) {
+            console.log('Setting default repo:', validRepos[0]);
             setSelectedRepo(validRepos[0]);
           }
         } catch (error) {
@@ -137,7 +142,7 @@ function App() {
       if (updatedEditors.length < ipynb.metadata.active_editors.length) {
         const updatedIpynb = { ...ipynb };
         updatedIpynb.metadata.active_editors = updatedEditors;
-        saveToGitHub(updatedIpynb, filePath, token, selectedRepo.fullName, user)
+        saveToGitHub(updatedIpynb, filePath, selectedRepo, user)
           .catch(error => console.error('Error cleaning up old editors:', error));
       }
     };
@@ -189,7 +194,7 @@ function App() {
       });
 
       // Load the notebook
-      const notebook = await fetchNotebook(filePath, token, selectedRepo.fullName);
+      const notebook = await fetchNotebook(filePath, selectedRepo.fullName);
       console.log('Loaded notebook metadata:', notebook.metadata);
       
       // Initialize metadata if needed
@@ -225,7 +230,7 @@ function App() {
       console.log('Updated notebook metadata:', notebook.metadata);
 
       // Save the updated notebook back to GitHub
-      await saveToGitHub(notebook, filePath, token, selectedRepo.fullName, user);
+      await saveToGitHub(notebook, filePath, selectedRepo, user);
       console.log('Saved notebook with updated editors');
       
       setIpynb(notebook);
@@ -279,7 +284,7 @@ function App() {
 
     try {
       const newIpynb = tiptapDocToIpynb(editor, ipynb);
-      const result = await saveToGitHub(newIpynb, filePath, token, selectedRepo.fullName, user);
+      const result = await saveToGitHub(newIpynb, filePath, selectedRepo, user);
       console.log('Save result:', result);
 
       setSaveMessage('File updated successfully');

@@ -1,76 +1,37 @@
 // Utilities for handling .bib files with GitHub integration
+import axios from 'axios';
 import bibtexParse from 'bibtex-parser-js';
+
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001/api';
 
 /**
  * Load a .bib file from GitHub repository
- * @param {string} token - GitHub access token
  * @param {string} selectedRepo - Repository in format "owner/repo"
  * @param {string} notebookPath - Path to the current notebook
  * @param {string} owner - Repository owner login
  * @returns {Promise<{content: string, path: string, sha: string} | null>}
  */
-export async function loadBibFromGitHub(token, selectedRepo, notebookPath, owner) {
+export async function loadBibFromGitHub(selectedRepo, notebookPath, owner) {
   console.log('🔍 Attempting to load .bib file from GitHub:', {
     repo: selectedRepo,
     notebook: notebookPath,
     owner
   });
 
-  // Validate repository format
-  const [repoOwner, repo] = selectedRepo.split('/');
-  if (!repoOwner || !repo || repoOwner !== owner) {
-    console.error('❌ Repository format mismatch:', {
-      providedOwner: owner,
-      repoOwner,
-      repo
-    });
-    throw new Error('Repository owner mismatch');
-  }
-
-  const possiblePaths = [
-    // Same directory as notebook
-    `${notebookPath.substring(0, notebookPath.lastIndexOf('/'))}/references.bib`,
-    // Root of repo
-    'references.bib',
-    // References directory
-    'references/main.bib'
-  ];
-
-  console.log('🔍 Searching for .bib file in paths:', possiblePaths);
-
-  // Try each path until we find the .bib file
-  for (const bibPath of possiblePaths) {
-    try {
-      console.log(`📖 Checking path: ${bibPath}`);
-      const response = await fetch(
-        `https://api.github.com/repos/${owner}/${repo}/contents/${bibPath}`,
-        {
-          headers: { 
-            Authorization: `token ${token}`,
-            Accept: 'application/vnd.github.v3+json'
-          }
-        }
-      );
-      
-      if (response.ok) {
-        console.log(`✅ Found .bib file at: ${bibPath}`);
-        const data = await response.json();
-        const content = decodeURIComponent(escape(atob(data.content)));
-        
-        // Log the first 100 characters of content for debugging
-        console.log('📄 First 100 chars of .bib content:', content.substring(0, 100));
-        
-        return { content, path: bibPath, sha: data.sha };
-      } else {
-        console.log(`❌ No .bib file at ${bibPath} (${response.status}: ${response.statusText})`);
+  try {
+    const response = await axios.get(`${API_BASE_URL}/bibliography/load`, {
+      params: {
+        repository: selectedRepo,
+        notebookPath
       }
-    } catch (error) {
-      console.log(`❌ Error checking ${bibPath}:`, error.message);
-    }
+    });
+    
+    console.log('✅ Successfully loaded .bib file');
+    return response.data;
+  } catch (error) {
+    console.error('❌ Error loading .bib file:', error);
+    return null;
   }
-  
-  console.log('❌ No .bib file found in any of the searched locations');
-  return null;
 }
 
 /**
@@ -78,46 +39,24 @@ export async function loadBibFromGitHub(token, selectedRepo, notebookPath, owner
  * @param {string} content - BibTeX content to save
  * @param {string} path - Path where to save the file
  * @param {string} sha - SHA of existing file (if updating)
- * @param {string} token - GitHub access token
  * @param {string} selectedRepo - Repository in format "owner/repo"
- * @param {string} owner - Repository owner login
  * @returns {Promise<Object>} GitHub API response
  */
-export async function saveBibToGitHub(content, path, sha, token, selectedRepo, owner) {
+export async function saveBibToGitHub(content, path, sha, selectedRepo) {
   try {
-    // Remove leading slash if present
-    const normalizedPath = path.startsWith('/') ? path.slice(1) : path;
-    
-    const response = await fetch(
-      `https://api.github.com/repos/${selectedRepo}/contents/${normalizedPath}`,
-      {
-        method: 'PUT',
-        headers: {
-          'Authorization': `token ${token}`,
-          'Content-Type': 'application/json',
-          'Accept': 'application/vnd.github.v3+json'
-        },
-        body: JSON.stringify({
-          message: 'Update bibliography file',
-          content: Buffer.from(content).toString('base64'),
-          ...(sha && { sha })
-        })
-      }
-    );
-
-    if (!response.ok) {
-      const error = await response.json();
-      console.error('❌ Failed to save .bib file:', error);
-      throw new Error(`Failed to save .bib file: ${error.message || 'Unknown error'}`);
-    }
-
-    const result = await response.json();
-    console.log('✅ Successfully saved .bib file:', {
-      path: result.content.path,
-      sha: result.content.sha
+    const response = await axios.post(`${API_BASE_URL}/bibliography/save`, {
+      content,
+      path,
+      repository: selectedRepo,
+      ...(sha && { sha })
     });
 
-    return result;
+    console.log('✅ Successfully saved .bib file:', {
+      path: response.data.content.path,
+      sha: response.data.content.sha
+    });
+
+    return response.data;
   } catch (error) {
     console.error('❌ Error saving .bib file:', error);
     throw error;

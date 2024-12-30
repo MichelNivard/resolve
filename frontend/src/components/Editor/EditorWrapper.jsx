@@ -75,6 +75,9 @@ const EditorWrapper = ({
         }
       }),
       Mathematics,
+      BibMention.configure({
+        suggestion: suggestionFactory(referenceManager)
+      })
     ],
     content: '',
     editorProps: {
@@ -86,10 +89,10 @@ const EditorWrapper = ({
 
   useEffect(() => {
     const loadNotebooks = async () => {
-      if (token && selectedRepo?.fullName) {
+      if (selectedRepo?.fullName) {
         try {
           console.log('Loading notebooks for repository:', selectedRepo.fullName);
-          const notebookList = await fetchNotebooksInRepo(token, selectedRepo.fullName);
+          const notebookList = await fetchNotebooksInRepo(selectedRepo.fullName);
           console.log('Loaded notebooks:', notebookList);
           setNotebooks(notebookList);
           // Only clear the file path if we successfully loaded notebooks
@@ -104,7 +107,7 @@ const EditorWrapper = ({
     };
 
     loadNotebooks();
-  }, [token, selectedRepo, setFilePath]);
+  }, [selectedRepo, setFilePath]);
 
   const onLoadFile = async () => {
     try {
@@ -180,7 +183,28 @@ const EditorWrapper = ({
             {!token && <LoginButton />}
             {token && (
               <div className="file-controls">
-                {selectedRepo ? (
+                <select
+                  value={selectedRepo?.fullName || ''}
+                  onChange={(e) => {
+                    console.log('Repositories:', repositories);
+                    const repo = repositories.find(r => r.fullName === e.target.value);
+                    console.log('Selected repo:', repo);
+                    setSelectedRepo(repo);
+                  }}
+                  className="repo-select glass-select"
+                >
+                  <option value="">Select Repository</option>
+                  {repositories.map((repo) => {
+                    console.log('Repository option:', repo);
+                    return (
+                      <option key={repo.id} value={repo.fullName}>
+                        {repo.fullName}
+                      </option>
+                    );
+                  })}
+                </select>
+
+                {selectedRepo && (
                   <select
                     value={filePath}
                     onChange={(e) => setFilePath(e.target.value)}
@@ -193,35 +217,8 @@ const EditorWrapper = ({
                       </option>
                     ))}
                   </select>
-                ) : (
-                  <input
-                    type="text"
-                    value={filePath}
-                    onChange={(e) => setFilePath(e.target.value)}
-                    placeholder="Enter file path"
-                    className="file-input"
-                  />
                 )}
-                <select
-                  value={selectedRepo?.fullName || ''}
-                  
-                  onChange={(e) => {
-                    const repo = repositories.find(r => r.fullName === e.target.value);
-                    if (repo && repo.fullName && repo.owner?.login) {
-                      setSelectedRepo(repo);
-                    }
-                  }}
-                  className="repo-select glass-select"
-                >
-                  <option value="">Select Repository</option>
-                  {repositories
-                    .filter(repo => repo.fullName && repo.owner?.login)
-                    .map((repo) => (
-                      <option key={repo.fullName} value={repo.fullName}>
-                        {repo.fullName}
-                      </option>
-                    ))}
-                </select>
+
                 <button className="glass-button" onClick={onLoadFile}>
                   Load Notebook
                 </button>

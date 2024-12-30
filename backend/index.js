@@ -25,6 +25,8 @@ const saveFileRoute = require('./api/saveFile');
 const lockFileRoute = require('./api/lockFile');
 const unlockFileRoute = require('./api/unlockFile');
 const getRepositoriesRoute = require('./api/getRepositories');
+const listNotebooksRoute = require('./api/listNotebooks');
+const bibliographyRoute = require('./api/bibliography');
 
 const app = express();
 
@@ -40,7 +42,8 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.use(helmet());
 app.use(cookieParser());
-app.use(express.json());
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
 app.use(secureCookies);
 
 // Apply rate limiting to all routes
@@ -52,7 +55,10 @@ const protectedRoutes = [
     '/api/saveFile',
     '/api/lockFile',
     '/api/unlockFile',
-    '/api/repositories'
+    '/api/repositories',
+    '/api/listNotebooks',
+    '/api/bibliography/load',
+    '/api/bibliography/save'
 ];
 
 protectedRoutes.forEach(route => {
@@ -68,6 +74,8 @@ app.use('/api/saveFile', saveFileRoute);
 app.use('/api/lockFile', lockFileRoute);
 app.use('/api/unlockFile', unlockFileRoute);
 app.use('/api/repositories', getRepositoriesRoute);
+app.use('/api/listNotebooks', listNotebooksRoute);
+app.use('/api/bibliography', bibliographyRoute);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
