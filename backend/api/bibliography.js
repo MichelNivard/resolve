@@ -9,9 +9,10 @@ async function loadBibliography(req, res) {
       return res.status(400).json({ error: 'Repository and notebookPath parameters are required' });
     }
 
-    const token = req.cookies.token || req.headers.authorization?.split(' ')[1];
+    const token = req.session?.githubToken;
     if (!token) {
-      return res.status(401).json({ error: 'No token provided' });
+      console.error('No GitHub token found in session');
+      return res.status(401).json({ error: 'Not authenticated' });
     }
 
     const octokit = new Octokit({ auth: token });
@@ -49,28 +50,39 @@ async function loadBibliography(req, res) {
 async function saveBibliography(req, res) {
   try {
     const { content, path, repository, sha } = req.body;
-    if (!content || !path || !repository) {
-      return res.status(400).json({ error: 'Content, path, and repository are required' });
+    
+    const token = req.session?.githubToken;
+    if (!token) {
+      console.error('No GitHub token found in session');
+      return res.status(401).json({ error: 'Not authenticated' });
     }
 
-    const token = req.cookies.token || req.headers.authorization?.split(' ')[1];
-    if (!token) {
-      return res.status(401).json({ error: 'No token provided' });
+    if (!content || !path || !repository) {
+      return res.status(400).json({ error: 'Missing required parameters' });
+    }
+
+    const [owner, repo] = repository.split('/');
+    if (!owner || !repo) {
+      return res.status(400).json({ error: 'Invalid repository format' });
     }
 
     const octokit = new Octokit({ auth: token });
-    const [owner, repo] = repository.split('/');
 
-    const response = await octokit.repos.createOrUpdateFileContents({
+    const message = 'Update bibliography';
+    const options = {
       owner,
       repo,
       path,
-      message: 'Update bibliography file',
+      message,
       content: Buffer.from(content).toString('base64'),
-      ...(sha && { sha }),
-    });
+    };
 
-    res.json(response.data);
+    if (sha) {
+      options.sha = sha;
+    }
+
+    await octokit.repos.createOrUpdateFileContents(options);
+    res.json({ success: true });
   } catch (error) {
     console.error('Error saving bibliography:', error);
     res.status(error.status || 500).json({ error: error.message });
