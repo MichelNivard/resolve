@@ -26,12 +26,26 @@ router.get('/', (req, res) => {
   }
 });
 
+// Add a route to check session status
+router.get('/check', (req, res) => {
+  console.log('Session check:', {
+    hasSession: !!req.session,
+    sessionID: req.sessionID,
+    githubToken: !!req.session?.githubToken
+  });
+  res.json({ 
+    authenticated: !!req.session?.githubToken,
+    sessionID: req.sessionID
+  });
+});
+
 // Callback to handle token exchange
 router.get('/callback', async (req, res) => {
   const { code } = req.query;
   console.log('Received code from GitHub:', { 
     hasCode: !!code,
-    codeLength: code ? code.length : 0 
+    codeLength: code ? code.length : 0,
+    sessionID: req.sessionID
   });
   
   if (!code) {
@@ -69,7 +83,7 @@ router.get('/callback', async (req, res) => {
     console.log('Token response:', {
       status: tokenRes.status,
       hasAccessToken: !!tokenRes.data.access_token,
-      data: tokenRes.data
+      sessionID: req.sessionID
     });
 
     if (!tokenRes.data.access_token) {
@@ -77,13 +91,28 @@ router.get('/callback', async (req, res) => {
       return res.status(400).send('No access token received');
     }
 
-    res.cookie('token', tokenRes.data.access_token, { 
-      httpOnly: true, 
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax'
-    });
+    // Store token in session
+    req.session.githubToken = tokenRes.data.access_token;
     
-    res.redirect('http://localhost:3000');
+    // Save session explicitly
+    req.session.save((err) => {
+      if (err) {
+        console.error('Error saving session:', err);
+        return res.status(500).send('Error saving session');
+      }
+      
+      console.log('Session saved successfully:', {
+        sessionID: req.sessionID,
+        hasToken: !!req.session.githubToken
+      });
+
+      // Redirect to frontend
+      const frontendUrl = process.env.NODE_ENV === 'production'
+        ? process.env.FRONTEND_URL
+        : 'http://localhost:3000';
+      
+      res.redirect(frontendUrl);
+    });
   } catch (err) {
     console.error('Token exchange error:', {
       message: err.message,
@@ -96,6 +125,23 @@ router.get('/callback', async (req, res) => {
     });
     res.status(500).send('Failed to exchange token');
   }
+});
+
+// Add logout endpoint
+router.post('/logout', (req, res) => {
+  console.log('Logging out user:', {
+    sessionID: req.sessionID,
+    hasToken: !!req.session?.githubToken
+  });
+
+  req.session.destroy((err) => {
+    if (err) {
+      console.error('Error destroying session:', err);
+      return res.status(500).json({ error: 'Failed to logout' });
+    }
+    res.clearCookie('sessionId');
+    res.json({ message: 'Logged out successfully' });
+  });
 });
 
 module.exports = router;

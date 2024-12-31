@@ -8,11 +8,11 @@ router.post('/', async (req, res) => {
   try {
     const { content, path, repository } = req.body;
     
-    const token = req.cookies.token || req.headers.authorization?.split(' ')[1];
+    const token = req.session?.githubToken;
 
     if (!token) {
-      console.error('No token found in cookies or headers');
-      return res.status(401).json({ error: 'No token provided' });
+      console.error('No GitHub token found in session');
+      return res.status(401).json({ error: 'Not authenticated' });
     }
 
     if (!content || !path || !repository) {
@@ -29,6 +29,12 @@ router.post('/', async (req, res) => {
     if (!owner || !repo) {
       return res.status(400).json({ error: 'Invalid repository format' });
     }
+
+    console.log('Saving file with session token:', {
+      sessionID: req.sessionID,
+      path: sanitizedPath,
+      repository: `${owner}/${repo}`
+    });
 
     const octokit = new Octokit({ auth: token });
 

@@ -6,11 +6,11 @@ const router = express.Router();
 
 router.get('/', async (req, res) => {
   try {
-    const token = req.cookies.token || req.headers.authorization?.split(' ')[1];
+    const token = req.session.githubToken;
 
     if (!token) {
-      console.error('No token found in cookies or headers');
-      return res.status(401).json({ error: 'No token provided' });
+      console.error('No token found in session');
+      return res.status(401).json({ error: 'Not authenticated' });
     }
 
     const octokit = new Octokit({ auth: token });
@@ -26,7 +26,9 @@ router.get('/', async (req, res) => {
     const formattedRepos = repos.map(repo => ({
       id: repo.id,
       fullName: repo.full_name,
-      owner: repo.owner.login,
+      owner: {
+        login: repo.owner.login
+      },
       name: repo.name,
       private: repo.private
     }));

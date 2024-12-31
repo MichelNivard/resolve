@@ -5,26 +5,12 @@ const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001/api
 // Configure axios defaults
 axios.defaults.withCredentials = true;
 
-export const getTokenFromBackend = async () => {
-  try {
-    const res = await axios.get(`${API_BASE_URL}/getToken`);
-    return res.data.token;
-  } catch (err) {
-    console.error('Error getting token:', err);
-    return null;
-  }
-};
-
 export const fetchNotebook = async (path, repository) => {
   try {
     console.log('Fetching notebook:', { path, repository });
-    const url = new URL(`${API_BASE_URL}/fetchFile`);
-    url.searchParams.append('path', path);
-    if (repository) {
-      url.searchParams.append('repository', repository);
-    }
-    
-    const response = await axios.get(url.toString());
+    const response = await axios.get(`${API_BASE_URL}/fetchFile`, {
+      params: { path, repository }
+    });
     return response.data.ipynb;
   } catch (error) {
     console.error('Error fetching notebook:', error);
@@ -45,23 +31,7 @@ export const fetchUser = async () => {
 export const fetchRepositories = async () => {
   try {
     const res = await axios.get(`${API_BASE_URL}/repositories`);
-    
-    // Ensure repositories have the required format
-    const repositories = res.data.repositories || [];
-    return repositories.map(repo => {
-      // Handle both snake_case and camelCase formats
-      const fullName = repo.full_name || repo.fullName || '';
-      const [ownerLogin, repoName] = fullName.split('/');
-      
-      return {
-        id: repo.id,
-        fullName,
-        name: repoName || '',
-        owner: {
-          login: repo.owner?.login || ownerLogin || ''
-        }
-      };
-    }).filter(repo => repo.fullName && repo.owner.login);
+    return res.data.repositories || [];
   } catch (err) {
     console.error('Error fetching repositories:', err);
     return [];
@@ -72,12 +42,12 @@ export const fetchNotebooksInRepo = async (repository) => {
   try {
     const response = await axios.get(`${API_BASE_URL}/listNotebooks`, {
       params: { repository },
-      withCredentials: true  // Ensure cookies are sent
+      withCredentials: true
     });
     return response.data.notebooks;
   } catch (error) {
     console.error('Error fetching notebooks:', error);
-    throw error; // Let the component handle the error
+    throw error;
   }
 };
 

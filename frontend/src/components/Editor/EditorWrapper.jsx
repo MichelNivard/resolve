@@ -28,7 +28,6 @@ import './EditorContent.css';
 import { fetchNotebooksInRepo } from '../../utils/api';
 
 const EditorWrapper = ({
-  token,
   referenceManager,
   filePath,
   setFilePath,
@@ -152,12 +151,6 @@ const EditorWrapper = ({
   }, [editor]);
 
   useEffect(() => {
-    if (token && editor) {
-      editor.commands.clearContent();
-    }
-  }, [token, editor]);
-
-  useEffect(() => {
     if (editor) {
       Object.entries(citationCommands).forEach(([name, command]) => {
         editor.commands[name] = command;
@@ -180,53 +173,50 @@ const EditorWrapper = ({
         <div className="header-content">
           <h1 className="header-title">Ipynb Editor</h1>
           <div>
-            {!token && <LoginButton />}
-            {token && (
-              <div className="file-controls">
+            <div className="file-controls">
+              <select
+                value={selectedRepo?.fullName || ''}
+                onChange={(e) => {
+                  console.log('Repositories:', repositories);
+                  const repo = repositories.find(r => r.fullName === e.target.value);
+                  console.log('Selected repo:', repo);
+                  setSelectedRepo(repo);
+                }}
+                className="repo-select glass-select"
+              >
+                <option value="">Select Repository</option>
+                {repositories.map((repo) => {
+                  console.log('Repository option:', repo);
+                  return (
+                    <option key={repo.id} value={repo.fullName}>
+                      {repo.fullName}
+                    </option>
+                  );
+                })}
+              </select>
+
+              {selectedRepo && (
                 <select
-                  value={selectedRepo?.fullName || ''}
-                  onChange={(e) => {
-                    console.log('Repositories:', repositories);
-                    const repo = repositories.find(r => r.fullName === e.target.value);
-                    console.log('Selected repo:', repo);
-                    setSelectedRepo(repo);
-                  }}
+                  value={filePath}
+                  onChange={(e) => setFilePath(e.target.value)}
                   className="repo-select glass-select"
                 >
-                  <option value="">Select Repository</option>
-                  {repositories.map((repo) => {
-                    console.log('Repository option:', repo);
-                    return (
-                      <option key={repo.id} value={repo.fullName}>
-                        {repo.fullName}
-                      </option>
-                    );
-                  })}
+                  <option value="">Select a notebook</option>
+                  {notebooks.map((notebook) => (
+                    <option key={notebook} value={notebook}>
+                      {notebook}
+                    </option>
+                  ))}
                 </select>
+              )}
 
-                {selectedRepo && (
-                  <select
-                    value={filePath}
-                    onChange={(e) => setFilePath(e.target.value)}
-                    className="repo-select glass-select"
-                  >
-                    <option value="">Select a notebook</option>
-                    {notebooks.map((notebook) => (
-                      <option key={notebook} value={notebook}>
-                        {notebook}
-                      </option>
-                    ))}
-                  </select>
-                )}
-
-                <button className="glass-button" onClick={onLoadFile}>
-                  Load Notebook
-                </button>
-                <button className="glass-button" onClick={onSaveFileClick}>
-                  Save Notebook
-                </button>
-              </div>
-            )}
+              <button className="glass-button" onClick={onLoadFile}>
+                Load Notebook
+              </button>
+              <button className="glass-button" onClick={onSaveFileClick}>
+                Save Notebook
+              </button>
+            </div>
           </div>
         </div>
         {editor && <EditorToolbar editor={editor} />}

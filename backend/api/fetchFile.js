@@ -9,8 +9,11 @@ router.get('/', async (req, res) => {
   try {
     const { path: filePath, repository } = req.query;
     
-    // Use the token from the validateToken middleware
-    const token = req.token;
+    // Use the token from the session
+    const token = req.session.githubToken;
+    if (!token) {
+      return res.status(401).json({ error: 'Not authenticated' });
+    }
 
     if (!repository) {
       console.error('No repository provided');
@@ -23,7 +26,7 @@ router.get('/', async (req, res) => {
       return res.status(400).json({ error: 'Invalid file path' });
     }
 
-    console.log('Using token for GitHub API');
+    console.log('Using session token for GitHub API');
     const octokit = new Octokit({ auth: token });
 
     // Extract owner and repo from repository (format: owner/repo)

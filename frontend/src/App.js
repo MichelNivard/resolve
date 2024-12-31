@@ -30,7 +30,7 @@ import { CommentMark } from './utils/CommentMark';
 import { BibMention } from './components/Citation/bibMention';
 
 function App() {
-  const { token } = useContext(AuthContext);
+  const { isAuthenticated, user } = useContext(AuthContext);
   const [filePath, setFilePath] = useState('');
   const [repositories, setRepositories] = useState([]);
   const [selectedRepo, setSelectedRepo] = useState(null);
@@ -39,13 +39,12 @@ function App() {
   const [saveMessage, setSaveMessage] = useState('');
   const [editorExtensions, setEditorExtensions] = useState(null);
   const [activeEditor, setActiveEditor] = useState(null);
-  const [user, setUser] = useState({});
 
   useEffect(() => {
     const loadRepositories = async () => {
-      if (token) {
+      if (isAuthenticated) {
         try {
-          const repos = await fetchRepositories(token);
+          const repos = await fetchRepositories();
           console.log('Raw repositories:', repos);
           
           // Filter and set repositories
@@ -69,21 +68,7 @@ function App() {
       }
     };
     loadRepositories();
-  }, [token]);
-
-  useEffect(() => {
-    const loadUser = async () => {
-      if (token) {
-        try {
-          const userData = await fetchUser(token);
-          setUser(userData);
-        } catch (error) {
-          console.error('Error loading user:', error);
-        }
-      }
-    };
-    loadUser();
-  }, [token]);
+  }, [isAuthenticated]);
 
   // Update editor extensions when reference manager changes
   useEffect(() => {
@@ -129,7 +114,7 @@ function App() {
   }, [referenceManager]);
 
   useEffect(() => {
-    if (!ipynb?.metadata?.active_editors || !token || !user || !filePath || !selectedRepo?.fullName) return;
+    if (!ipynb?.metadata?.active_editors || !isAuthenticated || !user || !filePath || !selectedRepo?.fullName) return;
 
     const cleanup = () => {
       const thirtyMinutesAgo = get30MinutesAgo();
@@ -149,7 +134,7 @@ function App() {
 
     const intervalId = setInterval(cleanup, 60000); // Run every minute
     return () => clearInterval(intervalId);
-  }, [ipynb, token, user, filePath, selectedRepo]);
+  }, [ipynb, isAuthenticated, user, filePath, selectedRepo]);
 
   const checkLastEditor = (notebook) => {
     if (!notebook?.metadata?.last_editor) return null;
@@ -169,7 +154,7 @@ function App() {
       setSaveMessage('Please enter a file path');
       return;
     }
-    if (!token) {
+    if (!isAuthenticated) {
       setSaveMessage('Please log in first');
       return;
     }
@@ -243,7 +228,6 @@ function App() {
       });
 
       const manager = new GitHubReferenceManager(
-        token,
         selectedRepo.fullName,
         filePath,
         selectedRepo.owner.login
@@ -273,8 +257,8 @@ function App() {
       console.warn('No editor instance available.');
       return;
     }
-    if (!token || !user?.login) {
-      console.error('No token or user information available');
+    if (!isAuthenticated || !user?.login) {
+      console.error('No authentication information available');
       return;
     }
     if (!selectedRepo) {
@@ -299,21 +283,34 @@ function App() {
   return (
     <div className="App">
       <WarningBanner editors={ipynb?.metadata?.active_editors} currentUser={user} />
-      <EditorWrapper
-        token={token}
-        referenceManager={referenceManager}
-        filePath={filePath}
-        setFilePath={setFilePath}
-        ipynb={ipynb}
-        setIpynb={setIpynb}
-        handleLoadFile={handleLoadFile}
-        handleSaveFile={onSaveFile}
-        saveMessage={saveMessage}
-        repositories={repositories}
-        selectedRepo={selectedRepo}
-        setSelectedRepo={setSelectedRepo}
-        extensions={editorExtensions}
-      />
+      {!isAuthenticated ? (
+        <div className="login-container">
+          <div className="login-card">
+            <h1>Sign in to Ipynb Editor</h1>
+            <p>
+              Access your notebooks and collaborate with others using GitHub authentication
+            </p>
+            <LoginButton />
+          </div>
+        </div>
+      ) : (
+        <>
+          <EditorWrapper
+            referenceManager={referenceManager}
+            filePath={filePath}
+            setFilePath={setFilePath}
+            ipynb={ipynb}
+            setIpynb={setIpynb}
+            handleLoadFile={handleLoadFile}
+            handleSaveFile={onSaveFile}
+            saveMessage={saveMessage}
+            repositories={repositories}
+            selectedRepo={selectedRepo}
+            setSelectedRepo={setSelectedRepo}
+            extensions={editorExtensions}
+          />
+        </>
+      )}
     </div>
   );
 }

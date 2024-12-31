@@ -1,13 +1,16 @@
 import React from 'react';
+import { FaGithub } from 'react-icons/fa';
 
 const LoginButton = () => {
   const handleLogin = () => {
-    // Redirect user to backend auth endpoint that starts GitHub OAuth
-    window.location.href = 'http://localhost:3001/api/auth'; 
+    window.location.href = 'http://localhost:3001/api/auth';
   };
 
   return (
-    <button onClick={handleLogin}>Login with GitHub</button>
+    <button onClick={handleLogin} className="login-button">
+      <FaGithub />
+      Continue with GitHub
+    </button>
   );
 };
 

@@ -1,5 +1,8 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
-import { getTokenFromBackend, fetchUser } from '../utils/api';
+import axios from 'axios';
+import { fetchUser } from '../utils/api';
+
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001/api';
 
 export const AuthContext = createContext();
 
@@ -12,31 +15,42 @@ export const useAuth = () => {
 };
 
 export const AuthProvider = ({ children }) => {
-  const [token, setToken] = useState(null);
   const [user, setUser] = useState(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
-    getTokenFromBackend().then((tk) => {
-      if (tk) setToken(tk);
-    });
+    // Check authentication status by attempting to fetch user data
+    fetchUser()
+      .then(userData => {
+        if (userData) {
+          setUser(userData);
+          setIsAuthenticated(true);
+        }
+      })
+      .catch(err => {
+        console.error('Error fetching user data:', err);
+        setIsAuthenticated(false);
+      });
   }, []);
 
-  useEffect(() => {
-    if (token) {
-      fetchUser()
-        .then(userData => {
-          if (userData) {
-            setUser(userData);
-          }
-        })
-        .catch(err => {
-          console.error('Error fetching user data:', err);
-        });
+  const logout = async () => {
+    try {
+      await axios.post(`${API_BASE_URL}/auth/logout`);
+      setUser(null);
+      setIsAuthenticated(false);
+    } catch (err) {
+      console.error('Error during logout:', err);
     }
-  }, [token]);
+  };
 
   return (
-    <AuthContext.Provider value={{ token, setToken, user, setUser }}>
+    <AuthContext.Provider value={{ 
+      user, 
+      setUser, 
+      isAuthenticated,
+      setIsAuthenticated,
+      logout 
+    }}>
       {children}
     </AuthContext.Provider>
   );

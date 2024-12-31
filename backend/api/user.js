@@ -4,12 +4,17 @@ const { Octokit } = require('@octokit/rest');
 const router = express.Router();
 
 router.get('/', async (req, res) => {
-  console.log('Incoming request to /api/user');
-  const token = req.cookies.token;
+  console.log('Incoming request to /api/user with session:', {
+    hasSession: !!req.session,
+    sessionID: req.sessionID,
+    hasToken: !!req.session?.githubToken
+  });
+  
+  const token = req.session?.githubToken;
   
   if (!token) {
-    console.error('No GitHub token found in cookies');
-    return res.status(401).json({ error: 'No authentication token found' });
+    console.error('No GitHub token found in session');
+    return res.status(401).json({ error: 'Not authenticated' });
   }
 
   try {

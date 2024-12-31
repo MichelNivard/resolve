@@ -14,10 +14,17 @@ async function loadBibliography(req, res) {
       return res.status(400).json({ error: 'Invalid repository format' });
     }
 
-    const token = req.cookies.token || req.headers.authorization?.split(' ')[1];
+    const token = req.session?.githubToken;
     if (!token) {
-      return res.status(401).json({ error: 'No token provided' });
+      console.error('No GitHub token found in session');
+      return res.status(401).json({ error: 'Not authenticated' });
     }
+
+    console.log('Loading bibliography with session token:', {
+      sessionID: req.sessionID,
+      repository: `${owner}/${repo}`,
+      notebookPath
+    });
 
     const octokit = new Octokit({ auth: token });
 
@@ -50,11 +57,17 @@ async function loadBibliography(req, res) {
       }
     }
 
-    // No .bib file found
+    // No bibliography file found
     res.status(404).json({ error: 'No bibliography file found' });
   } catch (error) {
     console.error('Error loading bibliography:', error);
-    res.status(500).json({ error: error.message });
+    if (error.status === 401) {
+      return res.status(401).json({ error: 'Invalid GitHub token' });
+    }
+    if (error.status === 404) {
+      return res.status(404).json({ error: 'Repository not found' });
+    }
+    res.status(500).json({ error: 'Failed to load bibliography' });
   }
 }
 

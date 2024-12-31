@@ -14,10 +14,17 @@ async function saveBibliography(req, res) {
       return res.status(400).json({ error: 'Invalid repository format' });
     }
 
-    const token = req.cookies.token || req.headers.authorization?.split(' ')[1];
+    const token = req.session?.githubToken;
     if (!token) {
-      return res.status(401).json({ error: 'No token provided' });
+      console.error('No GitHub token found in session');
+      return res.status(401).json({ error: 'Not authenticated' });
     }
+
+    console.log('Saving bibliography with session token:', {
+      sessionID: req.sessionID,
+      path,
+      repository: `${owner}/${repo}`
+    });
 
     const octokit = new Octokit({ auth: token });
 
@@ -49,10 +56,16 @@ async function saveBibliography(req, res) {
       ...(sha && { sha })
     });
 
-    res.json(data);
+    res.json({ success: true, data });
   } catch (error) {
     console.error('Error saving bibliography:', error);
-    res.status(500).json({ error: error.message });
+    if (error.status === 401) {
+      return res.status(401).json({ error: 'Invalid GitHub token' });
+    }
+    if (error.status === 404) {
+      return res.status(404).json({ error: 'Repository or file not found' });
+    }
+    res.status(500).json({ error: 'Failed to save bibliography' });
   }
 }
 
