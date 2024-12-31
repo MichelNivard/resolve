@@ -171,7 +171,7 @@ const EditorWrapper = ({
       )}
       <header className="app-header">
         <div className="header-content">
-          <h1 className="header-title">Ipynb Editor</h1>
+          <h1 className="header-title">Resolve</h1>
           <div>
             <div className="file-controls">
               <select
