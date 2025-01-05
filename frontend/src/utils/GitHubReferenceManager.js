@@ -20,17 +20,16 @@ export class GitHubReferenceManager {
 
     try {
       const bibFile = await loadBibFromGitHub(
-        this.token,
         this.selectedRepo,
         this.notebookPath,
         this.owner
       );
 
-      if (bibFile) {
+      if (bibFile && bibFile.content) {
         try {
           const parsed = bibtexParse.toJSON(bibFile.content);
           this.references = this._normalizeReferences(parsed);
-          this.bibPath = bibFile.path;
+          this.bibPath = bibFile.path || `${this.notebookPath.substring(0, this.notebookPath.lastIndexOf('/'))}/references.bib`;
           this.sha = bibFile.sha;
         } catch (error) {
           console.error('Error parsing BibTeX content:', error);
@@ -49,131 +48,93 @@ export class GitHubReferenceManager {
       this._initialized = true;
     } catch (error) {
       console.error('Error initializing reference manager:', error);
-      this.references = [];
-      this._initialized = true;
-    }
-  }
-
-  async addReference(entry) {
-    try {
-      if (!this._initialized) {
-        await this.init();
-      }
-
-      const normalizedEntry = this._normalizeEntry(entry);
-      this.references.push(normalizedEntry);
-      await this.save();
-    } catch (error) {
-      console.error('Error adding reference:', error);
       throw error;
     }
   }
 
-  async updateReference(citationKey, newEntry) {
-    try {
-      if (!this._initialized) {
-        await this.init();
-      }
-
-      const index = this.references.findIndex(ref => ref.citationKey === citationKey);
-      if (index === -1) {
-        console.error('Reference not found:', citationKey);
-        throw new Error(`Reference with citation key "${citationKey}" not found`);
-      }
-
-      const normalizedEntry = this._normalizeEntry(newEntry);
-      this.references[index] = normalizedEntry;
-      await this.save();
-    } catch (error) {
-      console.error('Error updating reference:', error);
-      throw error;
+  _normalizeReferences(parsed) {
+    if (!Array.isArray(parsed)) {
+      console.warn('Parsed BibTeX is not an array:', parsed);
+      return [];
     }
+    return parsed.map(entry => ({
+      ...entry,
+      citationKey: entry.citationKey || entry.key || '',
+      entryTags: entry.entryTags || {}
+    }));
   }
 
   async save() {
-    if (!this.bibPath) {
-      return;
+    if (!this._initialized) {
+      await this.init();
     }
 
     try {
       const content = this.references
-        .map(ref => formatBibTeXEntry(ref))
-        .join('\n\n');
+        .map(entry => formatBibTeXEntry(entry))
+        .join('\n');
+
       const result = await saveBibToGitHub(
         content,
         this.bibPath,
         this.sha,
-        this.token,
-        this.selectedRepo,
-        this.owner
+        this.selectedRepo
       );
-      this.sha = result.content.sha;
+
+      if (result && result.content) {
+        this.sha = result.content.sha;
+      }
+
+      return result;
     } catch (error) {
       console.error('Error saving references:', error);
       throw error;
     }
   }
 
-  async search(query) {
-    try {
-      if (!this._initialized) {
-        await this.init();
-      }
+  addReference(reference) {
+    if (!this._initialized) {
+      throw new Error('Reference manager not initialized');
+    }
 
-      if (!query) {
-        return this.references;
-      }
+    // Ensure the reference has required fields
+    if (!reference.entryType || !reference.citationKey) {
+      throw new Error('Invalid reference format');
+    }
 
-      const results = this.references.filter(ref => {
-        const searchableFields = [
-          ref.citationKey,
-          ref.entryTags?.title,
-          ref.entryTags?.author,
-          ref.entryTags?.year,
-          ref.entryTags?.journal,
-          ref.entryTags?.booktitle
-        ].filter(field => field && typeof field === 'string');
+    // Check for duplicate citation key
+    const existingIndex = this.references.findIndex(
+      ref => ref.citationKey === reference.citationKey
+    );
 
-        const matches = searchableFields.some(field => 
-          field.toLowerCase().includes(query.toLowerCase())
-        );
-
-        return matches;
-      });
-
-      return results;
-    } catch (error) {
-      console.error('Error searching references:', error);
-      throw error;
+    if (existingIndex >= 0) {
+      // Update existing reference
+      this.references[existingIndex] = reference;
+    } else {
+      // Add new reference
+      this.references.push(reference);
     }
   }
 
-  _normalizeReferences(references) {
-    return references.map(ref => this._normalizeEntry(ref))
-      .filter(ref => ref && ref.citationKey && ref.entryTags);
+  removeReference(citationKey) {
+    if (!this._initialized) {
+      throw new Error('Reference manager not initialized');
+    }
+
+    const index = this.references.findIndex(
+      ref => ref.citationKey === citationKey
+    );
+
+    if (index >= 0) {
+      this.references.splice(index, 1);
+    }
   }
 
-  _normalizeEntry(entry) {
-    if (!entry) {
-      return null;
-    }
+  getReferences() {
+    return this.references;
+  }
 
-    if (!entry.entryTags || typeof entry.entryTags !== 'object') {
-      return null;
-    }
-
-    if (!entry.citationKey) {
-      return null;
-    }
-
-    const normalizedTags = {};
-    for (const [key, value] of Object.entries(entry.entryTags)) {
-      normalizedTags[key.toLowerCase()] = String(value || '');
-    }
-
-    return {
-      ...entry,
-      entryTags: normalizedTags
-    };
+  getReference(citationKey) {
+    return this.references.find(ref => ref.citationKey === citationKey);
   }
 }
