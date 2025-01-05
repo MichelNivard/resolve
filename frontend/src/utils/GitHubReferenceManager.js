@@ -42,7 +42,8 @@ export class GitHubReferenceManager {
         );
         this.bibPath = `${notebookDir}/references.bib`;
         this.references = [];
-        await this.save();
+        // Create empty bib file without recursion
+        await this._saveWithoutInit();
       }
 
       this._initialized = true;
@@ -64,11 +65,8 @@ export class GitHubReferenceManager {
     }));
   }
 
-  async save() {
-    if (!this._initialized) {
-      await this.init();
-    }
-
+  // Internal save method that doesn't check initialization
+  async _saveWithoutInit() {
     try {
       const content = this.references
         .map(entry => formatBibTeXEntry(entry))
@@ -90,6 +88,13 @@ export class GitHubReferenceManager {
       console.error('Error saving references:', error);
       throw error;
     }
+  }
+
+  async save() {
+    if (!this._initialized) {
+      await this.init();
+    }
+    return this._saveWithoutInit();
   }
 
   addReference(reference) {
