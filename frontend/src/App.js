@@ -191,6 +191,7 @@ function App() {
       setIpynb(notebook);
 
       const manager = new GitHubReferenceManager(
+        null,  // token is not needed since we're using session auth
         selectedRepo.fullName,
         filePath,
         selectedRepo.owner.login
