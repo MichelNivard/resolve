@@ -4,10 +4,23 @@ const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://api.resolve.pub';
 
 // Configure axios defaults
 axios.defaults.withCredentials = true;
+axios.defaults.headers.common['Access-Control-Allow-Credentials'] = true;
+
+// Create an axios instance with specific config
+const api = axios.create({
+  baseURL: API_BASE_URL,
+  withCredentials: true,
+  headers: {
+    'Content-Type': 'application/json',
+    'Access-Control-Allow-Credentials': true
+  }
+});
 
 export const checkAuth = async () => {
   try {
-    const res = await axios.get(`${API_BASE_URL}/api/auth/check`);
+    console.log('Checking auth with URL:', `${API_BASE_URL}/api/auth/check`);
+    const res = await api.get('/api/auth/check');
+    console.log('Auth check response:', res.data);
     return res.data.authenticated;
   } catch (err) {
     console.error('Error checking auth:', err);
@@ -18,7 +31,7 @@ export const checkAuth = async () => {
 export const fetchNotebook = async (path, repository) => {
   try {
     console.log('Fetching notebook:', { path, repository });
-    const response = await axios.get(`${API_BASE_URL}/api/fetchFile`, {
+    const response = await api.get('/api/fetchFile', {
       params: { path, repository }
     });
     return response.data.ipynb;
@@ -30,7 +43,7 @@ export const fetchNotebook = async (path, repository) => {
 
 export const fetchUser = async () => {
   try {
-    const res = await axios.get(`${API_BASE_URL}/api/user`);
+    const res = await api.get('/api/user');
     return res.data;
   } catch (err) {
     console.error('Error fetching user:', err);
@@ -40,7 +53,7 @@ export const fetchUser = async () => {
 
 export const fetchRepositories = async () => {
   try {
-    const res = await axios.get(`${API_BASE_URL}/api/repositories`);
+    const res = await api.get('/api/repositories');
     return res.data.repositories || [];
   } catch (err) {
     console.error('Error fetching repositories:', err);
@@ -50,7 +63,7 @@ export const fetchRepositories = async () => {
 
 export const fetchNotebooksInRepo = async (repository) => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/api/listNotebooks`, {
+    const response = await api.get('/api/listNotebooks', {
       params: { repository },
       withCredentials: true
     });
@@ -63,7 +76,7 @@ export const fetchNotebooksInRepo = async (repository) => {
 
 export const saveNotebook = async (content, path, repository) => {
   try {
-    const response = await axios.post(`${API_BASE_URL}/api/saveFile`, {
+    const response = await api.post('/api/saveFile', {
       content,
       path,
       repository
