@@ -58,6 +58,11 @@ const EditorWrapper = ({
   const editor = useEditor({
     extensions: extensions || [
       StarterKit,
+      RawCell,
+      CodeCell,
+      Underline,
+      Highlight,
+      Table,
       TableCell,
       TableHeader,
       TableRow,
