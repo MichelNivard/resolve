@@ -25,19 +25,23 @@ export function ipynbToTiptapDoc(ipynb, editor) {
   );
   console.log('Found track change extension:', trackChangeExtension);
   console.log('Available marks in schema:', editor.schema.marks);
+  console.log('Input ipynb:', ipynb);
   
   const wasEnabled = trackChangeExtension?.options.enabled;
   if (wasEnabled) {
     editor.commands.setTrackChangeStatus(false);
   }
 
-  const { cells } = parseIpynb(ipynb);
-  console.log('Parsed cells from ipynb:', JSON.stringify(cells, null, 2));
+  // Parse ipynb if it's a string
+  const notebookData = typeof ipynb === 'string' ? JSON.parse(ipynb) : ipynb;
+  const { cells } = parseIpynb(notebookData);
+  
+  console.log('Parsed cells:', cells);
   const docNodes = [];
 
   // Create a transaction to set content with marks preserved
   const tr = editor.state.tr;
-  tr.setMeta('trackManualChanged', true); // Tell TrackChanges extension to ignore this change
+  tr.setMeta('trackManualChanged', true);
 
   for (const cell of cells) {
     if (cell.type === 'raw') {
@@ -53,31 +57,23 @@ export function ipynbToTiptapDoc(ipynb, editor) {
       });
     } else if (cell.type === 'markdown') {
       if (cell.tiptapContent) {
-        console.log('Raw tiptapContent:', JSON.stringify(cell.tiptapContent, null, 2));
-        // If TipTap JSON is available, use it directly
-        // Ensure marks and track changes are preserved
+        console.log('Raw tiptapContent:', cell.tiptapContent);
         const content = cell.tiptapContent.content.map((node, pos) => {
-          console.log('Processing node:', JSON.stringify(node, null, 2));
-          // Deep clone the node to avoid reference issues
+          console.log('Processing node:', node);
           const processedNode = { ...node };
           
           if (node.marks && node.marks.length > 0) {
-            console.log('Processing marks for node:', JSON.stringify(node.marks, null, 2));
-            // Preserve and process all marks
+            console.log('Processing marks for node:', node.marks);
             processedNode.marks = node.marks.map(mark => {
-              console.log('Processing mark:', JSON.stringify(mark, null, 2));
-              // Handle different mark types
+              console.log('Processing mark:', mark);
               if (mark.type === 'comment' || mark.type === 'insertion' || mark.type === 'deletion') {
                 console.log('Found mark of type:', mark.type, 'with attrs:', mark.attrs);
-                // Verify the mark type exists in the schema
                 const markType = editor.schema.marks[mark.type];
                 if (!markType) {
                   console.error('Mark type not found in schema:', mark.type);
                   return null;
                 }
-                console.log('Mark type found in schema:', markType);
                 
-                // For comment marks, ensure all required attributes are present
                 if (mark.type === 'comment') {
                   const attrs = {
                     commentId: mark.attrs.commentId || `comment-${Date.now()}-${Math.random().toString(36).substr(2, 9)}-${pos}`,
@@ -86,99 +82,73 @@ export function ipynbToTiptapDoc(ipynb, editor) {
                     text: mark.attrs.text || '',
                     timestamp: mark.attrs.timestamp || new Date().toISOString(),
                     resolved: mark.attrs.resolved || false,
-                    ...mark.attrs // Keep any other existing attributes
+                    ...mark.attrs
                   };
-                  
-                  // Create a proper comment mark
-                  const commentMark = editor.schema.marks.comment.create(attrs);
                   return {
-                    type: commentMark.type.name,
-                    attrs: commentMark.attrs
+                    type: markType.name,
+                    attrs
                   };
                 }
                 
                 return {
                   type: mark.type,
-                  attrs: { ...mark.attrs }
+                  attrs: mark.attrs
                 };
               }
               return mark;
-            }).filter(Boolean); // Remove any null marks
-            console.log('Processed marks:', JSON.stringify(processedNode.marks, null, 2));
-          } else {
-            console.log('No marks found in node');
+            }).filter(Boolean);
           }
           return processedNode;
         });
-        
-        console.log('Processed content before adding to docNodes:', JSON.stringify(content, null, 2));
         docNodes.push(...content);
       } else {
-        console.log('Raw markdown cell content:', cell.content);
-        
-        // Convert markdown to HTML, then to Tiptap JSON
+        // Convert markdown to HTML, then to TipTap JSON
         const html = markdownToHtml(cell.content);
-        console.log('Converted markdown to HTML:', html);
-        
-        // Generate TipTap JSON with math extension
-        const tiptapJson = generateJSON(html, [
+        const json = generateJSON(html, [
           StarterKit,
-          RawCell,
-          CodeCell,
-          Underline,
-          Highlight,
-          TrackChangeExtension,
-          CommentMark,
-          Mathematics,
-          BibMention,
-          Table.configure({
-            resizable: true,
-          }),
+          Table,
           TableRow,
           TableCell,
           TableHeader,
+          Underline,
+          Highlight,
+          Mathematics,
+          TrackChangeExtension,
+          CommentMark,
+          BibMention
         ]);
-        
-        console.log('Generated TipTap JSON:', JSON.stringify(tiptapJson, null, 2));
-        docNodes.push(...tiptapJson.content);
+        docNodes.push(...json.content);
       }
     } else if (cell.type === 'code') {
       docNodes.push({
         type: 'codeCell',
         attrs: {
-          code: cell.code,
+          content: cell.content,
           outputs: cell.outputs || [],
-          folded: true
+          executionCount: cell.execution_count || null,
+          metadata: cell.metadata || {}
         }
       });
     }
   }
 
-  const doc = { type: 'doc', content: docNodes };
-  console.log('Final doc before setting content:', JSON.stringify(doc, null, 2));
-  
-  // Set content with track changes disabled and using transaction
-  tr.replaceWith(0, tr.doc.content.size, editor.schema.nodeFromJSON(doc));
-  editor.view.dispatch(tr);
-  
-  // Restore track changes state if it was enabled
+  // Create the final document
+  const doc = {
+    type: 'doc',
+    content: docNodes
+  };
+
+  console.log('Final doc before setting content:', doc);
+
+  // Set the content
+  editor.commands.setContent(doc);
+
+  // Re-enable track changes if it was enabled
   if (wasEnabled) {
     editor.commands.setTrackChangeStatus(true);
   }
 
-  // Log the editor's content after setting
-  console.log('Editor content after setting:', editor.getJSON());
-  console.log('Schema marks after setting content:', editor.schema.marks);
-  
-  // Verify marks are in the document
-  editor.state.doc.descendants((node, pos) => {
-    if (node.marks.length > 0) {
-      console.log('Found marks at position', pos, ':', node.marks.map(m => ({
-        type: m.type.name,
-        attrs: m.attrs
-      })));
-    }
-  });
+  return doc;
 }
 
 export function tiptapDocToIpynb(editor, originalIpynb) {
@@ -276,15 +246,15 @@ export function tiptapDocToIpynb(editor, originalIpynb) {
     } else if (node.type === 'codeCell') {
       // Flush current markdown cell
       flushMarkdownCell();
-      const { code, outputs, execution_count, folded } = node.attrs;
-      // execution_count might be undefined, ensure a fallback
+      const { content, outputs, executionCount, metadata } = node.attrs;
+      // executionCount might be undefined, ensure a fallback
       cells.push({
         type: 'code',
-        code: code || '',
-        execution_count: execution_count !== undefined ? execution_count : null,
+        content: content || '',
+        execution_count: executionCount !== undefined ? executionCount : null,
         outputs: outputs || [],
         metadata: {
-          collapsed: folded
+          collapsed: metadata.collapsed
         }
       });
     } else {
