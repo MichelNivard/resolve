@@ -160,7 +160,7 @@ export function tiptapDocToIpynb(editor, originalIpynb) {
   
   const cells = [];
   const editorContent = editor.getJSON();
-  console.log('Editor content with marks:', JSON.stringify(editorContent, null, 2));
+  console.log('Input editor content:', editorContent);
 
   let currentMarkdownNodes = [];
 
@@ -258,7 +258,7 @@ export function tiptapDocToIpynb(editor, originalIpynb) {
         execution_count: executionCount !== undefined ? executionCount : null,
         outputs: outputs || [],
         metadata: {
-          collapsed: metadata.collapsed
+          collapsed: metadata?.collapsed || false
         }
       });
     } else {
