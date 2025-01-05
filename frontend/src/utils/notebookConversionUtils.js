@@ -211,54 +211,50 @@ export function tiptapDocToIpynb(editor, originalIpynb) {
       }).join('\n\n');
       
       cells.push({ 
-        type: 'markdown', 
-        content: processedContent,
-        tiptapContent: { 
-          type: 'doc', 
-          content: currentMarkdownNodes
-        }
+        cell_type: 'markdown',  
+        source: processedContent.split('\n').map(line => line + '\n'),  
+        metadata: {}  
       });
       currentMarkdownNodes = [];
     }
   };
 
   editorContent.content.forEach((node, index) => {
-
-    if (node.type === 'paragraph' || node.type === 'heading') {
+    if (node.type === 'paragraph' || node.type === 'heading' || node.type === 'table') {
       // Add to markdown content
-      const text = editor.view.dom.querySelector(`[data-node-index="${index}"]`)?.textContent || '';
       currentMarkdownNodes.push(node);
     } else if (node.type === 'rawCell') {
       // Flush current markdown cell first
       flushMarkdownCell();
       
       // For YAML cells, ensure we preserve the exact formatting
-      let content = node.attrs.content;
+      let content = node.attrs.content || '';  
       if (node.attrs.isYamlHeader && node.attrs.formattedYaml) {
         content = `---\n${node.attrs.formattedYaml}---`;
       }
       
       cells.push({ 
-        type: 'raw', 
-        content,
-        isYamlHeader: node.attrs.isYamlHeader,
-        parsedYaml: node.attrs.parsedYaml,
-        formattedYaml: node.attrs.formattedYaml,
-        isAcademicArticle: node.attrs.isAcademicArticle,
-        tiptapContent: node.attrs.tiptapContent
+        cell_type: 'raw',  
+        source: content.split('\n').map(line => line + '\n'),  
+        metadata: {  
+          isYamlHeader: node.attrs.isYamlHeader || false,
+          parsedYaml: node.attrs.parsedYaml || null,
+          isAcademicArticle: node.attrs.isAcademicArticle || false
+        }
       });
     } else if (node.type === 'codeCell') {
       // Flush current markdown cell
       flushMarkdownCell();
+
       const { content, outputs, executionCount, metadata } = node.attrs;
-      // executionCount might be undefined, ensure a fallback
       cells.push({
-        type: 'code',
-        content: content || '',
+        cell_type: 'code',  
+        source: (content || '').split('\n').map(line => line + '\n'),  
         execution_count: executionCount !== undefined ? executionCount : null,
         outputs: outputs || [],
         metadata: {
-          collapsed: metadata?.collapsed || false
+          collapsed: metadata?.collapsed || false,
+          ...metadata
         }
       });
     } else {
@@ -270,13 +266,14 @@ export function tiptapDocToIpynb(editor, originalIpynb) {
   // If doc ended with markdown nodes
   flushMarkdownCell();
 
-  // We now have a 'cells' array with raw, code, and markdown cells in original order.
-  // YAML was handled separately in parse/serialize. If needed, you can handle YAML from raw cell here.
-  // But since we've integrated YAML into a raw cell at the start, it's already in `cells`.
+  // Create the final notebook object
+  const notebook = {
+    cells,
+    metadata: originalIpynb?.metadata || {},
+    nbformat: originalIpynb?.nbformat || 4,
+    nbformat_minor: originalIpynb?.nbformat_minor || 5
+  };
 
-  // If you need YAML from originalIpynb or some other source, insert it into cells before calling serializeIpynb.
-  // Assuming originalIpynb was used only to keep formatting consistent, you can just pass it:
-  
-  const newIpynb = serializeIpynb({ yaml: {}, cells });
-  return newIpynb;
+  console.log('Final notebook:', notebook);
+  return notebook;
 }
