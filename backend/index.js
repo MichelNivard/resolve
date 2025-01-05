@@ -35,17 +35,25 @@ const bibliographyRoute = await import('./api/bibliography.js');
 
 const app = express();
 
+// Trust proxy - needed for secure cookies behind nginx
+app.set('trust proxy', 1);
+
 // CORS configuration based on environment
 const corsOptions = {
     origin: process.env.NODE_ENV === 'production' 
-        ? process.env.ALLOWED_ORIGIN 
+        ? ['https://www.resolve.pub', 'https://resolve.pub']
         : 'http://localhost:3000',
-    credentials: true
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
 };
 
 // Middleware
 app.use(cors(corsOptions));
-app.use(helmet());
+app.use(helmet({
+    crossOriginResourcePolicy: { policy: "cross-origin" },
+    contentSecurityPolicy: false
+}));
 app.use(cookieParser());
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
@@ -66,10 +74,11 @@ app.use(session({
   saveUninitialized: false,
   rolling: true, // Forces cookie set on every response
   cookie: {
-    secure: process.env.NODE_ENV === 'production',
+    secure: true, // Always use secure in production
     httpOnly: true,
     maxAge: 24 * 60 * 60 * 1000, // 24 hours
-    sameSite: 'lax' // Protect against CSRF
+    sameSite: 'none', // Required for cross-domain
+    domain: '.resolve.pub' // Allow sharing between subdomains
   },
   name: 'sessionId'
 }));

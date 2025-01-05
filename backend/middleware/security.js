@@ -9,6 +9,7 @@ export const createRateLimiter = (windowMs = 15 * 60 * 1000, max = 100) => {
         message: 'Too many requests from this IP, please try again later.',
         standardHeaders: true,
         legacyHeaders: false,
+        trustProxy: true // Add this to fix the X-Forwarded-For error
     });
 };
 
@@ -26,11 +27,25 @@ export const secureCookies = (req, res, next) => {
         res.cookie('token', req.cookies.token, {
             httpOnly: true,
             secure: true,
-            sameSite: 'strict',
+            sameSite: 'none', // Changed from 'strict' to 'none' for cross-domain
+            domain: '.resolve.pub', // Added domain for cross-subdomain support
             maxAge: 24 * 60 * 60 * 1000 // 24 hours
         });
     }
     next();
+};
+
+// Session cookie middleware
+export const sessionConfig = {
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+        secure: true,
+        sameSite: 'none',
+        domain: '.resolve.pub',
+        maxAge: 24 * 60 * 60 * 1000 // 24 hours
+    }
 };
 
 // Token validation middleware
