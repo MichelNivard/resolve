@@ -8,7 +8,7 @@ import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
 import session from 'express-session';
 import FileStore from 'session-file-store';
-import { createRateLimiter, secureCookies } from './middleware/security.js';
+import { createRateLimiter, secureCookies, validateToken } from './middleware/security.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -28,8 +28,7 @@ const authRoute = await import('./api/auth.js');
 const userRoute = await import('./api/user.js');
 const fetchFileRoute = await import('./api/fetchFile.js');
 const saveFileRoute = await import('./api/saveFile.js');
-const lockFileRoute = await import('./api/lockFile.js');
-const unlockFileRoute = await import('./api/unlockFile.js');
+
 const getRepositoriesRoute = await import('./api/getRepositories.js');
 const listNotebooksRoute = await import('./api/listNotebooks.js');
 const bibliographyRoute = await import('./api/bibliography.js');
@@ -122,8 +121,6 @@ app.use(createRateLimiter());
 const protectedRoutes = [
     '/api/fetchFile',
     '/api/saveFile',
-    '/api/lockFile',
-    '/api/unlockFile',
     '/api/repositories',
     '/api/listNotebooks',
     '/api/bibliography/load',
@@ -148,8 +145,6 @@ app.use('/api/auth', authRoute.default);
 app.use('/api/user', userRoute.default);
 app.use('/api/fetchFile', fetchFileRoute.default);
 app.use('/api/saveFile', saveFileRoute.default);
-app.use('/api/lockFile', lockFileRoute.default);
-app.use('/api/unlockFile', unlockFileRoute.default);
 app.use('/api/repositories', getRepositoriesRoute.default);
 app.use('/api/listNotebooks', listNotebooksRoute.default);
 app.use('/api/bibliography', bibliographyRoute.default);

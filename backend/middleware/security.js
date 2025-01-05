@@ -1,8 +1,8 @@
-const rateLimit = require('express-rate-limit');
-const path = require('path');
+import rateLimit from 'express-rate-limit';
+import path from 'path';
 
 // Rate limiting middleware
-const createRateLimiter = (windowMs = 15 * 60 * 1000, max = 100) => {
+export const createRateLimiter = (windowMs = 15 * 60 * 1000, max = 100) => {
     return rateLimit({
         windowMs,
         max,
@@ -13,14 +13,14 @@ const createRateLimiter = (windowMs = 15 * 60 * 1000, max = 100) => {
 };
 
 // Path sanitization middleware
-const sanitizePath = (filePath) => {
+export const sanitizePath = (filePath) => {
     if (!filePath) return '';
     // Normalize the path and remove any attempts to traverse up
     return path.normalize(filePath).replace(/^(\.\.(\/|\\|$))+/, '');
 };
 
 // Enhanced cookie security middleware
-const secureCookies = (req, res, next) => {
+export const secureCookies = (req, res, next) => {
     // Set secure cookie options in production
     if (process.env.NODE_ENV === 'production') {
         res.cookie('token', req.cookies.token, {
@@ -34,7 +34,7 @@ const secureCookies = (req, res, next) => {
 };
 
 // Token validation middleware
-const validateToken = (req, res, next) => {
+export const validateToken = (req, res, next) => {
     const token = req.cookies.token || req.headers.authorization?.split(' ')[1];
     
     if (!token) {
@@ -46,11 +46,4 @@ const validateToken = (req, res, next) => {
     
     req.token = token;
     next();
-};
-
-module.exports = {
-    createRateLimiter,
-    sanitizePath,
-    secureCookies,
-    validateToken
 };

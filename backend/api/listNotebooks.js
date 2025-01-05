@@ -1,6 +1,6 @@
 // backend/api/listNotebooks.js
-const express = require('express');
-const { Octokit } = require('@octokit/rest');
+import express from 'express';
+import { Octokit } from '@octokit/rest';
 
 const router = express.Router();
 
@@ -64,4 +64,4 @@ async function listNotebooks(req, res) {
 
 router.get('/', listNotebooks);
 
-module.exports = router;
+export default router;

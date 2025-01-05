@@ -1,7 +1,7 @@
 // backend/api/fetchFile.js
-const express = require('express');
-const { Octokit } = require('@octokit/rest');
-const { sanitizePath } = require('../middleware/security');
+import express from 'express';
+import { Octokit } from '@octokit/rest';
+import { sanitizePath } from '../middleware/security.js';
 
 const router = express.Router();
 
@@ -20,48 +20,43 @@ router.get('/', async (req, res) => {
       return res.status(400).json({ error: 'Repository not specified' });
     }
 
-    // Sanitize the file path
-    const sanitizedPath = sanitizePath(filePath);
-    if (!sanitizedPath) {
-      return res.status(400).json({ error: 'Invalid file path' });
-    }
-
-    console.log('Using session token for GitHub API');
-    const octokit = new Octokit({ auth: token });
-
-    // Extract owner and repo from repository (format: owner/repo)
     const [owner, repo] = repository.split('/');
-    if (!owner || !repo) {
-      return res.status(400).json({ error: 'Invalid repository format. Expected "owner/repo"' });
-    }
+    const sanitizedPath = sanitizePath(filePath);
 
-    console.log(`Fetching file ${sanitizedPath} from ${owner}/${repo}`);
-    // Fetch the file content
+    const octokit = new Octokit({
+      auth: token
+    });
+
+    // Get file content from GitHub
     const response = await octokit.repos.getContent({
       owner,
       repo,
-      path: sanitizedPath,
+      path: sanitizedPath
     });
 
-    const content = Buffer.from(response.data.content, 'base64').toString();
-    const ipynb = JSON.parse(content);
+    if (!response.data) {
+      return res.status(404).json({ error: 'File not found' });
+    }
+
+    // Decode content from base64
+    const content = Buffer.from(response.data.content, 'base64').toString('utf8');
+    let ipynb;
+
+    try {
+      ipynb = JSON.parse(content);
+    } catch (error) {
+      console.error('Error parsing notebook:', error);
+      return res.status(400).json({ error: 'Invalid notebook format' });
+    }
 
     res.json({ ipynb });
   } catch (error) {
     console.error('Error fetching file:', error);
-    if (error.status === 401) {
-      return res.status(401).json({ error: 'Invalid GitHub token' });
-    }
     if (error.status === 404) {
       return res.status(404).json({ error: 'File not found' });
     }
-    // Generic error message in production
-    res.status(500).json({ 
-      error: process.env.NODE_ENV === 'production' 
-        ? 'Error fetching file' 
-        : error.message 
-    });
+    res.status(500).json({ error: 'Failed to fetch file' });
   }
 });
 
-module.exports = router;
+export default router;

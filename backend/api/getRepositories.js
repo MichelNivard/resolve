@@ -1,6 +1,6 @@
 // backend/api/getRepositories.js
-const express = require('express');
-const { Octokit } = require('@octokit/rest');
+import express from 'express';
+import { Octokit } from '@octokit/rest';
 
 const router = express.Router();
 
@@ -22,22 +22,21 @@ router.get('/', async (req, res) => {
       per_page: 100
     });
 
-    // Format the response to include only necessary information
-    const formattedRepos = repos.map(repo => ({
+    // Format repositories
+    const repositories = repos.map(repo => ({
       id: repo.id,
       fullName: repo.full_name,
+      name: repo.name,
       owner: {
         login: repo.owner.login
-      },
-      name: repo.name,
-      private: repo.private
+      }
     }));
 
-    res.json({ repositories: formattedRepos });
-  } catch (err) {
-    console.error('Error fetching repositories:', err);
+    res.json({ repositories });
+  } catch (error) {
+    console.error('Error fetching repositories:', error);
     res.status(500).json({ error: 'Failed to fetch repositories' });
   }
 });
 
-module.exports = router;
+export default router;
