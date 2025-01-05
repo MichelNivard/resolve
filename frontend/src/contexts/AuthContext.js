@@ -18,17 +18,18 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const checkAuthentication = async () => {
       try {
         // First check if we're authenticated
-        const isAuthed = await checkAuth();
+        const isAuthed = await checkAuth(`${API_BASE_URL}/api/auth/check`);
         setIsAuthenticated(isAuthed);
 
         if (isAuthed) {
           // If authenticated, fetch user data
-          const userData = await fetchUser();
+          const userData = await fetchUser(`${API_BASE_URL}/api/auth/user`);
           if (userData) {
             setUser(userData);
           }
@@ -37,6 +38,7 @@ export const AuthProvider = ({ children }) => {
         console.error('Authentication check failed:', err);
         setIsAuthenticated(false);
         setUser(null);
+        setError(err.message);
       } finally {
         setLoading(false);
       }
@@ -52,11 +54,16 @@ export const AuthProvider = ({ children }) => {
       setIsAuthenticated(false);
     } catch (err) {
       console.error('Error during logout:', err);
+      setError(err.message);
     }
   };
 
   if (loading) {
     return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>;
   }
 
   return (

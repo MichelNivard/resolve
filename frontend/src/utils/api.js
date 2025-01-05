@@ -18,7 +18,7 @@ export const checkAuth = async () => {
 export const fetchNotebook = async (path, repository) => {
   try {
     console.log('Fetching notebook:', { path, repository });
-    const response = await axios.get(`${API_BASE_URL}/fetchFile`, {
+    const response = await axios.get(`${API_BASE_URL}/api/fetchFile`, {
       params: { path, repository }
     });
     return response.data.ipynb;
@@ -30,7 +30,7 @@ export const fetchNotebook = async (path, repository) => {
 
 export const fetchUser = async () => {
   try {
-    const res = await axios.get(`${API_BASE_URL}/user`);
+    const res = await axios.get(`${API_BASE_URL}/api/user`);
     return res.data;
   } catch (err) {
     console.error('Error fetching user:', err);
@@ -40,7 +40,7 @@ export const fetchUser = async () => {
 
 export const fetchRepositories = async () => {
   try {
-    const res = await axios.get(`${API_BASE_URL}/repositories`);
+    const res = await axios.get(`${API_BASE_URL}/api/repositories`);
     return res.data.repositories || [];
   } catch (err) {
     console.error('Error fetching repositories:', err);
@@ -50,7 +50,7 @@ export const fetchRepositories = async () => {
 
 export const fetchNotebooksInRepo = async (repository) => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/listNotebooks`, {
+    const response = await axios.get(`${API_BASE_URL}/api/listNotebooks`, {
       params: { repository },
       withCredentials: true
     });
@@ -63,7 +63,7 @@ export const fetchNotebooksInRepo = async (repository) => {
 
 export const saveNotebook = async (content, path, repository) => {
   try {
-    const response = await axios.post(`${API_BASE_URL}/saveFile`, {
+    const response = await axios.post(`${API_BASE_URL}/api/saveFile`, {
       content,
       path,
       repository
