@@ -4,7 +4,6 @@ const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://api.resolve.pub';
 
 // Configure axios defaults
 axios.defaults.withCredentials = true;
-axios.defaults.headers.common['Access-Control-Allow-Credentials'] = true;
 
 // Create an axios instance with specific config
 const api = axios.create({
@@ -12,9 +11,27 @@ const api = axios.create({
   withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
-    'Access-Control-Allow-Credentials': true
+    'Accept': 'application/json'
+  },
+  // Explicitly set credentials mode
+  xhrFields: {
+    withCredentials: true
   }
 });
+
+// Add response interceptor for debugging
+api.interceptors.response.use(
+  response => response,
+  error => {
+    console.error('API Error:', {
+      message: error.message,
+      response: error.response?.data,
+      status: error.response?.status,
+      headers: error.response?.headers
+    });
+    return Promise.reject(error);
+  }
+);
 
 export const checkAuth = async () => {
   try {

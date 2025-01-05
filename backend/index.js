@@ -45,7 +45,17 @@ const corsOptions = {
         : 'http://localhost:3000',
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization']
+    allowedHeaders: [
+        'Content-Type', 
+        'Authorization',
+        'Access-Control-Allow-Headers',
+        'Access-Control-Allow-Credentials',
+        'Access-Control-Allow-Origin',
+        'Origin',
+        'Accept'
+    ],
+    exposedHeaders: ['Set-Cookie'],
+    optionsSuccessStatus: 200
 };
 
 // Middleware
@@ -58,6 +68,9 @@ app.use(cookieParser());
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 app.use(secureCookies);
+
+// Add pre-flight handling
+app.options('*', cors(corsOptions));
 
 // Configure express-session
 app.use(session({
