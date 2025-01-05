@@ -45,8 +45,6 @@ export const checkAuth = async () => {
   }
 };
 
-{{ ... }}
-
 export const fetchNotebook = async (path, repository) => {
   try {
     console.log('Fetching notebook:', { path, repository });
