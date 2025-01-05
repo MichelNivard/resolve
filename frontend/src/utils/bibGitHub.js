@@ -19,11 +19,12 @@ export async function loadBibFromGitHub(selectedRepo, notebookPath, owner) {
   });
 
   try {
-    const response = await axios.get(`${API_BASE_URL}/bibliography/load`, {
+    const response = await axios.get(`${API_BASE_URL}/api/bibliography/load`, {
       params: {
         repository: selectedRepo,
         notebookPath
-      }
+      },
+      withCredentials: true
     });
     
     console.log('✅ Successfully loaded .bib file');
@@ -44,18 +45,16 @@ export async function loadBibFromGitHub(selectedRepo, notebookPath, owner) {
  */
 export async function saveBibToGitHub(content, path, sha, selectedRepo) {
   try {
-    const response = await axios.post(`${API_BASE_URL}/bibliography/save`, {
+    const response = await axios.post(`${API_BASE_URL}/api/bibliography/save`, {
       content,
       path,
       repository: selectedRepo,
       ...(sha && { sha })
+    }, {
+      withCredentials: true
     });
 
-    console.log('✅ Successfully saved .bib file:', {
-      path: response.data.content.path,
-      sha: response.data.content.sha
-    });
-
+    console.log('✅ Successfully saved .bib file');
     return response.data;
   } catch (error) {
     console.error('❌ Error saving .bib file:', error);
@@ -69,14 +68,18 @@ export async function saveBibToGitHub(content, path, sha, selectedRepo) {
  * @returns {string} Formatted BibTeX entry
  */
 export function formatBibTeXEntry(entry) {
-  console.log('📝 Formatting BibTeX entry:', {
-    type: entry.entryType,
-    key: entry.citationKey
+  const { entryType, citationKey, entryTags } = entry;
+  
+  // Start the entry
+  let result = `@${entryType}{${citationKey},\n`;
+  
+  // Add each field
+  Object.entries(entryTags).forEach(([key, value]) => {
+    result += `  ${key} = {${value}},\n`;
   });
-
-  const fields = Object.entries(entry.entryTags)
-    .map(([key, value]) => `  ${key} = {${value}}`)
-    .join(',\n');
-    
-  return `@${entry.entryType}{${entry.citationKey},\n${fields}\n}`;
+  
+  // Close the entry
+  result += '}\n\n';
+  
+  return result;
 }
