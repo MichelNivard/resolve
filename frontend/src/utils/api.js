@@ -51,12 +51,26 @@ export const fetchNotebook = async (path, repository) => {
     const response = await api.get('/api/fetchFile', {
       params: { path, repository }
     });
-    // Parse the raw response
-    const ipynb = JSON.parse(response.data);
+    
+    console.log('Raw response:', response.data);
+    console.log('Response type:', typeof response.data);
+    
+    let ipynb;
+    if (typeof response.data === 'string') {
+      ipynb = JSON.parse(response.data);
+    } else {
+      ipynb = response.data;
+    }
+    
     console.log('Parsed notebook:', ipynb);
     return ipynb;
   } catch (error) {
     console.error('Error fetching notebook:', error);
+    console.error('Full error details:', {
+      message: error.message,
+      response: error.response?.data,
+      status: error.response?.status
+    });
     throw error;
   }
 };
