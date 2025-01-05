@@ -3,7 +3,7 @@ import { FaGithub } from 'react-icons/fa';
 
 const LoginButton = () => {
   const handleLogin = () => {
-    window.location.href = 'http://localhost:3001/api/auth';
+    window.location.href = `${process.env.REACT_APP_API_URL}/api/auth`;
   };
 
   return (
@@ -14,4 +14,5 @@ const LoginButton = () => {
   );
 };
 
-export default LoginButton;
+export default LoginButton; // yuor component
+
