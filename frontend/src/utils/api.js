@@ -53,16 +53,14 @@ export const fetchNotebook = async (path, repository) => {
     });
     
     console.log('Raw response:', response.data);
-    console.log('Response type:', typeof response.data);
     
-    let ipynb;
-    if (typeof response.data === 'string') {
-      ipynb = JSON.parse(response.data);
-    } else {
-      ipynb = response.data;
+    // Extract ipynb from response
+    const ipynb = response.data.ipynb;
+    if (!ipynb) {
+      throw new Error('No notebook data in response');
     }
     
-    console.log('Parsed notebook:', ipynb);
+    console.log('Notebook data:', ipynb);
     return ipynb;
   } catch (error) {
     console.error('Error fetching notebook:', error);
