@@ -1,9 +1,19 @@
 import axios from 'axios';
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://api.resolve.pub';
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://api.resolve.pub';
 
 // Configure axios defaults
 axios.defaults.withCredentials = true;
+
+export const checkAuth = async () => {
+  try {
+    const res = await axios.get(`${API_BASE_URL}/api/auth/check`);
+    return res.data.authenticated;
+  } catch (err) {
+    console.error('Error checking auth:', err);
+    return false;
+  }
+};
 
 export const fetchNotebook = async (path, repository) => {
   try {
