@@ -19,7 +19,7 @@ The project is a Jupyter Notebook Editor with GitHub Integration, structured int
 - **Backend**: Express.js server with API endpoints for authentication, file management, and user operations
 - **Frontend**: React-based application with advanced editing capabilities
 
-The technical **GOAL** is for the backend to eventally become a set of serverless functions on vercel, while the frontend remains a single page application.
+The backend handles authentication, file operations, and user management, while the frontend provides a user-friendly interface for editing Jupyter notebooks hosted on GitHub. The gitguhb token stays only on the server whie the frontend authenticates to the backend with a session cookie. 
 
 
 ### Key Components

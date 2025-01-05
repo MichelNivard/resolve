@@ -43,39 +43,40 @@ const EditorWrapper = ({
 }) => {
   const [showComments, setShowComments] = useState(false);
   const [notebooks, setNotebooks] = useState([]);
+  const [error, setError] = useState(null);
+  const [trackChangesEnabled, setTrackChangesEnabled] = useState(false);
+  const [commentMarkKey, setCommentMarkKey] = useState(0);
+
+  const handleTrackChangesToggle = (enabled) => {
+    setTrackChangesEnabled(enabled);
+  }
+
+  const handleCommentMarkUpdate = () => {
+    setCommentMarkKey((prev) => prev + 1);
+  }
 
   const editor = useEditor({
     extensions: extensions || [
       StarterKit,
-      RawCell.configure({
-        // Remove handleClick configuration since we're handling it in the node view
-      }),
-      CodeCell,
-      Underline,
-      Highlight,
-      Table.configure({
-        resizable: true,
-      }),
-      TableRow,
       TableCell,
       TableHeader,
+      TableRow,
       TrackChangeExtension.configure({
         enabled: false,
-        onStatusChange: (enabled) => {
-          console.log('Track changes status:', enabled);
-        }
+        onStatusChange: handleTrackChangesToggle
       }),
       CommentMark.configure({
         HTMLAttributes: {
           class: 'comment-mark',
         },
-        onUpdate: () => {
-          console.log('Comment mark updated');
-        }
+        onUpdate: handleCommentMarkUpdate
       }),
       Mathematics,
       BibMention.configure({
-        suggestion: suggestionFactory(referenceManager)
+        suggestion: suggestionFactory(referenceManager),
+        HTMLAttributes: {
+          class: 'bib-mention'
+        }
       })
     ],
     content: '',
@@ -90,17 +91,14 @@ const EditorWrapper = ({
     const loadNotebooks = async () => {
       if (selectedRepo?.fullName) {
         try {
-          console.log('Loading notebooks for repository:', selectedRepo.fullName);
           const notebookList = await fetchNotebooksInRepo(selectedRepo.fullName);
-          console.log('Loaded notebooks:', notebookList);
           setNotebooks(notebookList);
           // Only clear the file path if we successfully loaded notebooks
           if (notebookList && notebookList.length > 0) {
             setFilePath('');
           }
         } catch (error) {
-          console.error('Failed to load notebooks:', error);
-          // Don't clear notebooks on error to maintain existing state
+          setError(error.message);
         }
       }
     };
@@ -112,7 +110,7 @@ const EditorWrapper = ({
     try {
       await handleLoadFile();
     } catch (error) {
-      console.error('Error loading file:', error);
+      setError(error.message);
     }
   }
 
@@ -121,7 +119,7 @@ const EditorWrapper = ({
     try {
       await handleSaveFile(editor);
     } catch (error) {
-      console.error('Error saving file:', error);
+      setError(error.message);
     }
   }
 
@@ -135,7 +133,7 @@ const EditorWrapper = ({
         try {
           ipynbToTiptapDoc(ipynb, editor);
         } catch (err) {
-          console.error('Error converting ipynb to Tiptap doc:', err);
+          setError(err.message);
         }
       });
     }
@@ -177,22 +175,17 @@ const EditorWrapper = ({
               <select
                 value={selectedRepo?.fullName || ''}
                 onChange={(e) => {
-                  console.log('Repositories:', repositories);
                   const repo = repositories.find(r => r.fullName === e.target.value);
-                  console.log('Selected repo:', repo);
                   setSelectedRepo(repo);
                 }}
                 className="repo-select glass-select"
               >
                 <option value="">Select Repository</option>
-                {repositories.map((repo) => {
-                  console.log('Repository option:', repo);
-                  return (
-                    <option key={repo.id} value={repo.fullName}>
-                      {repo.fullName}
-                    </option>
-                  );
-                })}
+                {repositories.map((repo) => (
+                  <option key={repo.id} value={repo.fullName}>
+                    {repo.fullName}
+                  </option>
+                ))}
               </select>
 
               {selectedRepo && (

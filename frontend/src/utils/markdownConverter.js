@@ -5,30 +5,25 @@ import { tables, strikethrough } from 'turndown-plugin-gfm';
 
 function markdownItCitations(md) {
   md.inline.ruler.before('emphasis', 'quarto_citations', (state, silent) => {
-    console.log('Checking at pos:', state.pos, 'remaining src:', state.src.slice(state.pos));
+
     const start = state.pos;
     if (state.src[start] !== '[') {
-      console.log('No [ found at pos');
       return false;
     }
 
     const end = state.src.indexOf(']', start);
     if (end === -1) {
-      console.log('No closing bracket ] found');
       return false;
     }
 
     const content = state.src.slice(start + 1, end);
-    console.log('Bracket content:', content);
 
     const citations = content.split(/;/);
-    console.log('Citations after split:', citations);
 
     let anyCitations = false;
     const parsedCitations = [];
     for (let part of citations) {
       part = part.trim();
-      console.log('Parsing citation part:', part);
 
       const citationMatch = part.match(/^(.*?)@\s*([A-Za-z0-9_][A-Za-z0-9_:.\#$%&+\-?<>~\/]*)\s*(.*)$/);
       if (citationMatch) {
@@ -37,20 +32,16 @@ function markdownItCitations(md) {
         const key = citationMatch[2];
         const suffix = citationMatch[3].trim();
         parsedCitations.push({ prefix, key, suffix });
-        console.log('Matched citation:', { prefix, key, suffix });
       } else {
-        console.log('No citation match for part:', part);
         parsedCitations.push({ prefix: part, key: null, suffix: '' });
       }
     }
 
     if (!anyCitations && !silent) {
-      console.log('No actual citations found in brackets');
       return false;
     }
 
     if (!silent) {
-      console.log('Citations found, creating token');
       state.pos = end + 1;
       const token = state.push('quarto_citations', '', 0);
       token.content = parsedCitations;
@@ -61,7 +52,6 @@ function markdownItCitations(md) {
 
   md.renderer.rules.quarto_citations = (tokens, idx) => {
     const citations = tokens[idx].content;
-    console.log('Rendering citations:', citations);
 
     const htmlPieces = citations.map(c => {
       if (c.key) {
@@ -94,14 +84,12 @@ md.block.ruler.before('paragraph', 'math_block', (state, startLine, endLine, sil
   const start = state.bMarks[startLine] + state.tShift[startLine];
   const line = state.src.slice(state.bMarks[startLine], state.eMarks[startLine]);
   
-  console.log('Checking line for math:', line);
   
   // Match complete math expression: $$...$$
   const mathMatch = line.match(/^\$\$(.*?)\$\$$/);
   if (!mathMatch) return false;
   
   const content = mathMatch[1];
-  console.log('Found block math content:', content);
   
   if (!silent) {
     const token = state.push('math_block', 'math', 0);
@@ -117,13 +105,11 @@ md.block.ruler.before('paragraph', 'math_block', (state, startLine, endLine, sil
 // Render rules that preserve the LaTeX
 md.renderer.rules.math_block = (tokens, idx) => {
   const token = tokens[idx];
-  console.log('Rendering block math token:', token);
   return `<div class="block-math">${token.content}</div>`;
 };
 
 md.renderer.rules.math_inline = (tokens, idx) => {
   const token = tokens[idx];
-  console.log('Rendering inline math token:', token);
   // Just keep inline math as markdown since the plugin doesn't support it
   return `$${token.content}$`;
 };
@@ -170,18 +156,14 @@ turndownService.addRule('math', {
   }
 });
 
-console.log(md.render('[@TestCitation]'));
 
-export function markdownToHtml(markdown) {
-  console.log('Input markdown:', markdown);
-  const html = md.render(markdown);
-  console.log('Converted HTML:', html);
+
+export function markdownToHtml(markdown) {  const html = md.render(markdown);
   return html;
 }
 
 export function htmlToMarkdown(html) {
-  console.log('Input HTML:', html);
+
   const markdown = turndownService.turndown(html);
-  console.log('Converted back to markdown:', markdown);
   return markdown;
 }

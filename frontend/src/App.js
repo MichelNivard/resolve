@@ -39,25 +39,17 @@ function App() {
   const [saveMessage, setSaveMessage] = useState('');
   const [editorExtensions, setEditorExtensions] = useState(null);
   const [activeEditor, setActiveEditor] = useState(null);
+  const [trackChangesEnabled, setTrackChangesEnabled] = useState(false);
+  const [commentMarkKey, setCommentMarkKey] = useState(0);
 
   useEffect(() => {
     const loadRepositories = async () => {
       if (isAuthenticated) {
         try {
           const repos = await fetchRepositories();
-          console.log('Raw repositories:', repos);
-          
-          // Filter and set repositories
-          const validRepos = repos.filter(repo => {
-            console.log('Checking repo:', repo);
-            return repo.fullName && repo.owner?.login;
-          });
-          console.log('Valid repositories:', validRepos);
+          const validRepos = repos.filter(repo => repo.fullName && repo.owner?.login);
           setRepositories(validRepos);
-          
-          // If user has valid repositories, select the first one by default
           if (validRepos.length > 0) {
-            console.log('Setting default repo:', validRepos[0]);
             setSelectedRepo(validRepos[0]);
           }
         } catch (error) {
@@ -75,7 +67,6 @@ function App() {
     if (referenceManager) {
       console.log('🔄 Creating editor extensions with reference manager');
       const suggestion = suggestionFactory(referenceManager);
-      
       setEditorExtensions([
         StarterKit,
         RawCell,
@@ -90,23 +81,18 @@ function App() {
         TableHeader,
         TrackChangeExtension.configure({
           enabled: false,
-          onStatusChange: (enabled) => {
-            console.log('Track changes status:', enabled);
-          }
+          onStatusChange: handleTrackChangesToggle
         }),
         CommentMark.configure({
           HTMLAttributes: {
             class: 'comment-mark',
           },
-          onUpdate: () => {
-            console.log('Comment mark updated');
-          }
+          onUpdate: handleCommentMarkUpdate
         }),
         Mathematics,
         BibMention.configure({ 
           suggestion,
           onBeforeCreate: () => {
-            console.log('BibMention: reference manager state:', referenceManager);
           }
         }),
       ]);
@@ -118,12 +104,9 @@ function App() {
 
     const cleanup = () => {
       const thirtyMinutesAgo = get30MinutesAgo();
-      
       const updatedEditors = ipynb.metadata.active_editors.filter(
         editor => editor.timestamp > thirtyMinutesAgo
       );
-
-      // Only save if we actually removed someone
       if (updatedEditors.length < ipynb.metadata.active_editors.length) {
         const updatedIpynb = { ...ipynb };
         updatedIpynb.metadata.active_editors = updatedEditors;
@@ -138,11 +121,9 @@ function App() {
 
   const checkLastEditor = (notebook) => {
     if (!notebook?.metadata?.last_editor) return null;
-    
     const lastEdit = new Date(notebook.metadata.last_editor.timestamp);
     const now = new Date(getCurrentTime());
     const diffMinutes = (now - lastEdit) / (1000 * 60);
-    
     if (diffMinutes <= 30) {
       return notebook.metadata.last_editor;
     }
@@ -178,11 +159,7 @@ function App() {
         owner: selectedRepo.owner.login
       });
 
-      // Load the notebook
       const notebook = await fetchNotebook(filePath, selectedRepo.fullName);
-      console.log('Loaded notebook metadata:', notebook.metadata);
-      
-      // Initialize metadata if needed
       if (!notebook.metadata) {
         notebook.metadata = {};
       }
@@ -190,13 +167,11 @@ function App() {
         notebook.metadata.active_editors = [];
       }
 
-      // Clean up old editors
       const thirtyMinutesAgo = get30MinutesAgo();
       notebook.metadata.active_editors = notebook.metadata.active_editors.filter(
         editor => editor.timestamp > thirtyMinutesAgo
       );
 
-      // Add current user to editors if not already present
       const existingEditorIndex = notebook.metadata.active_editors.findIndex(
         editor => editor.name === (user.name || user.login)
       );
@@ -208,24 +183,12 @@ function App() {
           timestamp: getCurrentTime()
         });
       } else {
-        // Update timestamp for existing editor
         notebook.metadata.active_editors[existingEditorIndex].timestamp = getCurrentTime();
       }
 
-      console.log('Updated notebook metadata:', notebook.metadata);
-
-      // Save the updated notebook back to GitHub
       await saveToGitHub(notebook, filePath, selectedRepo, user);
-      console.log('Saved notebook with updated editors');
-      
-      setIpynb(notebook);
 
-      // Initialize reference manager
-      console.log('🔄 Initializing reference manager for notebook:', {
-        filePath,
-        repo: selectedRepo.fullName,
-        owner: selectedRepo.owner.login
-      });
+      setIpynb(notebook);
 
       const manager = new GitHubReferenceManager(
         selectedRepo.fullName,
@@ -278,6 +241,14 @@ function App() {
       setSaveMessage(`Error saving file: ${error.message}`);
       setTimeout(() => setSaveMessage(''), 3000);
     }
+  };
+
+  const handleTrackChangesToggle = (enabled) => {
+    setTrackChangesEnabled(enabled);
+  };
+
+  const handleCommentMarkUpdate = () => {
+    setCommentMarkKey((prev) => prev + 1);
   };
 
   return (

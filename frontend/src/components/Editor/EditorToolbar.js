@@ -67,8 +67,6 @@ const EditorToolbar = ({ editor, onToggleComments }) => {
 
   // Track Changes toggle handler
   const handleToggleTrackChanges = () => {
-    //log
-    console.log('track changes toggle evaluated')
     // Toggle the track change status using the command
     editor.commands.toggleTrackChangeStatus();
 
@@ -144,7 +142,6 @@ const EditorToolbar = ({ editor, onToggleComments }) => {
   };
 
   const handleCommentDialogConfirm = async () => {
-    console.log('handleCommentDialogConfirm triggered');
     if (!commentText.trim()) {
       setShowCommentDialog(false);
       return;
@@ -157,8 +154,6 @@ const EditorToolbar = ({ editor, onToggleComments }) => {
 
       const username = 'Michel Nivard'; // Extract the username from the response
 
-      console.log('Fetched username:', username);
-
       if (!editor) return;
 
       // Apply the comment mark with the fetched username
@@ -168,7 +163,6 @@ const EditorToolbar = ({ editor, onToggleComments }) => {
         text: commentText.trim(), // Comment text
       }).run();
 
-      console.log('After addComment:', editor.getJSON());
     } catch (error) {
       console.error('Error fetching username or applying comment:', error);
     } finally {

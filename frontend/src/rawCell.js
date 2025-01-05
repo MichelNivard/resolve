@@ -76,10 +76,8 @@ export const RawCell = Node.create({
     },
   
     renderHTML({ node }) {
-      console.log('renderHTML called with node:', node);
       if (node.attrs.isYamlHeader && node.attrs.isAcademicArticle) {
         if (node.attrs.displayMode === 'edit') {
-          console.log('Rendering edit mode in HTML');
           return ['div', { 
             'data-type': 'raw-cell', 
             class: 'raw-cell',
@@ -91,7 +89,6 @@ export const RawCell = Node.create({
             }, node.attrs.content || ''] // Always use current content
           ];
         }
-        console.log('Rendering view mode in HTML');
         const yaml = node.attrs.parsedYaml || {};
         return ['div', { 
           'data-type': 'raw-cell', 
@@ -120,17 +117,12 @@ export const RawCell = Node.create({
         let popup = null;
 
         const createPopupEditor = () => {
-          console.log('Creating popup editor with node attrs:', node.attrs);
-          
-          // Create overlay
           const overlay = document.createElement('div');
           overlay.className = 'yaml-editor-overlay';
           
-          // Create popup
           const popupEl = document.createElement('div');
           popupEl.className = 'yaml-editor-popup';
           
-          // Create header
           const header = document.createElement('div');
           header.className = 'yaml-editor-header';
           
@@ -142,11 +134,8 @@ export const RawCell = Node.create({
           closeBtn.className = 'yaml-editor-close';
           closeBtn.innerHTML = '×';
           closeBtn.onclick = () => {
-            console.log('Closing popup with content:', popup.textarea.value);
-            // When closing, make sure to update the node with latest content
             const currentContent = popup.textarea.value;
             const parsed = tryParseYaml(currentContent);
-            console.log('Parsed content on close:', parsed);
             editor.chain()
               .updateAttributes('rawCell', {
                 content: currentContent,
@@ -160,23 +149,17 @@ export const RawCell = Node.create({
           header.appendChild(title);
           header.appendChild(closeBtn);
           
-          // Create textarea
           const textarea = document.createElement('textarea');
           textarea.className = 'yaml-editor-textarea';
           const initialContent = node.attrs.content;
-          console.log('Setting initial textarea content:', initialContent);
           textarea.value = initialContent || '';
           
           textarea.addEventListener('input', (e) => {
             const newContent = e.target.value;
-            console.log('Input event with content:', newContent);
             const parsed = tryParseYaml(newContent);
-            console.log('Parsed content on input:', parsed);
             
-            // Ensure proper YAML formatting when updating
             let content = newContent;
             if (parsed?.parsed) {
-              // If it's valid YAML, ensure proper fence formatting
               content = `---\n${parsed.formatted}---`;
             }
             
@@ -213,12 +196,10 @@ export const RawCell = Node.create({
             e.stopPropagation();
           });
           
-          // Assemble popup
           popupEl.appendChild(header);
           popupEl.appendChild(textarea);
           overlay.appendChild(popupEl);
           
-          // Prevent clicks on overlay from bubbling
           overlay.addEventListener('mousedown', (e) => {
             if (e.target === overlay) {
               closeBtn.click();
@@ -238,20 +219,11 @@ export const RawCell = Node.create({
 
         if (typeof getPos === 'function' && editor && node.attrs.isAcademicArticle) {
           dom.addEventListener('click', () => {
-            console.log('Cell clicked, current displayMode:', node.attrs.displayMode);
             if (node.attrs.displayMode === 'view') {
-              console.log('Switching to edit mode with content:', node.attrs.content);
-              
-              // Get the current node's position
-              const pos = getPos();
-              // Get the latest node state
-              const currentNode = editor.state.doc.nodeAt(pos);
-              console.log('Latest node state:', currentNode.attrs);
-              
               editor.chain()
                 .updateAttributes('rawCell', {
                   displayMode: 'edit',
-                  content: currentNode.attrs.content, // Ensure we use the latest content
+                  content: node.attrs.content, // Ensure we use the latest content
                 })
                 .run();
             }
@@ -259,35 +231,20 @@ export const RawCell = Node.create({
         }
         
         const update = (node) => {
-          console.log('Update called with node:', node);
-          console.log('Current node content:', node.attrs.content);
-          
           if (node.attrs.isYamlHeader && node.attrs.isAcademicArticle) {
             if (node.attrs.displayMode === 'edit') {
-              console.log('Creating/updating popup');
               if (!popup) {
-                // Get the current node's position
-                const pos = getPos();
-                // Get the latest node state
-                const currentNode = editor.state.doc.nodeAt(pos);
-                console.log('Latest node state for popup:', currentNode.attrs);
-                
                 popup = createPopupEditor();
                 document.body.appendChild(popup.element);
                 
-                // Use the latest content
-                popup.textarea.value = currentNode.attrs.content || '';
+                popup.textarea.value = node.attrs.content || '';
                 
                 requestAnimationFrame(() => {
                   popup.textarea.focus();
                   popup.textarea.selectionStart = popup.textarea.selectionEnd = popup.textarea.value.length;
                 });
               } else {
-                // Update existing popup content with latest
-                const pos = getPos();
-                const currentNode = editor.state.doc.nodeAt(pos);
-                console.log('Updating existing popup with latest content:', currentNode.attrs.content);
-                popup.textarea.value = currentNode.attrs.content || '';
+                popup.textarea.value = node.attrs.content || '';
               }
             } else {
               if (popup) {

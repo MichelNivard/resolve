@@ -249,7 +249,6 @@ export function tiptapDocToIpynb(editor, originalIpynb) {
   };
 
   editorContent.content.forEach((node, index) => {
-    console.log('Processing node:', JSON.stringify(node, null, 2));
 
     if (node.type === 'paragraph' || node.type === 'heading') {
       // Add to markdown content
@@ -305,6 +304,5 @@ export function tiptapDocToIpynb(editor, originalIpynb) {
   // Assuming originalIpynb was used only to keep formatting consistent, you can just pass it:
   
   const newIpynb = serializeIpynb({ yaml: {}, cells });
-  console.log('Converted ipynb:', JSON.stringify(newIpynb, null, 2));
   return newIpynb;
 }
