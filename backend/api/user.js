@@ -1,5 +1,5 @@
-const express = require('express');
-const { Octokit } = require('@octokit/rest');
+import express from 'express';
+import { Octokit } from '@octokit/rest';
 
 const router = express.Router();
 
@@ -41,4 +41,4 @@ router.get('/', async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;

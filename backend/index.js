@@ -1,7 +1,22 @@
-const path = require('path');
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+import dotenv from 'dotenv';
+import express from 'express';
+import cors from 'cors';
+import cookieParser from 'cookie-parser';
+import helmet from 'helmet';
+import session from 'express-session';
+import FileStore from 'session-file-store';
+import { createRateLimiter, secureCookies } from './middleware/security.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 const envPath = path.resolve(__dirname, '.env');
 console.log('Loading .env file from:', envPath);
-require('dotenv').config({ path: envPath });
+dotenv.config({ path: envPath });
+
+const FileStoreSession = FileStore(session);
 
 console.log('Environment variables loaded:', {
   hasGithubClientId: !!process.env.GITHUB_CLIENT_ID,
@@ -9,25 +24,15 @@ console.log('Environment variables loaded:', {
   hasRedirectUri: !!process.env.REDIRECT_URI
 });
 
-const express = require('express');
-const cors = require('cors');
-const cookieParser = require('cookie-parser');
-const helmet = require('helmet');
-const session = require('express-session');
-const FileStore = require('session-file-store')(session);
-
-// Import security middleware
-const { createRateLimiter, secureCookies } = require('./middleware/security');
-
-const authRoute = require('./api/auth');
-const userRoute = require('./api/user');
-const fetchFileRoute = require('./api/fetchFile');
-const saveFileRoute = require('./api/saveFile');
-const lockFileRoute = require('./api/lockFile');
-const unlockFileRoute = require('./api/unlockFile');
-const getRepositoriesRoute = require('./api/getRepositories');
-const listNotebooksRoute = require('./api/listNotebooks');
-const bibliographyRoute = require('./api/bibliography');
+const authRoute = await import('./api/auth.js');
+const userRoute = await import('./api/user.js');
+const fetchFileRoute = await import('./api/fetchFile.js');
+const saveFileRoute = await import('./api/saveFile.js');
+const lockFileRoute = await import('./api/lockFile.js');
+const unlockFileRoute = await import('./api/unlockFile.js');
+const getRepositoriesRoute = await import('./api/getRepositories.js');
+const listNotebooksRoute = await import('./api/listNotebooks.js');
+const bibliographyRoute = await import('./api/bibliography.js');
 
 const app = express();
 
@@ -49,7 +54,7 @@ app.use(secureCookies);
 
 // Configure express-session
 app.use(session({
-  store: new FileStore({
+  store: new FileStoreSession({
     path: './sessions',
     ttl: 86400, // 1 day in seconds
     retries: 0,
@@ -139,15 +144,15 @@ protectedRoutes.forEach(route => {
 });
 
 // Routes
-app.use('/api/auth', authRoute);
-app.use('/api/user', userRoute);
-app.use('/api/fetchFile', fetchFileRoute);
-app.use('/api/saveFile', saveFileRoute);
-app.use('/api/lockFile', lockFileRoute);
-app.use('/api/unlockFile', unlockFileRoute);
-app.use('/api/repositories', getRepositoriesRoute);
-app.use('/api/listNotebooks', listNotebooksRoute);
-app.use('/api/bibliography', bibliographyRoute);
+app.use('/api/auth', authRoute.default);
+app.use('/api/user', userRoute.default);
+app.use('/api/fetchFile', fetchFileRoute.default);
+app.use('/api/saveFile', saveFileRoute.default);
+app.use('/api/lockFile', lockFileRoute.default);
+app.use('/api/unlockFile', unlockFileRoute.default);
+app.use('/api/repositories', getRepositoriesRoute.default);
+app.use('/api/listNotebooks', listNotebooksRoute.default);
+app.use('/api/bibliography', bibliographyRoute.default);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
