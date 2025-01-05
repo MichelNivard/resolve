@@ -232,6 +232,7 @@ function App() {
 
     try {
       const newIpynb = tiptapDocToIpynb(editor, ipynb);
+      console.log('Save result:', newIpynb);
       const result = await saveToGitHub(newIpynb, filePath, selectedRepo, user);
       console.log('Save result:', result);
 
