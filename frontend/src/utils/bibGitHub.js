@@ -45,10 +45,14 @@ export async function loadBibFromGitHub(selectedRepo, notebookPath, owner) {
  */
 export async function saveBibToGitHub(content, path, sha, selectedRepo) {
   try {
+    // Extract notebookPath from the bibliography path
+    const notebookPath = path.replace('/references.bib', '/notebook.ipynb');
+    
     const response = await axios.post(`${API_BASE_URL}/api/bibliography/save`, {
       content,
       path,
       repository: selectedRepo,
+      notebookPath,
       ...(sha && { sha })
     }, {
       withCredentials: true
@@ -68,18 +72,27 @@ export async function saveBibToGitHub(content, path, sha, selectedRepo) {
  * @returns {string} Formatted BibTeX entry
  */
 export function formatBibTeXEntry(entry) {
+  if (!entry || !entry.entryType || !entry.citationKey) {
+    console.warn('Invalid BibTeX entry:', entry);
+    return '';
+  }
+
   const { entryType, citationKey, entryTags } = entry;
   
   // Start the entry
   let result = `@${entryType}{${citationKey},\n`;
   
   // Add each field
-  Object.entries(entryTags).forEach(([key, value]) => {
-    result += `  ${key} = {${value}},\n`;
-  });
+  if (entryTags && typeof entryTags === 'object') {
+    Object.entries(entryTags).forEach(([key, value]) => {
+      if (value) {
+        result += `  ${key} = {${value}},\n`;
+      }
+    });
+  }
   
   // Close the entry
-  result += '}\n\n';
+  result += '}\n';
   
   return result;
 }

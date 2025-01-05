@@ -20,22 +20,29 @@ async function loadBibliography(req, res) {
 
     // Get the directory of the notebook
     const notebookDir = notebookPath.substring(0, notebookPath.lastIndexOf('/'));
+    const bibPath = `${notebookDir}/references.bib`;
 
     try {
-      // Try to get bibliography.json from the same directory as the notebook
+      // Try to get references.bib from the same directory as the notebook
       const { data: bibFile } = await octokit.repos.getContent({
         owner,
         repo,
-        path: `${notebookDir}/bibliography.json`
+        path: bibPath
       });
 
       const content = Buffer.from(bibFile.content, 'base64').toString('utf8');
-      const bibliography = JSON.parse(content);
-      res.json({ bibliography });
+      res.json({ 
+        content,
+        path: bibPath,
+        sha: bibFile.sha
+      });
     } catch (error) {
       if (error.status === 404) {
-        // If bibliography.json doesn't exist, return an empty bibliography
-        res.json({ bibliography: {} });
+        // If references.bib doesn't exist, return an empty response
+        res.json({ 
+          content: '',
+          path: bibPath
+        });
       } else {
         throw error;
       }
@@ -48,57 +55,51 @@ async function loadBibliography(req, res) {
 
 async function saveBibliography(req, res) {
   try {
-    const { repository, notebookPath, bibliography } = req.body;
-    if (!repository || !notebookPath || !bibliography) {
-      return res.status(400).json({ error: 'Missing required parameters' });
+    const { content, path, repository, notebookPath, sha } = req.body;
+    
+    if (!content || !path || !repository || !notebookPath) {
+      return res.status(400).json({ 
+        error: 'Missing required parameters',
+        required: ['content', 'path', 'repository', 'notebookPath'],
+        received: { content: !!content, path: !!path, repository: !!repository, notebookPath: !!notebookPath }
+      });
     }
 
     const token = req.session?.githubToken;
     if (!token) {
+      console.error('No GitHub token found in session');
       return res.status(401).json({ error: 'Not authenticated' });
     }
 
     const octokit = new Octokit({ auth: token });
     const [owner, repo] = repository.split('/');
-    const notebookDir = notebookPath.substring(0, notebookPath.lastIndexOf('/'));
-    const bibliographyPath = `${notebookDir}/bibliography.json`;
-
-    // Convert bibliography to string
-    const content = JSON.stringify(bibliography, null, 2);
 
     try {
-      // Try to get existing file to get its SHA
-      const { data: existingFile } = await octokit.repos.getContent({
+      const response = await octokit.repos.createOrUpdateFileContents({
         owner,
         repo,
-        path: bibliographyPath
+        path,
+        message: 'Update bibliography file',
+        content: Buffer.from(content).toString('base64'),
+        ...(sha && { sha })
       });
 
-      // Update existing file
-      await octokit.repos.createOrUpdateFileContents({
-        owner,
-        repo,
-        path: bibliographyPath,
-        message: 'Update bibliography.json',
-        content: Buffer.from(content).toString('base64'),
-        sha: existingFile.sha
+      res.json({ 
+        content: {
+          path: response.data.content.path,
+          sha: response.data.content.sha
+        }
       });
     } catch (error) {
+      console.error('Error saving bibliography:', error);
       if (error.status === 404) {
-        // Create new file if it doesn't exist
-        await octokit.repos.createOrUpdateFileContents({
-          owner,
-          repo,
-          path: bibliographyPath,
-          message: 'Create bibliography.json',
-          content: Buffer.from(content).toString('base64')
-        });
+        res.status(404).json({ error: 'Repository or file not found' });
+      } else if (error.status === 409) {
+        res.status(409).json({ error: 'Conflict: File has been modified' });
       } else {
         throw error;
       }
     }
-
-    res.json({ success: true });
   } catch (error) {
     console.error('Error saving bibliography:', error);
     res.status(500).json({ error: 'Failed to save bibliography' });
