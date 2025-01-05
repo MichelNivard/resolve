@@ -34,7 +34,11 @@ export function ipynbToTiptapDoc(ipynb, editor) {
 
   // Parse ipynb if it's a string
   const notebookData = typeof ipynb === 'string' ? JSON.parse(ipynb) : ipynb;
-  const { cells } = parseIpynb(notebookData);
+  // Extract the actual notebook data
+  const notebookContent = notebookData.ipynb || notebookData;
+  
+  console.log('Notebook content before parsing:', notebookContent);
+  const { cells } = parseIpynb(notebookContent);
   
   console.log('Parsed cells:', cells);
   const docNodes = [];
