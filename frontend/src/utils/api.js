@@ -45,18 +45,24 @@ export const checkAuth = async () => {
   }
 };
 
+{{ ... }}
+
 export const fetchNotebook = async (path, repository) => {
   try {
     console.log('Fetching notebook:', { path, repository });
     const response = await api.get('/api/fetchFile', {
       params: { path, repository }
     });
-    return response.data.ipynb;
+    // Parse the raw response
+    const ipynb = JSON.parse(response.data);
+    console.log('Parsed notebook:', ipynb);
+    return ipynb;
   } catch (error) {
     console.error('Error fetching notebook:', error);
     throw error;
   }
-}; 
+};
+
 
 export const fetchUser = async () => {
   try {
