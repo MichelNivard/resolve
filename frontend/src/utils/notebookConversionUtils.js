@@ -129,7 +129,7 @@ export function ipynbToTiptapDoc(ipynb, editor) {
       docNodes.push({
         type: 'codeCell',
         attrs: {
-          source: cell.source,
+          source: Array.isArray(cell.source) ? cell.source.join('') : cell.source,
           outputs: cell.outputs || [],
           executionCount: cell.execution_count || null,
           metadata: cell.metadata || {}
@@ -249,7 +249,7 @@ export function tiptapDocToIpynb(editor, originalIpynb) {
       const { source, outputs, executionCount, metadata } = node.attrs;
       cells.push({
         cell_type: 'code',  
-        source: (source || '').split('\n').map(line => line + '\n'),  
+        source: Array.isArray(source) ? source : source.split('\n').map(line => line + '\n'),
         execution_count: executionCount !== undefined ? executionCount : null,
         outputs: outputs || [],
         metadata: {

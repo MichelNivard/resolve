@@ -1,9 +1,11 @@
 import React from 'react';
 
 const CodeRenderer = ({ code }) => {
+  const codeContent = Array.isArray(code) ? code.join('') : code;
+  
   return (
     <pre>
-      <code>{code}</code>
+      <code>{codeContent}</code>
     </pre>
   );
 };

@@ -13,7 +13,13 @@ export const CodeCell = Node.create({
 
   addAttributes() {
     return {
-      source: { default: '' },
+      source: { 
+        default: '',
+        parseHTML: element => element.getAttribute('data-source') || '',
+        renderHTML: attributes => {
+          return { 'data-source': attributes.source }
+        }
+      },
       outputs: { default: [] },
       executionCount: { default: null },
       metadata: { 
@@ -71,7 +77,7 @@ function CodeCellNodeView({ node, editor, getPos }) {
 
       {showCode && (
         <pre className="code-cell-content">
-          <code>{source}</code>
+          <code>{typeof source === 'string' ? source : Array.isArray(source) ? source.join('') : ''}</code>
         </pre>
       )}
 
