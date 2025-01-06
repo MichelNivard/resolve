@@ -55,13 +55,13 @@ async function loadBibliography(req, res) {
 
 async function saveBibliography(req, res) {
   try {
-    const { content, path, repository, notebookPath, sha } = req.body;
+    const { content, path, repository, sha } = req.body;
     
-    if (!content || !path || !repository || !notebookPath) {
+    if (!content || !path || !repository) {
       return res.status(400).json({ 
         error: 'Missing required parameters',
-        required: ['content', 'path', 'repository', 'notebookPath'],
-        received: { content: !!content, path: !!path, repository: !!repository, notebookPath: !!notebookPath }
+        required: ['content', 'path', 'repository'],
+        received: { content: !!content, path: !!path, repository: !!repository }
       });
     }
 
@@ -78,7 +78,7 @@ async function saveBibliography(req, res) {
       const response = await octokit.repos.createOrUpdateFileContents({
         owner,
         repo,
-        path,
+        path: path.replace(/^\/+/, ''), // Remove leading slashes
         message: 'Update bibliography file',
         content: Buffer.from(content).toString('base64'),
         ...(sha && { sha })

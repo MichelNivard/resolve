@@ -45,14 +45,12 @@ export async function loadBibFromGitHub(selectedRepo, notebookPath, owner) {
  */
 export async function saveBibToGitHub(content, path, sha, selectedRepo) {
   try {
-    // Extract notebookPath from the bibliography path
-    const notebookPath = path.replace('/references.bib', '/notebook.ipynb');
+    const cleanPath = path.replace(/^\/+/, ''); // Remove leading slashes
     
     const response = await axios.post(`${API_BASE_URL}/api/bibliography/save`, {
       content,
-      path,
+      path: cleanPath,
       repository: selectedRepo,
-      notebookPath,
       ...(sha && { sha })
     }, {
       withCredentials: true
