@@ -129,7 +129,7 @@ export function ipynbToTiptapDoc(ipynb, editor) {
       docNodes.push({
         type: 'codeCell',
         attrs: {
-          content: cell.content,
+          source: cell.source,
           outputs: cell.outputs || [],
           executionCount: cell.execution_count || null,
           metadata: cell.metadata || {}
@@ -246,10 +246,10 @@ export function tiptapDocToIpynb(editor, originalIpynb) {
       // Flush current markdown cell
       flushMarkdownCell();
 
-      const { content, outputs, executionCount, metadata } = node.attrs;
+      const { source, outputs, executionCount, metadata } = node.attrs;
       cells.push({
         cell_type: 'code',  
-        source: (content || '').split('\n').map(line => line + '\n'),  
+        source: (source || '').split('\n').map(line => line + '\n'),  
         execution_count: executionCount !== undefined ? executionCount : null,
         outputs: outputs || [],
         metadata: {

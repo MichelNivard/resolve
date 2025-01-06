@@ -13,9 +13,16 @@ export const CodeCell = Node.create({
 
   addAttributes() {
     return {
-      code: { default: '' },
+      source: { default: '' },
       outputs: { default: [] },
-      folded: { default: true },
+      executionCount: { default: null },
+      metadata: { 
+        default: {
+          collapsed: true,
+          scrolled: false
+        }
+      },
+      folded: { default: true }, // UI state, not part of nbformat
     };
   },
 
@@ -33,14 +40,21 @@ export const CodeCell = Node.create({
 });
 
 function CodeCellNodeView({ node, editor, getPos }) {
-  const { code, outputs, folded } = node.attrs;
+  const { source, outputs, folded, metadata } = node.attrs;
   const [showCode, setShowCode] = useState(!folded);
 
   const toggleCode = () => {
     setShowCode((prev) => !prev);
     const pos = getPos();
     if (typeof pos === 'number') {
-      editor.chain().setTextSelection(pos).updateAttributes('codeCell', { folded: !showCode }).run();
+      // Update both folded UI state and metadata.collapsed
+      editor.chain()
+        .setTextSelection(pos)
+        .updateAttributes('codeCell', { 
+          folded: !showCode,
+          metadata: { ...metadata, collapsed: !showCode }
+        })
+        .run();
     }
   };
 
@@ -57,7 +71,7 @@ function CodeCellNodeView({ node, editor, getPos }) {
 
       {showCode && (
         <pre className="code-cell-content">
-          <code>{code}</code>
+          <code>{source}</code>
         </pre>
       )}
 
