@@ -108,14 +108,9 @@ export default function EditorBubbleMenuManager({ editor }) {
     const doi = doiInput.trim();
     console.log('Processing DOI:', doi);
     
-    if (!doi.startsWith('doi:')) {
-      console.error('Invalid DOI format');
-      return;
-    }
-
     try {
-      console.log('Fetching citation key for DOI:', doi.substring(4));
-      const citationKey = await editor.referenceManager.addReferenceFromDOI(doi.substring(4));
+      console.log('Fetching citation key for DOI:', doi);
+      const citationKey = await editor.referenceManager.addReferenceFromDOI(`doi:${doi}`);
       console.log('Got citation key:', citationKey);
 
       console.log('Inserting citation into editor');
@@ -199,14 +194,18 @@ export default function EditorBubbleMenuManager({ editor }) {
             </>
           ) : isCitationInputVisible ? (
             <>
+              <span className="citation-label">DOI:</span>
               <input
                 type="text"
                 className="bubble-menu-input"
-                placeholder="doi:10.xxxx/xxxxx"
+                placeholder="10.xxxx/xxxxx"
                 value={doiInput}
                 onChange={(e) => {
                   console.log('DOI input changed:', e.target.value);
-                  setDoiInput(e.target.value);
+                  const value = e.target.value.startsWith('doi:') ? 
+                    e.target.value.substring(4) : 
+                    e.target.value;
+                  setDoiInput(value);
                 }}
                 onKeyDown={(e) => {
                   console.log('Key pressed in DOI input:', e.key);
