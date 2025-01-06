@@ -113,11 +113,16 @@ export default function EditorBubbleMenuManager({ editor }) {
       const citationKey = await editor.referenceManager.addReferenceFromDOI(`doi:${doi}`);
       console.log('Got citation key:', citationKey);
 
-      console.log('Inserting citation into editor');
+      // Get the current selection end position
+      const { to } = editor.state.selection;
+
+      console.log('Inserting citation into editor at position:', to);
       editor.chain()
         .focus()
-        .setMark('citation', { citationKey })
-        .insertContent(`[@${citationKey}]`)
+        // Move to end of selection
+        .setTextSelection(to)
+        // Insert citation
+        .insertContent(` [@${citationKey}]`)
         .run();
       console.log('Citation inserted successfully');
 

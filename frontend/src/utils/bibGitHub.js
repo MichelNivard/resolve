@@ -77,14 +77,15 @@ export function formatBibTeXEntry(entry) {
 
   const { entryType, citationKey, entryTags } = entry;
   
-  // Start the entry
-  let result = `@${entryType}{${citationKey},\n`;
+  // Start the entry with lowercase type
+  let result = `@${entryType.toLowerCase()}{${citationKey.toLowerCase()},\n`;
   
-  // Add each field
+  // Add each field with lowercase field names
   if (entryTags && typeof entryTags === 'object') {
     Object.entries(entryTags).forEach(([key, value]) => {
       if (value) {
-        result += `  ${key} = {${value}},\n`;
+        // Convert field name to lowercase
+        result += `\t${key.toLowerCase()} = {${value}},\n`;
       }
     });
   }
