@@ -129,7 +129,7 @@ export function ipynbToTiptapDoc(ipynb, editor) {
       docNodes.push({
         type: 'codeCell',
         attrs: {
-          source: Array.isArray(cell.source) ? cell.source.join('') : cell.source,
+          source: cell.source, // Keep as array, don't join
           outputs: cell.outputs || [],
           executionCount: cell.execution_count || null,
           metadata: cell.metadata || {}

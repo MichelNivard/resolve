@@ -14,10 +14,14 @@ export const CodeCell = Node.create({
   addAttributes() {
     return {
       source: { 
-        default: '',
-        parseHTML: element => element.getAttribute('data-source') || '',
+        default: [],
+        parseHTML: element => {
+          const source = element.getAttribute('data-source');
+          return source ? source.split('\n').map(line => line + '\n') : [];
+        },
         renderHTML: attributes => {
-          return { 'data-source': attributes.source }
+          const source = Array.isArray(attributes.source) ? attributes.source.join('') : attributes.source;
+          return { 'data-source': source };
         }
       },
       outputs: { default: [] },
@@ -77,7 +81,7 @@ function CodeCellNodeView({ node, editor, getPos }) {
 
       {showCode && (
         <pre className="code-cell-content">
-          <code>{typeof source === 'string' ? source : Array.isArray(source) ? source.join('') : ''}</code>
+          <code>{Array.isArray(source) ? source.join('') : source}</code>
         </pre>
       )}
 

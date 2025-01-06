@@ -97,8 +97,8 @@ export function parseIpynb(ipynb) {
     } else if (c.cell_type === 'code') {
       cells.push({
         type: 'code', 
-        execution_count: c.execution_count, // store this too
-        code: c.source.join(''),
+        execution_count: c.execution_count,
+        source: c.source,
         outputs: c.outputs || []
       });
     } else {
@@ -215,8 +215,8 @@ export function serializeIpynb({ yaml: yamlObj, cells }) {
         cell_type: 'code',
         execution_count: execution_count || null,
         metadata: {},
-        source: code.split('\n'),
-        outputs
+        source: Array.isArray(code) ? code : code.split('\n').map(line => line + '\n'),
+        outputs: outputs || []
       });
     } else {
       console.warn('Unknown cell type during serialization:', type);
