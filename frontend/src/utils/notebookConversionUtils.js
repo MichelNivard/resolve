@@ -15,8 +15,8 @@ import { generateHTML } from '@tiptap/html'
 import { CodeCell } from '../codeCell';
 import { RawCell } from '../rawCell';
 import { TrackChangeExtension } from './TrackChanges';
-import { CommentMark } from './CommentMark'; // import the node defined above
-import { BibMention } from '../components/Citation/bibMention'
+import { CommentMark } from './CommentMark'; 
+import { CitationMark } from '../components/Citation/CitationMark';
 
 export function ipynbToTiptapDoc(ipynb, editor) {
   // Temporarily disable track changes while loading content
@@ -110,16 +110,18 @@ export function ipynbToTiptapDoc(ipynb, editor) {
         const html = markdownToHtml(cell.content);
         const json = generateJSON(html, [
           StarterKit,
+          RawCell,
+          CodeCell,
+          Underline,
+          Highlight,
+          TrackChangeExtension,
+          CommentMark,
+          Mathematics,
+          CitationMark,
           Table,
           TableRow,
           TableCell,
-          TableHeader,
-          Underline,
-          Highlight,
-          Mathematics,
-          TrackChangeExtension,
-          CommentMark,
-          BibMention
+          TableHeader
         ]);
         docNodes.push(...json.content);
       }
@@ -198,13 +200,11 @@ export function tiptapDocToIpynb(editor, originalIpynb) {
           Mathematics.configure({
             preserveBackslashes: true
           }),
-          BibMention,
-          Table.configure({
-            resizable: true,
-          }),
+          CitationMark,
+          Table,
           TableRow,
           TableCell,
-          TableHeader,
+          TableHeader
         ]);
         
         return htmlToMarkdown(html);

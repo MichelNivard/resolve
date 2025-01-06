@@ -2,14 +2,15 @@ import React, { useState, useContext } from 'react';
 import { BubbleMenu } from '@tiptap/react';
 import { getMarkRange } from '@tiptap/core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCheck, faTimes, faComment, faQuoteRight } from '@fortawesome/free-solid-svg-icons';
+import { faCheck, faTimes, faComment, faQuoteLeft } from '@fortawesome/free-solid-svg-icons';
 import { AuthContext } from '../../contexts/AuthContext';
-import { createCitationMenu } from '../Citation/CitationComponents';
 import '../Comments/CommentsSidebar.css';
 
 export default function EditorBubbleMenuManager({ editor }) {
   const [isCommentInputVisible, setIsCommentInputVisible] = useState(false);
+  const [isCitationInputVisible, setIsCitationInputVisible] = useState(false);
   const [commentText, setCommentText] = useState('');
+  const [doiInput, setDoiInput] = useState('');
   const { user } = useContext(AuthContext);
 
   const findTrackChangeMark = (view, pos) => {
@@ -97,65 +98,28 @@ export default function EditorBubbleMenuManager({ editor }) {
     }
   };
 
-  const handleAddCitation = () => {
-    const { from, to } = editor.state.selection;
-    if (from === to) return; // Require text selection for citation
-
-    const coords = editor.view.coordsAtPos(from);
-    const menuContainer = document.createElement('div');
-    menuContainer.style.position = 'absolute';
-    menuContainer.style.left = `${coords.left}px`;
-    menuContainer.style.top = `${coords.bottom}px`;
-    document.body.appendChild(menuContainer);
-
-    // Get references from the correct storage location
-    const bibMentionExt = editor.extensionManager.extensions.find(ext => ext.name === 'bibMention');
-    console.log('BubbleMenu: Found bibMention extension:', bibMentionExt);
-    const suggestion = bibMentionExt?.options?.suggestion;
-    console.log('BubbleMenu: Got suggestion from extension:', suggestion);
-    const referenceMap = suggestion?.referenceMap || {};
-    console.log('BubbleMenu: Got referenceMap:', referenceMap);
+  const handleAddCitation = async () => {
+    if (!editor) return;
     
-    // Convert referenceMap to items array format
-    const items = Object.entries(referenceMap).map(([key, entry]) => {
-      const authors = entry.author ? entry.author.split(/\s+and\s+/) : [];
-      return {
-        id: key,
-        bibKey: key,
-        title: entry.title || '',
-        authors: authors,
-        firstAuthor: authors[0] || '',
-        year: entry.year || ''
-      };
-    }).sort((a, b) => {
-      // Sort by year (descending) then by key (ascending)
-      if (b.year !== a.year) return b.year.localeCompare(a.year);
-      return a.bibKey.localeCompare(b.bibKey);
-    });
+    const doi = doiInput.trim();
+    if (!doi.startsWith('doi:')) {
+      console.error('Invalid DOI format');
+      return;
+    }
 
-    console.log('BubbleMenu: Created items array:', items);
+    try {
+      const citationKey = await editor.referenceManager.addReferenceFromDOI(doi.substring(4));
+      editor.chain()
+        .focus()
+        .setMark('citation', { citationKey })
+        .insertContent(`[@${citationKey}]`)
+        .run();
 
-    const menu = createCitationMenu({
-      editor,
-      items,
-      command: ({ citations }) => {
-        if (!citations || citations.length === 0) return;
-        
-        const content = `[@${citations.join('; @')}]`;
-        editor
-          .chain()
-          .focus()
-          .insertContent(content)
-          .run();
-
-        menuContainer.remove();
-      },
-      onClose: () => {
-        menuContainer.remove();
-      }
-    });
-
-    menu.mount(menuContainer);
+      setDoiInput('');
+      setIsCitationInputVisible(false);
+    } catch (error) {
+      console.error('Error adding citation:', error);
+    }
   };
 
   return (
@@ -235,13 +199,48 @@ export default function EditorBubbleMenuManager({ editor }) {
               </button>
               <button
                 className="bubble-menu-button"
-                onClick={handleAddCitation}
+                onClick={() => setIsCitationInputVisible(true)}
                 title="Add citation"
               >
-                <FontAwesomeIcon icon={faQuoteRight} />
+                <FontAwesomeIcon icon={faQuoteLeft} />
               </button>
             </>
           )}
+        </div>
+      </BubbleMenu>
+
+      <BubbleMenu
+        editor={editor}
+        shouldShow={({ editor }) => isCitationInputVisible}
+        tippyOptions={{ duration: 100 }}
+      >
+        <div className="bubble-menu-container">
+          <div className="citation-input-container">
+            <input
+              type="text"
+              className="bubble-menu-input"
+              placeholder="doi:10.xxxx/xxxxx"
+              value={doiInput}
+              onChange={(e) => setDoiInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  handleAddCitation();
+                }
+              }}
+            />
+            <button className="bubble-menu-button accept" onClick={handleAddCitation}>
+              <FontAwesomeIcon icon={faCheck} />
+            </button>
+            <button
+              className="bubble-menu-button reject"
+              onClick={() => {
+                setDoiInput('');
+                setIsCitationInputVisible(false);
+              }}
+            >
+              <FontAwesomeIcon icon={faTimes} />
+            </button>
+          </div>
         </div>
       </BubbleMenu>
     </>

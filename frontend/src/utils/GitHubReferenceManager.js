@@ -1,5 +1,6 @@
 import { loadBibFromGitHub, saveBibToGitHub, formatBibTeXEntry } from './bibGitHub';
 import bibtexParse from 'bibtex-parser-js';
+import { doi2bib } from './doiUtils';
 
 export class GitHubReferenceManager {
   constructor(token, selectedRepo, notebookPath, owner) {
@@ -118,6 +119,28 @@ export class GitHubReferenceManager {
     } else {
       // Add new reference
       this.references.push(reference);
+    }
+  }
+
+  async addReferenceFromDOI(doi) {
+    if (!this._initialized) {
+      await this.init();
+    }
+    
+    try {
+      const bibEntry = await doi2bib(doi);
+      const parsed = bibtexParse.toJSON(bibEntry)[0];
+      
+      // Add to references if not already present
+      if (!this.references.find(ref => ref.citationKey === parsed.citationKey)) {
+        this.references.push(parsed);
+        await this.save();
+      }
+      
+      return parsed.citationKey;
+    } catch (error) {
+      console.error('Error adding reference from DOI:', error);
+      throw error;
     }
   }
 

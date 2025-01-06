@@ -9,7 +9,6 @@ import EditorWrapper from './components/Editor/EditorWrapper';
 import WarningBanner from './components/WarningBanner';
 import LoginButton from './components/Auth/LoginButton';
 import { GitHubReferenceManager } from './utils/GitHubReferenceManager';
-import { suggestionFactory } from './components/Citation/suggestion';
 import 'katex/dist/katex.min.css';
 
 // Import TipTap extensions
@@ -27,7 +26,7 @@ import { RawCell } from './rawCell';
 import { CodeCell } from './codeCell';
 import { TrackChangeExtension } from './utils/TrackChanges';
 import { CommentMark } from './utils/CommentMark';
-import { BibMention } from './components/Citation/bibMention';
+import { CitationMark } from './components/Citation/CitationMark';
 
 function App() {
   const { isAuthenticated, user } = useContext(AuthContext);
@@ -66,7 +65,6 @@ function App() {
   useEffect(() => {
     if (referenceManager) {
       console.log('🔄 Creating editor extensions with reference manager');
-      const suggestion = suggestionFactory(referenceManager);
       setEditorExtensions([
         StarterKit,
         RawCell,
@@ -90,11 +88,7 @@ function App() {
           onUpdate: handleCommentMarkUpdate
         }),
         Mathematics,
-        BibMention.configure({ 
-          suggestion,
-          onBeforeCreate: () => {
-          }
-        }),
+        CitationMark,
       ]);
     }
   }, [referenceManager]);
