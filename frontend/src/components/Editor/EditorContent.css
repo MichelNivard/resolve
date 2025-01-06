@@ -43,7 +43,7 @@
     border-radius: 4px;
     padding: 4px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    z-index: 2000;
+    z-index: 3000; /* Increased z-index to appear above comments */
   }
 
   .bubble-menu-button {
@@ -146,6 +146,8 @@
     border: 1px solid #ccc;
     border-radius: 4px;
     width: 150px;
+    z-index: 3000; /* Match the container's z-index */
+    position: relative; /* Ensure z-index works */
   }
 
   .bubble-menu-icon-button {

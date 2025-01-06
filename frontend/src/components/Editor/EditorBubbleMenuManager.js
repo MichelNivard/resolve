@@ -121,8 +121,8 @@ export default function EditorBubbleMenuManager({ editor }) {
         .focus()
         // Move to end of selection
         .setTextSelection(to)
-        // Insert citation
-        .insertContent(` [@${citationKey}]`)
+        // Insert citation with lowercase key
+        .insertContent(` [@${citationKey.toLowerCase()}]`)
         .run();
       console.log('Citation inserted successfully');
 
