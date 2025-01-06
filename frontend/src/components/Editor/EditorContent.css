@@ -109,6 +109,25 @@
     gap: 0;
   }
 
+  .citation-input-container {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px;
+  }
+
+  .citation-input-container .bubble-menu-input {
+    min-width: 200px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 6px 8px;
+    font-size: 14px;
+  }
+
+  .citation-input-container .bubble-menu-button {
+    padding: 6px 12px;
+  }
+
   .comment-input {
     border: none;
     padding: 4px;
@@ -455,10 +474,4 @@
   background-color: #f0f0f0;
   border-radius: 3px;
   padding: 0 4px;
-}
-
-.citation-input-container {
-  display: flex;
-  align-items: center;
-  gap: 4px;
 }
