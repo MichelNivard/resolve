@@ -67,8 +67,8 @@
   }
 
   .bubble-menu-button.accept {
-    background-color: #4CAF50;
-    color: white;
+    background-color: #ffffff;
+    color: rgb(51, 51, 51);
   }
 
   .bubble-menu-button.accept:hover {
@@ -76,8 +76,8 @@
   }
 
   .bubble-menu-button.reject {
-    background-color: #f44336;
-    color: white;
+    background-color: #ffffff;
+    color: rgb(51, 51, 51);
   }
 
   .bubble-menu-button.reject:hover {
