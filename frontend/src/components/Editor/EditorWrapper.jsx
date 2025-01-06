@@ -25,6 +25,41 @@ import LoginButton from '../Auth/LoginButton';
 import './EditorContent.css';
 import { fetchNotebooksInRepo } from '../../utils/api';
 
+const ReferencesList = ({ references }) => {
+  if (!references || references.length === 0) return null;
+
+  return (
+    <div className="references-section">
+      <h2>References</h2>
+      <div className="references-list">
+        {references.map((ref, index) => {
+          const { entryTags = {} } = ref;
+          const { author, year, title, journal, doi, url } = entryTags;
+          
+          return (
+            <div key={index} className="reference-item">
+              {author && `${author}. `}
+              {year && `(${year}). `}
+              {title && `${title}. `}
+              {journal && <em>{journal}</em>}
+              {doi && (
+                <a href={`https://doi.org/${doi}`} target="_blank" rel="noopener noreferrer">
+                  {` doi:${doi}`}
+                </a>
+              )}
+              {!doi && url && (
+                <a href={url} target="_blank" rel="noopener noreferrer">
+                  {` ${url}`}
+                </a>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
+
 const EditorWrapper = ({
   referenceManager,
   filePath,
@@ -228,6 +263,9 @@ const EditorWrapper = ({
               <div className="editor-main">
                 <div className="editor-content-container">
                   <EditorContent editor={editor} />
+                  {referenceManager && (
+                    <ReferencesList references={referenceManager.getReferences()} />
+                  )}
                 </div>
               </div>
             </div>
