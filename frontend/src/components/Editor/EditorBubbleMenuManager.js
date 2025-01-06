@@ -174,29 +174,65 @@ export default function EditorBubbleMenuManager({ editor }) {
             <>
               <input
                 type="text"
+                className="comment-input"
+                placeholder="Add comment..."
                 value={commentText}
                 onChange={(e) => setCommentText(e.target.value)}
-                placeholder="Add a comment..."
-                className="bubble-menu-input"
-                style={{ width: '150px', height: '24px', padding: '0 8px' }}
-                autoFocus
-              />
-              <button
-                className="bubble-menu-button"
-                onClick={() => {
-                  setIsCommentInputVisible(false);
-                  setCommentText('');
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    handleAddComment();
+                  }
                 }}
-                title="Cancel"
+              />
+              <button className="bubble-menu-button accept" onClick={handleAddComment}>
+                <FontAwesomeIcon icon={faCheck} />
+              </button>
+              <button
+                className="bubble-menu-button reject"
+                onClick={() => {
+                  setCommentText('');
+                  setIsCommentInputVisible(false);
+                }}
               >
                 <FontAwesomeIcon icon={faTimes} />
               </button>
-              <button
-                className="bubble-menu-button"
-                onClick={handleAddComment}
-                title="Add comment"
+            </>
+          ) : isCitationInputVisible ? (
+            <>
+              <input
+                type="text"
+                className="bubble-menu-input"
+                placeholder="doi:10.xxxx/xxxxx"
+                value={doiInput}
+                onChange={(e) => {
+                  console.log('DOI input changed:', e.target.value);
+                  setDoiInput(e.target.value);
+                }}
+                onKeyDown={(e) => {
+                  console.log('Key pressed in DOI input:', e.key);
+                  if (e.key === 'Enter') {
+                    handleAddCitation();
+                  }
+                }}
+              />
+              <button 
+                className="bubble-menu-button accept" 
+                onClick={() => {
+                  console.log('Citation accept button clicked');
+                  handleAddCitation();
+                }}
               >
                 <FontAwesomeIcon icon={faCheck} />
+              </button>
+              <button
+                className="bubble-menu-button reject"
+                onClick={() => {
+                  console.log('Citation cancel button clicked');
+                  setDoiInput('');
+                  setIsCitationInputVisible(false);
+                }}
+              >
+                <FontAwesomeIcon icon={faTimes} />
               </button>
             </>
           ) : (
@@ -221,58 +257,6 @@ export default function EditorBubbleMenuManager({ editor }) {
               </button>
             </>
           )}
-        </div>
-      </BubbleMenu>
-
-      <BubbleMenu
-        editor={editor}
-        shouldShow={({ editor }) => {
-          console.log('Citation BubbleMenu shouldShow check:', { 
-            isCitationInputVisible, 
-            editorExists: !!editor 
-          });
-          return isCitationInputVisible;
-        }}
-        tippyOptions={{ duration: 100 }}
-      >
-        <div className="bubble-menu-container">
-          <div className="citation-input-container">
-            <input
-              type="text"
-              className="bubble-menu-input"
-              placeholder="doi:10.xxxx/xxxxx"
-              value={doiInput}
-              onChange={(e) => {
-                console.log('DOI input changed:', e.target.value);
-                setDoiInput(e.target.value);
-              }}
-              onKeyDown={(e) => {
-                console.log('Key pressed in DOI input:', e.key);
-                if (e.key === 'Enter') {
-                  handleAddCitation();
-                }
-              }}
-            />
-            <button 
-              className="bubble-menu-button accept" 
-              onClick={() => {
-                console.log('Citation accept button clicked');
-                handleAddCitation();
-              }}
-            >
-              <FontAwesomeIcon icon={faCheck} />
-            </button>
-            <button
-              className="bubble-menu-button reject"
-              onClick={() => {
-                console.log('Citation cancel button clicked');
-                setDoiInput('');
-                setIsCitationInputVisible(false);
-              }}
-            >
-              <FontAwesomeIcon icon={faTimes} />
-            </button>
-          </div>
         </div>
       </BubbleMenu>
     </>
