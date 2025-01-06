@@ -99,21 +99,32 @@ export default function EditorBubbleMenuManager({ editor }) {
   };
 
   const handleAddCitation = async () => {
-    if (!editor) return;
+    console.log('handleAddCitation called');
+    if (!editor) {
+      console.error('No editor instance available');
+      return;
+    }
     
     const doi = doiInput.trim();
+    console.log('Processing DOI:', doi);
+    
     if (!doi.startsWith('doi:')) {
       console.error('Invalid DOI format');
       return;
     }
 
     try {
+      console.log('Fetching citation key for DOI:', doi.substring(4));
       const citationKey = await editor.referenceManager.addReferenceFromDOI(doi.substring(4));
+      console.log('Got citation key:', citationKey);
+
+      console.log('Inserting citation into editor');
       editor.chain()
         .focus()
         .setMark('citation', { citationKey })
         .insertContent(`[@${citationKey}]`)
         .run();
+      console.log('Citation inserted successfully');
 
       setDoiInput('');
       setIsCitationInputVisible(false);
@@ -199,7 +210,11 @@ export default function EditorBubbleMenuManager({ editor }) {
               </button>
               <button
                 className="bubble-menu-button"
-                onClick={() => setIsCitationInputVisible(true)}
+                onClick={() => {
+                  console.log('Citation button clicked');
+                  setIsCitationInputVisible(true);
+                  console.log('isCitationInputVisible set to true');
+                }}
                 title="Add citation"
               >
                 <FontAwesomeIcon icon={faQuoteLeft} />
@@ -211,7 +226,13 @@ export default function EditorBubbleMenuManager({ editor }) {
 
       <BubbleMenu
         editor={editor}
-        shouldShow={({ editor }) => isCitationInputVisible}
+        shouldShow={({ editor }) => {
+          console.log('Citation BubbleMenu shouldShow check:', { 
+            isCitationInputVisible, 
+            editorExists: !!editor 
+          });
+          return isCitationInputVisible;
+        }}
         tippyOptions={{ duration: 100 }}
       >
         <div className="bubble-menu-container">
@@ -221,19 +242,30 @@ export default function EditorBubbleMenuManager({ editor }) {
               className="bubble-menu-input"
               placeholder="doi:10.xxxx/xxxxx"
               value={doiInput}
-              onChange={(e) => setDoiInput(e.target.value)}
+              onChange={(e) => {
+                console.log('DOI input changed:', e.target.value);
+                setDoiInput(e.target.value);
+              }}
               onKeyDown={(e) => {
+                console.log('Key pressed in DOI input:', e.key);
                 if (e.key === 'Enter') {
                   handleAddCitation();
                 }
               }}
             />
-            <button className="bubble-menu-button accept" onClick={handleAddCitation}>
+            <button 
+              className="bubble-menu-button accept" 
+              onClick={() => {
+                console.log('Citation accept button clicked');
+                handleAddCitation();
+              }}
+            >
               <FontAwesomeIcon icon={faCheck} />
             </button>
             <button
               className="bubble-menu-button reject"
               onClick={() => {
+                console.log('Citation cancel button clicked');
                 setDoiInput('');
                 setIsCitationInputVisible(false);
               }}
