@@ -85,6 +85,13 @@ const EditorWrapper = ({
     },
   });
 
+  // Attach referenceManager to editor when both are available
+  useEffect(() => {
+    if (editor && referenceManager) {
+      editor.referenceManager = referenceManager;
+    }
+  }, [editor, referenceManager]);
+
   useEffect(() => {
     const loadNotebooks = async () => {
       if (selectedRepo?.fullName) {
