@@ -9,7 +9,7 @@ import Table from '@tiptap/extension-table';
 import TableRow from '@tiptap/extension-table-row';
 import TableCell from '@tiptap/extension-table-cell';
 import TableHeader from '@tiptap/extension-table-header';
-import { BibMention } from '../Citation/bibMention';
+import { CitationMark } from '../Citation/CitationMark';
 import EditorBubbleMenuManager from './EditorBubbleMenuManager';
 import './TrackChangesBubble.css';
 import './TableStyles.css';
@@ -18,12 +18,10 @@ import { CommentMark } from '../../utils/CommentMark';
 import { RawCell } from '../../rawCell';
 import '../../rawCell.css'
 import { CodeCell } from '../../codeCell';
-import { suggestionFactory } from '../Citation/suggestion';
 import { ipynbToTiptapDoc } from '../../utils/notebookConversionUtils';
 import EditorToolbar from './EditorToolbar';
 import { CommentsSidebar } from '../Comments/CommentsSidebar';
 import LoginButton from '../Auth/LoginButton';
-import { citationCommands } from '../Citation/citationCommands';
 import './EditorContent.css';
 import { fetchNotebooksInRepo } from '../../utils/api';
 
@@ -77,12 +75,7 @@ const EditorWrapper = ({
         onUpdate: handleCommentMarkUpdate
       }),
       Mathematics,
-      BibMention.configure({
-        suggestion: suggestionFactory(referenceManager),
-        HTMLAttributes: {
-          class: 'bib-mention'
-        }
-      })
+      CitationMark,
     ],
     content: '',
     editorProps: {
@@ -155,9 +148,9 @@ const EditorWrapper = ({
 
   useEffect(() => {
     if (editor) {
-      Object.entries(citationCommands).forEach(([name, command]) => {
-        editor.commands[name] = command;
-      });
+      // Object.entries(citationCommands).forEach(([name, command]) => {
+      //   editor.commands[name] = command;
+      // });
     }
   }, [editor]);
 

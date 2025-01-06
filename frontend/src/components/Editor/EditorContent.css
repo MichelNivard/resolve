@@ -450,3 +450,15 @@
   background: rgba(255, 0, 0, 0.1);
   color: #d32f2f;
 }
+
+.citation {
+  background-color: #f0f0f0;
+  border-radius: 3px;
+  padding: 0 4px;
+}
+
+.citation-input-container {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
