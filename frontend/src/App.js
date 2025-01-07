@@ -249,30 +249,48 @@ function App() {
     setCommentMarkKey((prev) => prev + 1);
   };
 
+  const verifyBetaCode = () => {
+    if (betaCode === 'beta-test-crash-dummy') {
+      setBetaCodeVerified(true);
+    }
+  };
+
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      verifyBetaCode();
+    }
+  };
+
   return (
     <div className="App">
       <WarningBanner editors={ipynb?.metadata?.active_editors} currentUser={user} />
       {!isAuthenticated ? (
         <div className="login-container">
           <div className="login-card">
-            <h1>Welcome</h1>
+          <h1>Sign in to Resolve</h1>
+            <p>
+              Welcome Resolve is in preview testing, for a beta code reach out to Michel Nivard (find me on bluesky or GitHub). Then access your notebooks and collaborate with others using GitHub authentication
+            </p>
             {!betaCodeVerified ? (
-              <>
+              <form className="beta-test-form" onSubmit={(e) => e.preventDefault()}>
                 <p>Please enter the beta test code to continue</p>
                 <input
                   type="text"
                   className="beta-test-input"
                   value={betaCode}
                   onChange={(e) => setBetaCode(e.target.value)}
-                  onKeyUp={(e) => {
-                    if (e.target.value === 'beta-test-crash-dummy') {
-                      setBetaCodeVerified(true);
-                    }
-                  }}
+                  onKeyPress={handleKeyPress}
                   placeholder="Enter beta test code"
                   autoFocus
                 />
-              </>
+                <button
+                  type="button"
+                  className="beta-confirm-button"
+                  onClick={verifyBetaCode}
+                >
+                  Confirm
+                </button>
+              </form>
             ) : (
               <LoginButton />
             )}
