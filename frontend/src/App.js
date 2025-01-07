@@ -30,6 +30,8 @@ import { CitationMark } from './components/Citation/CitationMark';
 
 function App() {
   const { isAuthenticated, user } = useContext(AuthContext);
+  const [betaCodeVerified, setBetaCodeVerified] = useState(false);
+  const [betaCode, setBetaCode] = useState('');
   const [filePath, setFilePath] = useState('');
   const [repositories, setRepositories] = useState([]);
   const [selectedRepo, setSelectedRepo] = useState(null);
@@ -253,11 +255,27 @@ function App() {
       {!isAuthenticated ? (
         <div className="login-container">
           <div className="login-card">
-            <h1>Sign in to Resolve</h1>
-            <p>
-              Access your notebooks and collaborate with others using GitHub authentication
-            </p>
-            <LoginButton />
+            <h1>Welcome</h1>
+            {!betaCodeVerified ? (
+              <>
+                <p>Please enter the beta test code to continue</p>
+                <input
+                  type="text"
+                  className="beta-test-input"
+                  value={betaCode}
+                  onChange={(e) => setBetaCode(e.target.value)}
+                  onKeyUp={(e) => {
+                    if (e.target.value === 'beta-test-crash-dummy') {
+                      setBetaCodeVerified(true);
+                    }
+                  }}
+                  placeholder="Enter beta test code"
+                  autoFocus
+                />
+              </>
+            ) : (
+              <LoginButton />
+            )}
           </div>
         </div>
       ) : (
