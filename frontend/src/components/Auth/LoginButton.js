@@ -14,10 +14,10 @@ const LoginButton = () => {
   };
 
   return (
-    <button onClick={handleLogin} className="login-button">
+    <><p>Login with GitGub to edit notebooks in Resolve</p><button onClick={handleLogin} className="login-button">
       <FaGithub />
       Continue with GitHub
-    </button>
+    </button></>
   );
 };
 

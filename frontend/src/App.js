@@ -268,12 +268,10 @@ function App() {
         <div className="login-container">
           <div className="login-card">
           <h1>Sign in to Resolve</h1>
-            <p>
-              Welcome Resolve is in preview testing, for a beta code reach out to Michel Nivard (find me on bluesky or GitHub). Then access your notebooks and collaborate with others using GitHub authentication
-            </p>
             {!betaCodeVerified ? (
+              
               <form className="beta-test-form" onSubmit={(e) => e.preventDefault()}>
-                <p>Please enter the beta test code to continue</p>
+                <p>Welcome Resolve is in preview testing, for a beta code reach out to Michel Nivard (find me on bluesky or GitHub). Please enter the beta test code to continue</p>
                 <input
                   type="text"
                   className="beta-test-input"
