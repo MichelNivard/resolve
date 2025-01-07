@@ -14,7 +14,16 @@ const LoginButton = () => {
   };
 
   return (
-    <><p>Login with GitGub to edit notebooks in Resolve</p><button onClick={handleLogin} className="login-button">
+    <><p>
+    Resolve is your seamless solution for collaborating on Quarto and Jupyter (`.ipynb`) documents. To get started, please sign in with your GitHub account.
+  </p>
+  <p>
+    Don't have a GitHub account yet?{' '}
+    <a href="https://github.com/join" style={{ fontWeight: 'bold' }}>
+      Register here
+    </a>{' '}
+    and join our community!
+  </p><button onClick={handleLogin} className="login-button">
       <FaGithub />
       Continue with GitHub
     </button></>
