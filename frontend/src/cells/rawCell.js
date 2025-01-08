@@ -144,11 +144,19 @@ export const RawCell = Node.create({
               
               input.addEventListener('input', (e) => {
                 e.stopPropagation();
-                adjustHeight();
                 const newYaml = { ...yaml };
                 newYaml[key] = e.target.value;
+                
+                // Format the YAML
+                const formattedYaml = Object.entries(newYaml)
+                  .map(([k, v]) => `${k}: ${typeof v === 'string' ? JSON.stringify(v) : v}`)
+                  .join('\n');
+                
+                // Update both parsed and formatted YAML
                 editor.commands.updateAttributes('rawCell', {
-                  parsedYaml: newYaml
+                  parsedYaml: newYaml,
+                  formattedYaml: formattedYaml,
+                  content: `---\n${formattedYaml}\n---`
                 });
               });
               
@@ -161,8 +169,17 @@ export const RawCell = Node.create({
                 e.stopPropagation();
                 const newYaml = { ...yaml };
                 newYaml[key] = e.target.value;
+                
+                // Format the YAML
+                const formattedYaml = Object.entries(newYaml)
+                  .map(([k, v]) => `${k}: ${typeof v === 'string' ? JSON.stringify(v) : v}`)
+                  .join('\n');
+                
+                // Update both parsed and formatted YAML
                 editor.commands.updateAttributes('rawCell', {
-                  parsedYaml: newYaml
+                  parsedYaml: newYaml,
+                  formattedYaml: formattedYaml,
+                  content: `---\n${formattedYaml}\n---`
                 });
               });
             }
