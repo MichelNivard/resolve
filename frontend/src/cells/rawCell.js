@@ -142,8 +142,19 @@ export const RawCell = Node.create({
                 input.style.height = input.scrollHeight + 'px';
               };
               
-              input.addEventListener('input', (e) => {
+              // Prevent editor from handling events
+              const stopEvent = (e) => {
                 e.stopPropagation();
+                e.preventDefault();
+              };
+              
+              input.addEventListener('keydown', stopEvent);
+              input.addEventListener('keypress', stopEvent);
+              input.addEventListener('keyup', stopEvent);
+              input.addEventListener('input', (e) => {
+                stopEvent(e);
+                adjustHeight();
+                
                 const newYaml = { ...yaml };
                 newYaml[key] = e.target.value;
                 
@@ -152,27 +163,12 @@ export const RawCell = Node.create({
                   .map(([k, v]) => `${k}: ${typeof v === 'string' ? JSON.stringify(v) : v}`)
                   .join('\n');
                 
-                const yamlContent = `---\n${formattedYaml}\n---`;
-                
-                // Get the current position
-                const pos = getPos();
-                
-                // Create a transaction to update the node
-                const tr = editor.state.tr;
-                
-                // Update the node's attributes and content
-                if (typeof pos === 'number') {
-                  tr.setNodeMarkup(pos, undefined, {
-                    content: yamlContent,
-                    parsedYaml: newYaml,
-                    formattedYaml: formattedYaml,
-                    isYamlHeader: true,
-                    isAcademicArticle: true
-                  });
-                  
-                  // Dispatch the transaction
-                  editor.view.dispatch(tr);
-                }
+                // Update attributes without replacing the node
+                editor.commands.updateAttributes('rawCell', {
+                  parsedYaml: newYaml,
+                  formattedYaml: formattedYaml,
+                  content: `---\n${formattedYaml}\n---`
+                });
               });
               
               // Initial height adjustment
@@ -180,8 +176,19 @@ export const RawCell = Node.create({
             } else {
               input = document.createElement('input');
               input.type = 'text';
-              input.addEventListener('input', (e) => {
+              
+              // Prevent editor from handling events
+              const stopEvent = (e) => {
                 e.stopPropagation();
+                e.preventDefault();
+              };
+              
+              input.addEventListener('keydown', stopEvent);
+              input.addEventListener('keypress', stopEvent);
+              input.addEventListener('keyup', stopEvent);
+              input.addEventListener('input', (e) => {
+                stopEvent(e);
+                
                 const newYaml = { ...yaml };
                 newYaml[key] = e.target.value;
                 
@@ -190,34 +197,19 @@ export const RawCell = Node.create({
                   .map(([k, v]) => `${k}: ${typeof v === 'string' ? JSON.stringify(v) : v}`)
                   .join('\n');
                 
-                const yamlContent = `---\n${formattedYaml}\n---`;
-                
-                // Get the current position
-                const pos = getPos();
-                
-                // Create a transaction to update the node
-                const tr = editor.state.tr;
-                
-                // Update the node's attributes and content
-                if (typeof pos === 'number') {
-                  tr.setNodeMarkup(pos, undefined, {
-                    content: yamlContent,
-                    parsedYaml: newYaml,
-                    formattedYaml: formattedYaml,
-                    isYamlHeader: true,
-                    isAcademicArticle: true
-                  });
-                  
-                  // Dispatch the transaction
-                  editor.view.dispatch(tr);
-                }
+                // Update attributes without replacing the node
+                editor.commands.updateAttributes('rawCell', {
+                  parsedYaml: newYaml,
+                  formattedYaml: formattedYaml,
+                  content: `---\n${formattedYaml}\n---`
+                });
               });
             }
             
             input.value = value || '';
             input.setAttribute('data-property', key);
             
-            // Prevent focus loss and propagation of events
+            // Prevent focus/click events from reaching editor
             input.addEventListener('mousedown', (e) => {
               e.stopPropagation();
             });
@@ -228,21 +220,14 @@ export const RawCell = Node.create({
             
             input.addEventListener('focus', (e) => {
               e.stopPropagation();
-              const selection = window.getSelection();
-              selection.removeAllRanges();
             });
             
             input.addEventListener('blur', (e) => {
               e.stopPropagation();
             });
             
-            // Prevent backspace from deleting the node
-            input.addEventListener('keydown', (e) => {
-              e.stopPropagation();
-              if (e.key === 'Backspace' && e.target.value === '') {
-                e.preventDefault();
-              }
-            });
+            // Make the input non-draggable
+            input.draggable = false;
             
             valueDiv.appendChild(input);
             row.appendChild(labelDiv);
