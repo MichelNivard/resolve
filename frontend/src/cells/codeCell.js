@@ -91,7 +91,32 @@ function CodeCellNodeView({ node, editor, getPos }) {
 }
 
 function renderOutput(output, index) {
+  // Handle stream output (like stdout)
+  if (output.output_type === 'stream') {
+    return (
+      <pre key={index} className="code-cell-output-stream">
+        <code>{Array.isArray(output.text) ? output.text.join('') : output.text}</code>
+      </pre>
+    );
+  }
+
+  // Handle data output
   if (output.data) {
+    // Handle HTML output
+    if (output.data['text/html']) {
+      const htmlContent = Array.isArray(output.data['text/html']) 
+        ? output.data['text/html'].join('') 
+        : output.data['text/html'];
+      return (
+        <div 
+          key={index} 
+          className="code-cell-output-html"
+          dangerouslySetInnerHTML={{ __html: htmlContent }}
+        />
+      );
+    }
+    
+    // Handle PNG images
     if (output.data['image/png']) {
       const base64Data = output.data['image/png'];
       return (
@@ -99,18 +124,26 @@ function renderOutput(output, index) {
           <img src={`data:image/png;base64,${base64Data}`} alt="output" />
         </div>
       );
-    } else if (output.data['text/plain']) {
+    }
+    
+    // Handle plain text
+    if (output.data['text/plain']) {
       return (
         <pre key={index} className="code-cell-output-text">
-          {output.data['text/plain'].join('')}
+          <code>
+            {Array.isArray(output.data['text/plain']) 
+              ? output.data['text/plain'].join('') 
+              : output.data['text/plain']}
+          </code>
         </pre>
       );
     }
   }
 
+  // For any other output type, show the raw JSON for debugging
   return (
-    <pre key={index} className="code-cell-output-text">
-      {JSON.stringify(output, null, 2)}
+    <pre key={index} className="code-cell-output-json">
+      <code>{JSON.stringify(output, null, 2)}</code>
     </pre>
   );
 }

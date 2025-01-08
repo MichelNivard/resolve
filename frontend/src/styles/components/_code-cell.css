@@ -1,0 +1,73 @@
+.code-cell {
+  margin: 1rem 0;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+}
+
+.code-cell-toggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  border: none;
+  background: #f5f5f5;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.code-cell-toggle:hover {
+  background: #eeeeee;
+}
+
+.code-cell-content {
+  margin: 0;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-top: 1px solid #e0e0e0;
+  font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  overflow-x: auto;
+}
+
+/* Output Styles */
+.code-cell-output-stream,
+.code-cell-output-text,
+.code-cell-output-json {
+  margin: 0;
+  padding: 1rem;
+  background: white;
+  border-top: 1px solid #e0e0e0;
+  font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  overflow-x: auto;
+  white-space: pre-wrap;
+}
+
+.code-cell-output-stream code,
+.code-cell-output-text code,
+.code-cell-output-json code {
+  font-family: inherit;
+}
+
+.code-cell-output-html {
+  padding: 1rem;
+  background: white;
+  border-top: 1px solid #e0e0e0;
+  overflow-x: auto;
+}
+
+.code-cell-output-image {
+  padding: 1rem;
+  background: white;
+  border-top: 1px solid #e0e0e0;
+  text-align: center;
+}
+
+.code-cell-output-image img {
+  max-width: 100%;
+  height: auto;
+}
