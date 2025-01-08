@@ -89,7 +89,7 @@ export const RawCell = Node.create({
       }];
     },
 
-    addNodeView(editor => {
+    addNodeView: (editor) => {
       return (node, view, getPos) => {
         console.log('RawCell nodeView rendering with node:', node);
         const dom = document.createElement('div');
