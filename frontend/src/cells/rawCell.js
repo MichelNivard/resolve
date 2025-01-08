@@ -152,12 +152,27 @@ export const RawCell = Node.create({
                   .map(([k, v]) => `${k}: ${typeof v === 'string' ? JSON.stringify(v) : v}`)
                   .join('\n');
                 
-                // Update both parsed and formatted YAML
-                editor.commands.updateAttributes('rawCell', {
-                  parsedYaml: newYaml,
-                  formattedYaml: formattedYaml,
-                  content: `---\n${formattedYaml}\n---`
-                });
+                const yamlContent = `---\n${formattedYaml}\n---`;
+                
+                // Get the current position
+                const pos = getPos();
+                
+                // Create a transaction to update the node
+                const tr = editor.state.tr;
+                
+                // Update the node's attributes and content
+                if (typeof pos === 'number') {
+                  tr.setNodeMarkup(pos, undefined, {
+                    content: yamlContent,
+                    parsedYaml: newYaml,
+                    formattedYaml: formattedYaml,
+                    isYamlHeader: true,
+                    isAcademicArticle: true
+                  });
+                  
+                  // Dispatch the transaction
+                  editor.view.dispatch(tr);
+                }
               });
               
               // Initial height adjustment
@@ -175,12 +190,27 @@ export const RawCell = Node.create({
                   .map(([k, v]) => `${k}: ${typeof v === 'string' ? JSON.stringify(v) : v}`)
                   .join('\n');
                 
-                // Update both parsed and formatted YAML
-                editor.commands.updateAttributes('rawCell', {
-                  parsedYaml: newYaml,
-                  formattedYaml: formattedYaml,
-                  content: `---\n${formattedYaml}\n---`
-                });
+                const yamlContent = `---\n${formattedYaml}\n---`;
+                
+                // Get the current position
+                const pos = getPos();
+                
+                // Create a transaction to update the node
+                const tr = editor.state.tr;
+                
+                // Update the node's attributes and content
+                if (typeof pos === 'number') {
+                  tr.setNodeMarkup(pos, undefined, {
+                    content: yamlContent,
+                    parsedYaml: newYaml,
+                    formattedYaml: formattedYaml,
+                    isYamlHeader: true,
+                    isAcademicArticle: true
+                  });
+                  
+                  // Dispatch the transaction
+                  editor.view.dispatch(tr);
+                }
               });
             }
             
