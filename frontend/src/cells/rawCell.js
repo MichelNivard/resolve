@@ -142,17 +142,21 @@ export const RawCell = Node.create({
                 input.style.height = input.scrollHeight + 'px';
               };
               
-              // Prevent editor from handling events
-              const stopEvent = (e) => {
+              // Only stop propagation, don't prevent default
+              input.addEventListener('keydown', (e) => {
                 e.stopPropagation();
-                e.preventDefault();
-              };
+              });
               
-              input.addEventListener('keydown', stopEvent);
-              input.addEventListener('keypress', stopEvent);
-              input.addEventListener('keyup', stopEvent);
+              input.addEventListener('keypress', (e) => {
+                e.stopPropagation();
+              });
+              
+              input.addEventListener('keyup', (e) => {
+                e.stopPropagation();
+              });
+              
               input.addEventListener('input', (e) => {
-                stopEvent(e);
+                e.stopPropagation();
                 adjustHeight();
                 
                 const newYaml = { ...yaml };
@@ -177,17 +181,21 @@ export const RawCell = Node.create({
               input = document.createElement('input');
               input.type = 'text';
               
-              // Prevent editor from handling events
-              const stopEvent = (e) => {
+              // Only stop propagation, don't prevent default
+              input.addEventListener('keydown', (e) => {
                 e.stopPropagation();
-                e.preventDefault();
-              };
+              });
               
-              input.addEventListener('keydown', stopEvent);
-              input.addEventListener('keypress', stopEvent);
-              input.addEventListener('keyup', stopEvent);
+              input.addEventListener('keypress', (e) => {
+                e.stopPropagation();
+              });
+              
+              input.addEventListener('keyup', (e) => {
+                e.stopPropagation();
+              });
+              
               input.addEventListener('input', (e) => {
-                stopEvent(e);
+                e.stopPropagation();
                 
                 const newYaml = { ...yaml };
                 newYaml[key] = e.target.value;
@@ -209,7 +217,7 @@ export const RawCell = Node.create({
             input.value = value || '';
             input.setAttribute('data-property', key);
             
-            // Prevent focus/click events from reaching editor
+            // Prevent editor from handling mouse/focus events
             input.addEventListener('mousedown', (e) => {
               e.stopPropagation();
             });
