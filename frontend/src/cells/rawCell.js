@@ -50,13 +50,8 @@ const YAML_PROPERTIES = {
 export const RawCell = Node.create({
     name: 'rawCell',
     group: 'block',
-    atom: true,
-    editable: true,
+    atom: false,
     selectable: true,
-
-    constructor() {
-      console.log('RawCell extension created');
-    },
 
     addAttributes() {
       return {
@@ -90,94 +85,23 @@ export const RawCell = Node.create({
     },
 
     renderHTML({ node }) {
-      console.log('RawCell renderHTML called with node:', node);
-      console.log('Node attributes:', node.attrs);
-      
       const yaml = node.attrs.parsedYaml || {};
       const isYamlHeader = node.attrs.isYamlHeader;
       const isAcademicArticle = node.attrs.isAcademicArticle;
 
-      console.log('YAML content:', yaml);
-      console.log('isYamlHeader:', isYamlHeader);
-      console.log('isAcademicArticle:', isAcademicArticle);
-
       if (isYamlHeader && isAcademicArticle) {
         return ['div', { 
-          'data-type': 'raw-cell', 
+          'data-type': 'raw-cell',
           'data-yaml-header': 'true',
           'data-academic': 'true',
           class: 'raw-cell academic-frontpage'
-        },
-          ['div', { class: 'frontpage-content', contenteditable: 'true' },
-            ['div', { class: 'title-section' },
-              ['input', {
-                class: 'title-input',
-                type: 'text',
-                value: yaml.title || '',
-                placeholder: 'Title',
-                'data-property': 'title'
-              }],
-              ['input', {
-                class: 'subtitle-input',
-                type: 'text',
-                value: yaml.subtitle || '',
-                placeholder: 'Subtitle',
-                'data-property': 'subtitle'
-              }]
-            ],
-            ['div', { class: 'author-section' },
-              ['input', {
-                class: 'author-input',
-                type: 'text',
-                value: yaml.author || '',
-                placeholder: 'Author',
-                'data-property': 'author'
-              }],
-              ['input', {
-                class: 'date-input',
-                type: 'text',
-                value: yaml.date || '',
-                placeholder: 'Date',
-                'data-property': 'date'
-              }]
-            ],
-            ['div', { class: 'abstract-section' },
-              ['div', { class: 'abstract-label' }, 'Abstract'],
-              ['textarea', {
-                class: 'abstract-input',
-                rows: '6',
-                'data-property': 'abstract',
-                placeholder: 'Enter abstract...'
-              }, yaml.abstract || '']
-            ],
-            ['div', { class: 'metadata-section' },
-              ['div', { class: 'metadata-row' },
-                ['select', {
-                  class: 'format-select',
-                  'data-property': 'format'
-                },
-                  ['option', { value: 'html', selected: yaml.format === 'html' }, 'HTML'],
-                  ['option', { value: 'pdf', selected: yaml.format === 'pdf' }, 'PDF'],
-                  ['option', { value: 'docx', selected: yaml.format === 'docx' }, 'DOCX']
-                ],
-                ['input', {
-                  class: 'bibliography-input',
-                  type: 'text',
-                  value: yaml.bibliography || '',
-                  placeholder: 'Bibliography file',
-                  'data-property': 'bibliography'
-                }]
-              ]
-            ]
-          ]
-        ];
+        }];
       }
 
       return ['div', { 
         'data-type': 'raw-cell',
-        class: 'raw-cell',
-        contenteditable: 'true'
-      }, node.attrs.content || ''];
+        class: 'raw-cell'
+      }];
     },
 
     addNodeView() {
@@ -186,6 +110,7 @@ export const RawCell = Node.create({
         const dom = document.createElement('div');
         dom.setAttribute('data-type', 'raw-cell');
         dom.classList.add('raw-cell');
+        dom.contentEditable = 'true';
 
         if (node.attrs.isYamlHeader && node.attrs.isAcademicArticle) {
           console.log('Rendering academic frontpage');

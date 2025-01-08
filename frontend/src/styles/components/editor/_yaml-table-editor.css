@@ -125,6 +125,19 @@ tr[data-property] td.property-description:has(:-webkit-any(:contains("(Required)
 .academic-frontpage {
   padding: 1rem;
   font-family: system-ui, -apple-system, sans-serif;
+  cursor: text;
+}
+
+.academic-frontpage[contenteditable="true"] {
+  cursor: text;
+}
+
+.raw-cell {
+  position: relative;
+}
+
+.raw-cell[contenteditable="true"] {
+  cursor: text;
 }
 
 .properties-table {
@@ -132,6 +145,8 @@ tr[data-property] td.property-description:has(:-webkit-any(:contains("(Required)
   flex-direction: column;
   gap: 0.5rem;
   width: 100%;
+  position: relative;
+  z-index: 1;
 }
 
 .property-row {
@@ -140,6 +155,7 @@ tr[data-property] td.property-description:has(:-webkit-any(:contains("(Required)
   gap: 1rem;
   padding: 0.5rem;
   border-radius: 4px;
+  position: relative;
 }
 
 .property-row:hover {
@@ -151,10 +167,12 @@ tr[data-property] td.property-description:has(:-webkit-any(:contains("(Required)
   font-weight: 500;
   color: #666;
   padding-top: 6px;
+  user-select: none;
 }
 
 .property-value {
   flex: 1;
+  position: relative;
 }
 
 .property-value input,
@@ -166,6 +184,8 @@ tr[data-property] td.property-description:has(:-webkit-any(:contains("(Required)
   font-family: inherit;
   font-size: inherit;
   background: white;
+  position: relative;
+  z-index: 2;
 }
 
 .property-value input:focus,
@@ -186,6 +206,7 @@ tr[data-property] td.property-description:has(:-webkit-any(:contains("(Required)
   display: inline-block;
   margin-right: 0.5rem;
   color: #999;
+  user-select: none;
 }
 
 /* Date input specific styling */
@@ -196,6 +217,22 @@ input[data-property="date"] {
 /* Format specific styling */
 input[data-property="format"] {
   max-width: 100px;
+}
+
+/* Prevent text selection on labels */
+.property-label,
+.property-label::before {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* Ensure inputs are always interactive */
+.property-value input,
+.property-value textarea {
+  pointer-events: auto !important;
+  cursor: text !important;
 }
 
 .frontpage-content {
