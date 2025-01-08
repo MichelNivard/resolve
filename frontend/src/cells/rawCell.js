@@ -136,14 +136,58 @@ export const RawCell = Node.create({
             let input;
             if (type === 'textarea') {
               input = document.createElement('textarea');
+              input.classList.add('abstract-input');
               input.rows = '4';
+              input.value = value || '';
+              input.placeholder = 'Enter abstract...';
+              input.setAttribute('data-property', property);
+              
+              // Auto-expand textarea
+              const adjustHeight = () => {
+                input.style.height = 'auto';
+                input.style.height = input.scrollHeight + 'px';
+              };
+              
+              input.addEventListener('input', (e) => {
+                e.stopPropagation();
+                adjustHeight();
+                const newYaml = { ...yaml };
+                newYaml[property] = e.target.value;
+                editor.commands.updateAttributes('rawCell', {
+                  parsedYaml: newYaml
+                });
+              });
+              
+              // Initial height adjustment
+              setTimeout(adjustHeight, 0);
+            } else if (type === 'select') {
+              input = document.createElement('select');
+              input.setAttribute('data-property', property);
+              const options = YAML_PROPERTIES[property].options;
+              options.forEach(option => {
+                const optionElement = document.createElement('option');
+                optionElement.value = option;
+                optionElement.textContent = option;
+                if (option === value) {
+                  optionElement.selected = true;
+                }
+                input.appendChild(optionElement);
+              });
+              input.addEventListener('change', (e) => {
+                e.stopPropagation();
+                const newYaml = { ...yaml };
+                newYaml[property] = e.target.value;
+                editor.commands.updateAttributes('rawCell', {
+                  parsedYaml: newYaml
+                });
+              });
             } else {
               input = document.createElement('input');
               input.type = type;
+              input.value = value || '';
+              input.setAttribute('data-property', property);
             }
             
-            input.value = value || '';
-            input.setAttribute('data-property', property);
             input.addEventListener('input', (e) => {
               e.stopPropagation();
               const newYaml = { ...yaml };
@@ -173,7 +217,7 @@ export const RawCell = Node.create({
           table.appendChild(createPropertyRow('Author', yaml.author, 'author'));
           table.appendChild(createPropertyRow('Date', yaml.date, 'date'));
           table.appendChild(createPropertyRow('Abstract', yaml.abstract, 'abstract', 'textarea'));
-          table.appendChild(createPropertyRow('Format', yaml.format, 'format'));
+          table.appendChild(createPropertyRow('Format', yaml.format, 'format', 'select'));
           table.appendChild(createPropertyRow('Bibliography', yaml.bibliography, 'bibliography'));
           
           dom.appendChild(table);
