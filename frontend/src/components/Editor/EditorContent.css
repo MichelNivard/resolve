@@ -29,11 +29,6 @@
     color: #e21111;
     text-decoration: line-through;
   }
-
-
-  
-
-  
   .bubble-menu-container {
     display: flex;
     align-items: center;
@@ -391,19 +386,6 @@
   color: white !important; /* Match the background color of the bubble */
 }
 
-.app-container {
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-  overflow: hidden;
-}
-
-.app-header {
-  padding: 1rem;
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-}
 
 .header-content {
   display: flex;
@@ -415,12 +397,6 @@
   font-size: 1.5rem;
   margin: 0;
   color: #333;
-}
-
-.app-main {
-  flex: 1;
-  overflow: hidden;
-  position: relative;
 }
 
 .content-container {
