@@ -50,6 +50,7 @@ export function ipynbToTiptapDoc(ipynb, editor) {
 
   for (const cell of cells) {
     if (cell.type === 'raw') {
+      console.log('Creating raw cell with data:', cell);
       const rawNode = {
         type: 'rawCell',
         attrs: { 
@@ -60,6 +61,7 @@ export function ipynbToTiptapDoc(ipynb, editor) {
           formattedYaml: cell.formattedYaml || null
         }
       };
+      console.log('Created raw node:', rawNode);
       
       // If it's a YAML header, ensure we have the proper structure
       if (cell.isYamlHeader && cell.isAcademicArticle) {

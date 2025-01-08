@@ -86,9 +86,16 @@ export const RawCell = Node.create({
     },
 
     renderHTML({ node }) {
+      console.log('RawCell renderHTML called with node:', node);
+      console.log('Node attributes:', node.attrs);
+      
       const yaml = node.attrs.parsedYaml || {};
       const isYamlHeader = node.attrs.isYamlHeader;
       const isAcademicArticle = node.attrs.isAcademicArticle;
+
+      console.log('YAML content:', yaml);
+      console.log('isYamlHeader:', isYamlHeader);
+      console.log('isAcademicArticle:', isAcademicArticle);
 
       if (isYamlHeader && isAcademicArticle) {
         return ['div', { 
