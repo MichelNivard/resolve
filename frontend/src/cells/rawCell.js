@@ -89,8 +89,8 @@ export const RawCell = Node.create({
       }];
     },
 
-    addNodeView: (editor) => {
-      return (node, view, getPos) => {
+    addNodeView() {
+      return ({ node, getPos, editor }) => {
         console.log('RawCell nodeView rendering with node:', node);
         const dom = document.createElement('div');
         dom.setAttribute('data-type', 'raw-cell');
@@ -116,133 +116,152 @@ export const RawCell = Node.create({
           additionalSection.classList.add('additional-fields');
           
           // Helper function to create a property row
-          const createPropertyRow = (key, value, level = 0) => {
+          const createPropertyRow = (key, value) => {
             const row = document.createElement('div');
             row.classList.add('property-row');
-            row.setAttribute('data-property', key);
-            row.setAttribute('data-level', level);
-
+            
             const labelDiv = document.createElement('div');
             labelDiv.classList.add('property-label');
-            labelDiv.textContent = key.charAt(0).toUpperCase() + key.slice(1);
-
+            // Special case for authors/author
+            const label = key === 'authors' ? 'Author(s)' : 
+                         key.charAt(0).toUpperCase() + key.slice(1);
+            labelDiv.textContent = label;
+            
             const valueDiv = document.createElement('div');
             valueDiv.classList.add('property-value');
-
-            if (key === 'author' || key === 'authors') {
-              // Handle author(s) specially
-              if (Array.isArray(value)) {
-                // Multiple authors
-                const authorNames = value.map(author => author.name || '').join(', ');
-                const authorInput = document.createElement('input');
-                authorInput.type = 'text';
-                authorInput.value = authorNames;
-                authorInput.setAttribute('data-property', key);
-                setupInputHandling(authorInput);
-                valueDiv.appendChild(authorInput);
-
-                // Create expandable details
-                const detailsToggle = document.createElement('span');
-                detailsToggle.classList.add('author-details-toggle');
-                detailsToggle.textContent = '▼ Show Details';
-                valueDiv.appendChild(detailsToggle);
-
-                const detailsDiv = document.createElement('div');
-                detailsDiv.classList.add('author-details', 'nested-fields');
-
-                value.forEach((author, index) => {
-                  if (typeof author === 'object') {
-                    Object.entries(author).forEach(([subKey, subValue]) => {
-                      if (subKey !== 'name') {
-                        detailsDiv.appendChild(createPropertyRow(subKey, subValue, level + 1));
-                      }
-                    });
-                  }
-                });
-
-                valueDiv.appendChild(detailsDiv);
-
-                detailsToggle.addEventListener('click', () => {
-                  detailsDiv.classList.toggle('expanded');
-                  detailsToggle.textContent = detailsDiv.classList.contains('expanded') 
-                    ? '▲ Hide Details' 
-                    : '▼ Show Details';
-                });
-              } else if (typeof value === 'object') {
-                // Single author
-                const authorInput = document.createElement('input');
-                authorInput.type = 'text';
-                authorInput.value = value.name || '';
-                authorInput.setAttribute('data-property', key);
-                setupInputHandling(authorInput);
-                valueDiv.appendChild(authorInput);
-
-                // Create expandable details
-                const detailsToggle = document.createElement('span');
-                detailsToggle.classList.add('author-details-toggle');
-                detailsToggle.textContent = '▼ Show Details';
-                valueDiv.appendChild(detailsToggle);
-
-                const detailsDiv = document.createElement('div');
-                detailsDiv.classList.add('author-details', 'nested-fields');
-
-                Object.entries(value).forEach(([subKey, subValue]) => {
-                  if (subKey !== 'name') {
-                    detailsDiv.appendChild(createPropertyRow(subKey, subValue, level + 1));
-                  }
-                });
-
-                valueDiv.appendChild(detailsDiv);
-
-                detailsToggle.addEventListener('click', () => {
-                  detailsDiv.classList.toggle('expanded');
-                  detailsToggle.textContent = detailsDiv.classList.contains('expanded') 
-                    ? '▲ Hide Details' 
-                    : '▼ Show Details';
-                });
-              }
-            } else if (typeof value === 'object' && value !== null) {
-              // Handle other nested objects
-              const nestedContainer = document.createElement('div');
-              nestedContainer.classList.add('nested-fields');
-
-              if (Array.isArray(value)) {
-                value.forEach((item, index) => {
-                  if (typeof item === 'object') {
-                    Object.entries(item).forEach(([subKey, subValue]) => {
-                      nestedContainer.appendChild(createPropertyRow(subKey, subValue, level + 1));
-                    });
-                  } else {
-                    const arrayRow = createPropertyRow(`${index + 1}`, item, level + 1);
-                    nestedContainer.appendChild(arrayRow);
-                  }
-                });
-              } else {
-                Object.entries(value).forEach(([subKey, subValue]) => {
-                  nestedContainer.appendChild(createPropertyRow(subKey, subValue, level + 1));
-                });
-              }
-
-              valueDiv.appendChild(nestedContainer);
+            
+            let input;
+            // Use textarea for abstract or if value is longer than 100 characters
+            if (key === 'abstract' || (value && value.length > 100)) {
+              input = document.createElement('textarea');
+              input.rows = '4';
+              input.spellcheck = true;
             } else {
-              // Handle primitive values
-              let input;
-              if (key === 'abstract' || (value && value.length > 100)) {
-                input = document.createElement('textarea');
-                input.rows = '4';
-                input.spellcheck = true;
-              } else {
-                input = document.createElement('input');
-                input.type = 'text';
-                input.spellcheck = false;
-              }
-
-              setupInputHandling(input);
-              input.value = value || '';
-              input.setAttribute('data-property', key);
-              valueDiv.appendChild(input);
+              input = document.createElement('input');
+              input.type = 'text';
+              input.spellcheck = false;
             }
+            
+            // Common input event handling setup
+            const setupInputHandling = (input) => {
+              // Prevent deletion of the field itself
+              input.addEventListener('keydown', (e) => {
+                if (e.key === 'Backspace') {
+                  // If at start of field or field is empty, prevent deletion
+                  if (input.selectionStart === 0 && input.selectionEnd === 0) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                  }
+                }
+                // Prevent deletion via Cut or Delete
+                if (e.key === 'Delete' || (e.key === 'x' && (e.ctrlKey || e.metaKey))) {
+                  if (input.selectionStart === 0 && input.selectionEnd === input.value.length) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                  }
+                }
+              });
 
+              // Handle click events to maintain focus
+              input.addEventListener('mousedown', (e) => {
+                e.stopPropagation();
+              });
+              
+              input.addEventListener('click', (e) => {
+                e.stopPropagation();
+                input.focus();
+              });
+              
+              // Make the input non-draggable
+              input.draggable = false;
+            };
+
+            setupInputHandling(input);
+            
+            if (key === 'abstract' || (value && value.length > 100)) {
+              // Auto-expand textarea
+              const adjustHeight = () => {
+                input.style.height = 'auto';
+                input.style.height = input.scrollHeight + 'px';
+              };
+              
+              input.addEventListener('input', (e) => {
+                const newYaml = { ...yaml };
+                newYaml[key] = e.target.value;
+                adjustHeight();
+                
+                // Format the YAML
+                const formattedYaml = Object.entries(newYaml)
+                  .map(([k, v]) => `${k}: ${typeof v === 'string' ? JSON.stringify(v) : v}`)
+                  .join('\n');
+                
+                const yamlContent = `---\n${formattedYaml}\n---`;
+                
+                // Get the current position
+                const pos = getPos();
+                
+                // Create a transaction to update the node
+                const tr = editor.state.tr;
+                
+                // Update the node's attributes and content
+                if (typeof pos === 'number') {
+                  console.log('Updating YAML at position:', pos, 'with content:', yamlContent);
+                  tr.setNodeMarkup(pos, undefined, {
+                    content: yamlContent,
+                    parsedYaml: newYaml,
+                    formattedYaml: formattedYaml,
+                    isYamlHeader: true,
+                    isAcademicArticle: true
+                  });
+                  
+                  // Dispatch the transaction
+                  editor.view.dispatch(tr);
+                  console.log('Transaction dispatched');
+                }
+              });
+              
+              // Initial height adjustment
+              setTimeout(adjustHeight, 0);
+            } else {
+              input.addEventListener('input', (e) => {
+                const newYaml = { ...yaml };
+                newYaml[key] = e.target.value;
+                
+                // Format the YAML
+                const formattedYaml = Object.entries(newYaml)
+                  .map(([k, v]) => `${k}: ${typeof v === 'string' ? JSON.stringify(v) : v}`)
+                  .join('\n');
+                
+                const yamlContent = `---\n${formattedYaml}\n---`;
+                
+                // Get the current position
+                const pos = getPos();
+                
+                // Create a transaction to update the node
+                const tr = editor.state.tr;
+                
+                // Update the node's attributes and content
+                if (typeof pos === 'number') {
+                  console.log('Updating YAML at position:', pos, 'with content:', yamlContent);
+                  tr.setNodeMarkup(pos, undefined, {
+                    content: yamlContent,
+                    parsedYaml: newYaml,
+                    formattedYaml: formattedYaml,
+                    isYamlHeader: true,
+                    isAcademicArticle: true
+                  });
+                  
+                  // Dispatch the transaction
+                  editor.view.dispatch(tr);
+                  console.log('Transaction dispatched');
+                }
+              });
+            }
+            
+            input.value = value || '';
+            input.setAttribute('data-property', key);
+            
+            valueDiv.appendChild(input);
             row.appendChild(labelDiv);
             row.appendChild(valueDiv);
             return row;
@@ -294,90 +313,6 @@ export const RawCell = Node.create({
           content.contentEditable = 'true';
           dom.appendChild(content);
         }
-
-        const setupInputHandling = (input) => {
-          // Prevent deletion of the field itself
-          input.addEventListener('keydown', (e) => {
-            if (e.key === 'Backspace') {
-              // If at start of field or field is empty, prevent deletion
-              if (input.selectionStart === 0 && input.selectionEnd === 0) {
-                e.preventDefault();
-                e.stopPropagation();
-              }
-            }
-            // Prevent deletion via Cut or Delete
-            if (e.key === 'Delete' || (e.key === 'x' && (e.ctrlKey || e.metaKey))) {
-              if (input.selectionStart === 0 && input.selectionEnd === input.value.length) {
-                e.preventDefault();
-                e.stopPropagation();
-              }
-            }
-          });
-
-          // Handle click events to maintain focus
-          input.addEventListener('mousedown', (e) => {
-            e.stopPropagation();
-          });
-          
-          input.addEventListener('click', (e) => {
-            e.stopPropagation();
-            input.focus();
-          });
-          
-          // Make the input non-draggable
-          input.draggable = false;
-
-          // Add input event handler
-          input.addEventListener('input', (e) => {
-            const newYaml = { ...yaml };
-            
-            // Handle nested properties
-            const path = e.target.getAttribute('data-property').split('.');
-            let current = newYaml;
-            
-            for (let i = 0; i < path.length - 1; i++) {
-              if (!current[path[i]]) {
-                current[path[i]] = {};
-              }
-              current = current[path[i]];
-            }
-            
-            current[path[path.length - 1]] = e.target.value;
-
-            // For textareas, adjust height
-            if (e.target.tagName.toLowerCase() === 'textarea') {
-              e.target.style.height = 'auto';
-              e.target.style.height = e.target.scrollHeight + 'px';
-            }
-            
-            // Format the YAML
-            const formattedYaml = Object.entries(newYaml)
-              .map(([k, v]) => `${k}: ${typeof v === 'string' ? JSON.stringify(v) : v}`)
-              .join('\n');
-            
-            const yamlContent = `---\n${formattedYaml}\n---`;
-            
-            // Get the current position
-            const pos = getPos();
-            
-            // Create a transaction to update the node
-            const tr = view.state.tr;
-            
-            // Update the node's attributes and content
-            if (typeof pos === 'number') {
-              tr.setNodeMarkup(pos, undefined, {
-                content: yamlContent,
-                parsedYaml: newYaml,
-                formattedYaml: formattedYaml,
-                isYamlHeader: true,
-                isAcademicArticle: true
-              });
-              
-              // Dispatch the transaction
-              view.dispatch(tr);
-            }
-          });
-        };
 
         return {
           dom,
