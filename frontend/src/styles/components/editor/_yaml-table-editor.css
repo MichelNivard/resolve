@@ -35,6 +35,8 @@
 
 .property-value {
   width: 60%;
+  position: relative;
+  z-index: 3;
 }
 
 .property-description {
@@ -127,6 +129,10 @@ tr[data-property] td.property-description:has(:-webkit-any(:contains("(Required)
   font-family: system-ui, -apple-system, sans-serif;
   background-color: rgb(249, 250, 251);
   border-radius: 4px;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 
 .properties-table {
@@ -197,6 +203,10 @@ tr[data-property] td.property-description:has(:-webkit-any(:contains("(Required)
   display: flex;
   align-items: center;
   user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 
 /* Icons for properties */
@@ -223,6 +233,14 @@ tr[data-property] td.property-description:has(:-webkit-any(:contains("(Required)
   font-size: 0.95rem;
   background: transparent;
   color: #111827;
+  position: relative;
+  z-index: 2;
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+  user-select: text;
+  pointer-events: auto !important;
+  cursor: text !important;
 }
 
 .property-value input:hover,
@@ -256,13 +274,6 @@ input[data-property="date"] {
 input[data-property="format"],
 input[data-property="jupyter"] {
   max-width: 100px;
-}
-
-/* Ensure inputs are always interactive */
-.property-value input,
-.property-value textarea {
-  pointer-events: auto !important;
-  cursor: text !important;
 }
 
 /* Adjust spacing between sections */
@@ -304,8 +315,6 @@ textarea[data-property="abstract"] {
 .academic-frontpage select {
   pointer-events: auto !important;
   cursor: text;
-  -webkit-user-select: text;
-  user-select: text;
 }
 
 .title-section {

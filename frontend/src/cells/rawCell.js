@@ -170,10 +170,29 @@ export const RawCell = Node.create({
             input.value = value || '';
             input.setAttribute('data-property', key);
             
+            // Prevent focus loss and propagation of events
+            input.addEventListener('mousedown', (e) => {
+              e.stopPropagation();
+            });
+            
+            input.addEventListener('click', (e) => {
+              e.stopPropagation();
+            });
+            
+            input.addEventListener('focus', (e) => {
+              e.stopPropagation();
+              const selection = window.getSelection();
+              selection.removeAllRanges();
+            });
+            
+            input.addEventListener('blur', (e) => {
+              e.stopPropagation();
+            });
+            
             // Prevent backspace from deleting the node
             input.addEventListener('keydown', (e) => {
+              e.stopPropagation();
               if (e.key === 'Backspace' && e.target.value === '') {
-                e.stopPropagation();
                 e.preventDefault();
               }
             });
