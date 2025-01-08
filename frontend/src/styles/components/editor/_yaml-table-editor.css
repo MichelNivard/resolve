@@ -162,10 +162,7 @@
   text-align: center;
 }
 
-/* Date input specific styling */
-input[data-property="date"] {
-  max-width: 150px;
-}
+
 
 /* Format and bibliography styling */
 input[data-property="format"],
@@ -186,10 +183,10 @@ textarea[data-property="abstract"] {
 
 /* Adjust spacing between sections */
 .property-row + .property-row {
-  margin-top: 2px;
+  margin-top: 1px;
 }
 
 /* Add subtle divider between sections */
 .property-row:not(:last-child) {
-  border-bottom: 1px solid rgba(229, 231, 235, 0.5);
+  border-bottom: 1px solid rgb(234, 235, 237);
 }
