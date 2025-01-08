@@ -50,9 +50,10 @@ const YAML_PROPERTIES = {
 export const RawCell = Node.create({
     name: 'rawCell',
     group: 'block',
-    content: 'inline*',
-    draggable: true,
+    inline: false,
+    atom: true,
     selectable: true,
+    draggable: true,
 
     addAttributes() {
       return {
@@ -76,7 +77,12 @@ export const RawCell = Node.create({
 
     parseHTML() {
       return [{
-        tag: 'div[data-type="raw-cell"]'
+        tag: 'div[data-type="raw-cell"]',
+        getAttrs: dom => ({
+          content: dom.textContent,
+          isYamlHeader: dom.getAttribute('data-yaml-header') === 'true',
+          isAcademicArticle: dom.getAttribute('data-academic') === 'true'
+        })
       }]
     },
 
@@ -88,10 +94,11 @@ export const RawCell = Node.create({
       if (isYamlHeader && isAcademicArticle) {
         return ['div', { 
           'data-type': 'raw-cell', 
-          class: 'raw-cell academic-frontpage',
-          contenteditable: 'true'
+          'data-yaml-header': 'true',
+          'data-academic': 'true',
+          class: 'raw-cell academic-frontpage'
         },
-          ['div', { class: 'frontpage-content' },
+          ['div', { class: 'frontpage-content', contenteditable: 'true' },
             ['div', { class: 'title-section' },
               ['input', {
                 class: 'title-input',
@@ -157,7 +164,7 @@ export const RawCell = Node.create({
       }
 
       return ['div', { 
-        'data-type': 'raw-cell', 
+        'data-type': 'raw-cell',
         class: 'raw-cell',
         contenteditable: 'true'
       }, node.attrs.content || ''];

@@ -50,16 +50,29 @@ export function ipynbToTiptapDoc(ipynb, editor) {
 
   for (const cell of cells) {
     if (cell.type === 'raw') {
-      docNodes.push({
+      const rawNode = {
         type: 'rawCell',
         attrs: { 
-          content: cell.content,
+          content: cell.content || '',
           isYamlHeader: cell.isYamlHeader || false,
           parsedYaml: cell.parsedYaml || null,
           isAcademicArticle: cell.isAcademicArticle || false,
-          tiptapContent: cell.tiptapContent || null
+          formattedYaml: cell.formattedYaml || null
         }
-      });
+      };
+      
+      // If it's a YAML header, ensure we have the proper structure
+      if (cell.isYamlHeader && cell.isAcademicArticle) {
+        const yaml = cell.parsedYaml || {};
+        if (!yaml.title) yaml.title = '';
+        if (!yaml.subtitle) yaml.subtitle = '';
+        if (!yaml.author) yaml.author = '';
+        if (!yaml.date) yaml.date = '';
+        if (!yaml.abstract) yaml.abstract = '';
+        rawNode.attrs.parsedYaml = yaml;
+      }
+      
+      docNodes.push(rawNode);
     } else if (cell.type === 'markdown') {
       if (cell.tiptapContent) {
         console.log('Raw tiptapContent:', cell.tiptapContent);
