@@ -117,7 +117,13 @@ export function ipynbToTiptapDoc(ipynb, editor) {
           Highlight,
           TrackChangeExtension,
           CommentMark,
-          Mathematics,
+          Mathematics.configure({
+            preserveBackslashes: true,
+            HTMLAttributes: {
+              'data-type': 'math',
+              'data-latex': '{{ node.attrs.content }}'
+            }
+          }),
           CitationMark,
           Table,
           TableRow,
@@ -199,7 +205,11 @@ export function tiptapDocToIpynb(editor, originalIpynb) {
           TrackChangeExtension,
           CommentMark,
           Mathematics.configure({
-            preserveBackslashes: true
+            preserveBackslashes: true,
+            HTMLAttributes: {
+              'data-type': 'math',
+              'data-latex': '{{ node.attrs.content }}'
+            }
           }),
           CitationMark,
           Table,

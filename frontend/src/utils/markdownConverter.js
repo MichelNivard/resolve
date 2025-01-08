@@ -148,11 +148,16 @@ turndownService.addRule('bibMention', {
 
 // Add custom HTML to Markdown conversion rules
 turndownService.addRule('math', {
-  filter: node => node.classList.contains('block-math'),
+  filter: node => 
+    node.classList.contains('block-math') || 
+    node.classList.contains('inline-math') ||
+    node.nodeName === 'SPAN' && node.getAttribute('data-type') === 'math',
   replacement: (content, node) => {
-    // Remove any existing backslash escaping and add single backslashes
-    const cleanContent = content.replace(/\\+/g, '\\');
-    return `$$${cleanContent}$$\n`;
+    // Preserve the original math content without escaping
+    const mathContent = node.getAttribute('data-latex') || node.textContent;
+    return node.classList.contains('block-math') ? 
+      `\n$$${mathContent}$$\n` : 
+      `$${mathContent}$`;
   }
 });
 
