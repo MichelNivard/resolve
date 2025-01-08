@@ -136,19 +136,54 @@ export const RawCell = Node.create({
               input = document.createElement('textarea');
               input.rows = '4';
               input.spellcheck = true;
+            } else {
+              input = document.createElement('input');
+              input.type = 'text';
+              input.spellcheck = false;
+            }
+            
+            // Common input event handling setup
+            const setupInputHandling = (input) => {
+              // Prevent deletion of the field itself
+              input.addEventListener('keydown', (e) => {
+                if (e.key === 'Backspace') {
+                  // If at start of field or field is empty, prevent deletion
+                  if (input.selectionStart === 0 && input.selectionEnd === 0) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                  }
+                }
+                // Prevent deletion via Cut or Delete
+                if (e.key === 'Delete' || (e.key === 'x' && (e.ctrlKey || e.metaKey))) {
+                  if (input.selectionStart === 0 && input.selectionEnd === input.value.length) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                  }
+                }
+              });
+
+              // Handle click events to maintain focus
+              input.addEventListener('mousedown', (e) => {
+                e.stopPropagation();
+              });
               
+              input.addEventListener('click', (e) => {
+                e.stopPropagation();
+                input.focus();
+              });
+              
+              // Make the input non-draggable
+              input.draggable = false;
+            };
+
+            setupInputHandling(input);
+            
+            if (key === 'abstract' || (value && value.length > 100)) {
               // Auto-expand textarea
               const adjustHeight = () => {
                 input.style.height = 'auto';
                 input.style.height = input.scrollHeight + 'px';
               };
-              
-              // Only handle backspace to prevent node deletion
-              input.addEventListener('keydown', (e) => {
-                if (e.key === 'Backspace' && !e.target.value) {
-                  e.stopPropagation();
-                }
-              });
               
               input.addEventListener('input', (e) => {
                 const newYaml = { ...yaml };
@@ -188,17 +223,6 @@ export const RawCell = Node.create({
               // Initial height adjustment
               setTimeout(adjustHeight, 0);
             } else {
-              input = document.createElement('input');
-              input.type = 'text';
-              input.spellcheck = false;
-              
-              // Only handle backspace to prevent node deletion
-              input.addEventListener('keydown', (e) => {
-                if (e.key === 'Backspace' && !e.target.value) {
-                  e.stopPropagation();
-                }
-              });
-              
               input.addEventListener('input', (e) => {
                 const newYaml = { ...yaml };
                 newYaml[key] = e.target.value;
@@ -236,19 +260,6 @@ export const RawCell = Node.create({
             
             input.value = value || '';
             input.setAttribute('data-property', key);
-            
-            // Handle click events to maintain focus
-            input.addEventListener('mousedown', (e) => {
-              e.stopPropagation();
-            });
-            
-            input.addEventListener('click', (e) => {
-              e.stopPropagation();
-              input.focus();
-            });
-            
-            // Make the input non-draggable
-            input.draggable = false;
             
             valueDiv.appendChild(input);
             row.appendChild(labelDiv);
