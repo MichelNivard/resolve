@@ -1,6 +1,6 @@
 import { Node } from '@tiptap/core'
 import yaml from 'js-yaml'
-import './styles/components/editor/_raw-cell.css'
+import '../styles/components/editor/_raw-cell.css'
 
 function tryParseYaml(content) {
   try {

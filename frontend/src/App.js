@@ -22,8 +22,8 @@ import Highlight from '@tiptap/extension-highlight';
 import Mathematics from 'tiptap-math';
 
 // Import custom extensions
-import { RawCell } from './rawCell';
-import { CodeCell } from './codeCell';
+import { RawCell } from './cells/rawCell';
+import { CodeCell } from './cells/codeCell';
 import { TrackChangeExtension } from './utils/TrackChanges';
 import { CommentMark } from './utils/CommentMark';
 import { CitationMark } from './components/Citation/CitationMark';

@@ -12,8 +12,9 @@ import 'katex/dist/katex.min.css';
 import { parseIpynb, serializeIpynb } from './ipynbUtils';
 import { markdownToHtml, htmlToMarkdown } from './markdownConverter';
 import { generateHTML } from '@tiptap/html'
-import { CodeCell } from '../codeCell';
-import { RawCell } from '../rawCell';
+import { Node } from '@tiptap/core';
+import { CodeCell } from '../cells/codeCell';
+import { RawCell } from '../cells/rawCell';
 import { TrackChangeExtension } from './TrackChanges';
 import { CommentMark } from './CommentMark'; 
 import { CitationMark } from '../components/Citation/CitationMark';

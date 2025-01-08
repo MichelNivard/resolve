@@ -1,7 +1,7 @@
 import { Node } from '@tiptap/core'
 import { NodeViewWrapper, ReactNodeViewRenderer } from '@tiptap/react'
 import React from 'react'
-import { markdownToHtml } from './utils/markdownConverter'
+import { markdownToHtml } from '../utils/markdownConverter'
 
 export const MarkdownCell = Node.create({
   name: 'markdownCell',
