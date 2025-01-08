@@ -31,27 +31,12 @@ function tryParseYaml(content) {
   return null;
 }
 
-// Define valid YAML properties and their options
-const YAML_PROPERTIES = {
-  title: { type: 'text', label: 'Title', required: true },
-  subtitle: { type: 'text', label: 'Subtitle' },
-  author: { type: 'text', label: 'Author', required: true },
-  date: { type: 'text', label: 'Date', required: true },
-  abstract: { type: 'textarea', label: 'Abstract' },
-  format: { 
-    type: 'select', 
-    label: 'Format',
-    options: ['html', 'pdf', 'docx'] 
-  },
-  bibliography: { type: 'text', label: 'Bibliography' },
-  jupyter: { type: 'text', label: 'Jupyter' }
-};
-
 export const RawCell = Node.create({
     name: 'rawCell',
     group: 'block',
     atom: false,
     selectable: true,
+    draggable: false,
 
     addAttributes() {
       return {
@@ -110,37 +95,33 @@ export const RawCell = Node.create({
         const dom = document.createElement('div');
         dom.setAttribute('data-type', 'raw-cell');
         dom.classList.add('raw-cell');
-        dom.contentEditable = 'true';
-
+        
         if (node.attrs.isYamlHeader && node.attrs.isAcademicArticle) {
           console.log('Rendering academic frontpage');
           dom.classList.add('academic-frontpage');
           const yaml = node.attrs.parsedYaml || {};
           
-          // Create the properties table
           const table = document.createElement('div');
           table.classList.add('properties-table');
           
           // Helper function to create a property row
-          const createPropertyRow = (label, value, property, type = 'text') => {
+          const createPropertyRow = (key, value) => {
             const row = document.createElement('div');
             row.classList.add('property-row');
             
             const labelDiv = document.createElement('div');
             labelDiv.classList.add('property-label');
-            labelDiv.textContent = label;
+            // Capitalize first letter of key for label
+            labelDiv.textContent = key.charAt(0).toUpperCase() + key.slice(1);
             
             const valueDiv = document.createElement('div');
             valueDiv.classList.add('property-value');
             
             let input;
-            if (type === 'textarea') {
+            // Use textarea for abstract or if value is longer than 100 characters
+            if (key === 'abstract' || (value && value.length > 100)) {
               input = document.createElement('textarea');
-              input.classList.add('abstract-input');
               input.rows = '4';
-              input.value = value || '';
-              input.placeholder = 'Enter abstract...';
-              input.setAttribute('data-property', property);
               
               // Auto-expand textarea
               const adjustHeight = () => {
@@ -152,7 +133,7 @@ export const RawCell = Node.create({
                 e.stopPropagation();
                 adjustHeight();
                 const newYaml = { ...yaml };
-                newYaml[property] = e.target.value;
+                newYaml[key] = e.target.value;
                 editor.commands.updateAttributes('rawCell', {
                   parsedYaml: newYaml
                 });
@@ -160,42 +141,21 @@ export const RawCell = Node.create({
               
               // Initial height adjustment
               setTimeout(adjustHeight, 0);
-            } else if (type === 'select') {
-              input = document.createElement('select');
-              input.setAttribute('data-property', property);
-              const options = YAML_PROPERTIES[property].options;
-              options.forEach(option => {
-                const optionElement = document.createElement('option');
-                optionElement.value = option;
-                optionElement.textContent = option;
-                if (option === value) {
-                  optionElement.selected = true;
-                }
-                input.appendChild(optionElement);
-              });
-              input.addEventListener('change', (e) => {
+            } else {
+              input = document.createElement('input');
+              input.type = 'text';
+              input.addEventListener('input', (e) => {
                 e.stopPropagation();
                 const newYaml = { ...yaml };
-                newYaml[property] = e.target.value;
+                newYaml[key] = e.target.value;
                 editor.commands.updateAttributes('rawCell', {
                   parsedYaml: newYaml
                 });
               });
-            } else {
-              input = document.createElement('input');
-              input.type = type;
-              input.value = value || '';
-              input.setAttribute('data-property', property);
             }
             
-            input.addEventListener('input', (e) => {
-              e.stopPropagation();
-              const newYaml = { ...yaml };
-              newYaml[property] = e.target.value;
-              editor.commands.updateAttributes('rawCell', {
-                parsedYaml: newYaml
-              });
-            });
+            input.value = value || '';
+            input.setAttribute('data-property', key);
             
             // Prevent backspace from deleting the node
             input.addEventListener('keydown', (e) => {
@@ -211,18 +171,13 @@ export const RawCell = Node.create({
             return row;
           };
           
-          // Add all properties
-          table.appendChild(createPropertyRow('Title', yaml.title, 'title'));
-          table.appendChild(createPropertyRow('Subtitle', yaml.subtitle, 'subtitle'));
-          table.appendChild(createPropertyRow('Author', yaml.author, 'author'));
-          table.appendChild(createPropertyRow('Date', yaml.date, 'date'));
-          table.appendChild(createPropertyRow('Abstract', yaml.abstract, 'abstract', 'textarea'));
-          table.appendChild(createPropertyRow('Format', yaml.format, 'format', 'select'));
-          table.appendChild(createPropertyRow('Bibliography', yaml.bibliography, 'bibliography'));
+          // Add all YAML properties dynamically
+          Object.entries(yaml).forEach(([key, value]) => {
+            table.appendChild(createPropertyRow(key, value));
+          });
           
           dom.appendChild(table);
         } else {
-          // For non-YAML content
           const content = document.createElement('div');
           content.classList.add('raw-content');
           content.textContent = node.attrs.content || '';
