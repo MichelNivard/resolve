@@ -8,11 +8,10 @@
 
 .app-header {
   width: 100%;
-  background: #fff;
+  background: #ffffff00;
   border-bottom: 1px solid #eee;
   position: sticky;
   top: 0;
-  z-index: 1;
 }
 
 .header-content {
