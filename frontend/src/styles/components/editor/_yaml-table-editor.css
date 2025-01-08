@@ -164,8 +164,6 @@
   font-size: 14px;
 }
 
-
-
 /* Format and bibliography styling */
 input[data-property="format"],
 input[data-property="jupyter"] {
@@ -191,4 +189,43 @@ textarea[data-property="abstract"] {
 /* Add subtle divider between sections */
 .property-row:not(:last-child) {
   border-bottom: 1px solid rgb(234, 235, 237);
+}
+
+/* Nested fields styling */
+.nested-fields {
+  margin-left: 24px;
+  border-left: 2px solid #eaebef;
+  padding-left: 12px;
+  margin-top: 4px;
+}
+
+.property-row[data-level="1"] .property-label {
+  font-size: 14px;
+  color: #666;
+}
+
+.property-row[data-level="2"] .property-label {
+  font-size: 13px;
+  color: #777;
+}
+
+/* Author details toggle */
+.author-details-toggle {
+  cursor: pointer;
+  color: #666;
+  font-size: 12px;
+  margin-left: 8px;
+  user-select: none;
+}
+
+.author-details-toggle:hover {
+  color: #111827;
+}
+
+.author-details {
+  display: none;
+}
+
+.author-details.expanded {
+  display: block;
 }
