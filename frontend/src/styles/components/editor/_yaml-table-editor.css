@@ -136,25 +136,86 @@ tr[data-property] td.property-description:has(:-webkit-any(:contains("(Required)
 }
 
 .properties-table {
-  font-family: var(--font-family);
+  display: flex;
+  flex-direction: column;
   width: 100%;
-  padding: 2rem;
+}
+
+.primary-fields,
+.additional-fields {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.additional-fields {
+  margin-top: 1rem;
+  border-top: 1px solid #E5E7EB;
+}
+
+.additional-fields-header {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem 0;
+  cursor: pointer;
+  user-select: none;
+  color: #4B5563;
+  font-size: 0.9rem;
+  gap: 0.5rem;
+}
+
+.additional-fields-header:hover {
+  color: #111827;
+}
+
+.additional-fields-header svg {
+  width: 16px;
+  height: 16px;
+  transition: transform 0.2s;
+}
+
+.additional-fields-header.expanded svg {
+  transform: rotate(90deg);
+}
+
+.additional-fields-content {
+  display: none;
+}
+
+.additional-fields-content.expanded {
+  display: flex;
+  flex-direction: column;
 }
 
 .property-row {
   display: flex;
   align-items: flex-start;
-  margin-bottom: 0.75rem;
   min-height: 32px;
+  position: relative;
 }
 
 .property-label {
-  flex: 0 0 120px;
-  padding: 8px 16px 8px 0;
-  color: #666;
-  font-size: 0.95rem;
+  flex: 0 0 100px;
+  padding: 8px 8px 8px 0;
+  color: #4B5563;
+  font-size: 0.9rem;
+  font-weight: normal;
   display: flex;
   align-items: center;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* Icons for properties */
+.property-label::before {
+  content: "≡";
+  display: inline-block;
+  margin-right: 0.5rem;
+  color: #9CA3AF;
+  font-weight: bold;
 }
 
 .property-value {
@@ -162,92 +223,83 @@ tr[data-property] td.property-description:has(:-webkit-any(:contains("(Required)
   padding: 4px 0;
 }
 
-/* Common input/textarea styles */
 .property-value input,
 .property-value textarea {
-  font-family: var(--font-family);
   width: 100%;
-  border: 1px solid transparent;
-  background: transparent;
   padding: 6px 8px;
-  font-size: 1rem;
-  color: #333;
+  border: 1px solid transparent;
   border-radius: 4px;
+  font-family: inherit;
+  font-size: 0.95rem;
+  background: transparent;
+  color: #111827;
+  position: relative;
+  z-index: 2;
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+  user-select: text;
+  pointer-events: auto !important;
+  cursor: text !important;
 }
 
-/* Title styling */
-.property-row[data-property="title"] input {
-  font-size: 1.4rem;
-  font-weight: 600;
-}
-
-/* Subtitle styling */
-.property-row[data-property="subtitle"] input {
-  font-size: 1.2rem;
-  font-weight: 500;
-  color: #444;
-}
-
-/* Author styling */
-.property-row[data-property="author"] input,
-.property-row[data-property="authors"] input {
-  font-size: 1.1rem;
-}
-
-/* Affiliations styling */
-.property-row[data-property="affiliations"] input {
-  font-style: italic;
-  color: #666;
-}
-
-/* Date styling */
-.property-row[data-property="date"] input {
-  width: auto;
-  min-width: 200px;
-}
-
-/* Abstract styling */
-.property-row[data-property="abstract"] {
-  margin-top: 1rem;
-  margin-bottom: 1.5rem;
-}
-
-.property-row[data-property="abstract"] textarea {
-  min-height: 120px;
-  line-height: 1.6;
-  text-align: justify;
-  resize: none;
-  overflow-y: hidden;
-}
-
-/* Focus and hover states */
 .property-value input:hover,
 .property-value textarea:hover {
-  border-color: #ddd;
+  border-color: #E5E7EB;
+  background-color: white;
 }
 
 .property-value input:focus,
 .property-value textarea:focus {
-  border-color: var(--primary-color);
   outline: none;
+  border-color: #E5E7EB;
+  background-color: white;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
-/* Additional fields section */
-.additional-fields {
-  margin-top: 2rem;
-  border-top: 1px solid #eee;
-  padding-top: 1rem;
-}
-
-.additional-fields .property-row {
-  margin-bottom: 0.5rem;
-}
-
-/* Make inputs non-draggable */
-.property-value input,
 .property-value textarea {
-  -webkit-user-drag: none;
-  user-drag: none;
+  resize: none;
+  height: auto;
+  min-height: 80px;
+  line-height: 1.5;
+  overflow: hidden;
+}
+
+/* Date input specific styling */
+input[data-property="date"] {
+  max-width: 150px;
+}
+
+/* Format and bibliography styling */
+input[data-property="format"],
+input[data-property="jupyter"] {
+  max-width: 100px;
+}
+
+/* Adjust spacing between sections */
+.property-row + .property-row {
+  margin-top: 2px;
+}
+
+/* Make abstract expand to content */
+.property-row:has(textarea[data-property="abstract"]) {
+  height: auto;
+}
+
+/* Remove scrolling from abstract */
+textarea[data-property="abstract"] {
+  overflow: hidden;
+  height: auto;
+}
+
+/* Auto-expand textarea to fit content */
+textarea[data-property="abstract"] {
+  overflow-y: hidden;
+}
+
+/* Add subtle divider between sections */
+.property-row:not(:last-child) {
+  border-bottom: 1px solid rgba(229, 231, 235, 0.5);
 }
 
 .frontpage-content {
