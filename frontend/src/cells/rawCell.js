@@ -50,10 +50,9 @@ const YAML_PROPERTIES = {
 export const RawCell = Node.create({
     name: 'rawCell',
     group: 'block',
-    inline: false,
     atom: true,
+    editable: true,
     selectable: true,
-    draggable: true,
 
     addAttributes() {
       return {
