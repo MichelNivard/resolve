@@ -218,7 +218,8 @@ export const RawCell = Node.create({
 
           const saveButton = dom.querySelector('.yaml-save-btn');
           if (saveButton) {
-            saveButton.addEventListener('click', () => {
+            saveButton.addEventListener('click', (e) => {
+              e.stopPropagation();
               editor.chain()
                 .updateAttributes('rawCell', {
                   displayMode: 'view'
@@ -228,19 +229,30 @@ export const RawCell = Node.create({
           }
         };
 
+        // Setup click handler for view mode
         const setupViewModeHandler = () => {
           if (node.attrs.isYamlHeader && node.attrs.isAcademicArticle && node.attrs.displayMode === 'view') {
             const articleContent = dom.querySelector('.article-content');
             if (articleContent) {
-              articleContent.addEventListener('click', () => {
-                editor.chain()
-                  .updateAttributes('rawCell', {
-                    displayMode: 'edit'
-                  })
-                  .run();
-              });
+              const handleClick = (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                if (typeof getPos === 'function') {
+                  editor.chain()
+                    .setNodeSelection(getPos())
+                    .updateAttributes('rawCell', {
+                      displayMode: 'edit'
+                    })
+                    .run();
+                }
+              };
+
+              articleContent.addEventListener('click', handleClick);
+              return () => articleContent.removeEventListener('click', handleClick);
             }
           }
+          return () => {};
         };
 
         const update = (node) => {
@@ -260,7 +272,11 @@ export const RawCell = Node.create({
                   <div class="article-abstract">${yaml.abstract || ''}</div>
                 </div>
               `;
-              setupViewModeHandler();
+              
+              // Setup click handler and store cleanup function
+              const cleanup = setupViewModeHandler();
+              // Store cleanup function for later
+              dom.dataset.cleanup = cleanup;
             }
           } else {
             dom.textContent = node.attrs.content || '';
@@ -274,7 +290,10 @@ export const RawCell = Node.create({
           dom,
           update,
           destroy: () => {
-            // Cleanup if needed
+            // Run cleanup function if it exists
+            if (dom.dataset.cleanup) {
+              dom.dataset.cleanup();
+            }
           }
         };
       };
