@@ -135,7 +135,7 @@ export const RawCell = Node.create({
             if (key === 'abstract' || (value && value.length > 100)) {
               input = document.createElement('textarea');
               input.rows = '4';
-              input.spellcheck = false;
+              input.spellcheck = true;
               
               // Auto-expand textarea
               const adjustHeight = () => {
