@@ -8,84 +8,6 @@
   position: relative;
 }
 
-.yaml-editor-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-}
-
-.yaml-editor-popup {
-  background: white;
-  padding: 2rem;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  width: 80%;
-  max-width: 800px;
-  max-height: 90vh;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  overflow: hidden;
-}
-
-.yaml-editor-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.yaml-editor-title {
-  font-size: 1.2rem;
-  font-weight: 500;
-  color: #333;
-}
-
-.yaml-editor-close {
-  background: none;
-  border: none;
-  font-size: 1.5rem;
-  cursor: pointer;
-  padding: 0.5rem;
-  color: #666;
-}
-
-.yaml-editor-close:hover {
-  color: #333;
-}
-
-.yaml-editor-textarea {
-  width: 95%;
-  flex: 1;
-  min-height: 200px;
-  max-height: calc(90vh - 120px); /* Account for header and padding */
-  font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
-  overflow-y: auto;
-  font-size: 14px;
-  padding: 1rem;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  background-color: #f8f9fa;
-  resize: vertical;
-  white-space: pre-wrap;
-  word-wrap: break-word;
-  overflow-wrap: break-word;
-  tab-size: 2;
-  -moz-tab-size: 2;
-}
-
-.yaml-editor-textarea:focus {
-  outline: none;
-  border-color: #3498db;
-  box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
-}
-
 .raw-cell-editor {
   width: 100%;
   min-height: 200px;
@@ -140,7 +62,6 @@
   margin: 1rem 0 2rem;
   color: black;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-  
 }
 
 .article-abstract-header {
@@ -150,7 +71,6 @@
   margin: 2rem 0 1rem;
   color: black;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-  
 }
 
 .article-abstract {
@@ -173,7 +93,6 @@
   text-align: center;
   margin-top: 2rem;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-  
 }
 
 .article-metadata > div {
