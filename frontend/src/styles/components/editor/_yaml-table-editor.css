@@ -138,99 +138,89 @@ tr[data-property] td.property-description:has(:-webkit-any(:contains("(Required)
 .properties-table {
   font-family: var(--font-family);
   width: 100%;
-  padding: 2rem 3rem;
+  padding: 2rem;
 }
 
 .property-row {
-  margin-bottom: 1.5rem;
-  width: 100%;
-}
-
-/* Title styling */
-.property-row[data-property="title"] input {
-  font-size: 2rem;
-  font-weight: 600;
-  margin-bottom: 1rem;
-  line-height: 1.3;
-  width: 100%;
-  display: block;
-}
-
-/* Subtitle styling */
-.property-row[data-property="subtitle"] input {
-  font-size: 1.4rem;
-  font-weight: 500;
-  color: #444;
-  margin-bottom: 1.5rem;
-  width: 100%;
-  display: block;
-}
-
-/* Author styling */
-.property-row[data-property="author"] input,
-.property-row[data-property="authors"] input {
-  font-size: 1.2rem;
+  display: flex;
+  align-items: flex-start;
   margin-bottom: 0.75rem;
-  width: 100%;
-  display: block;
+  min-height: 32px;
 }
 
-/* Affiliations styling */
-.property-row[data-property="affiliations"] input {
-  font-size: 1rem;
+.property-label {
+  flex: 0 0 120px;
+  padding: 8px 16px 8px 0;
   color: #666;
-  font-style: italic;
-  margin-bottom: 1rem;
-  width: 100%;
-  display: block;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
 }
 
-/* Date styling */
-.property-row[data-property="date"] input {
-  font-size: 1rem;
-  color: #666;
-  margin-bottom: 2rem;
-  width: auto;
-  min-width: 200px;
-  display: block;
-}
-
-/* Abstract styling */
-.property-row[data-property="abstract"] {
-  margin-top: 2rem;
-  margin-bottom: 2rem;
-}
-
-.property-row[data-property="abstract"] .property-label {
-  font-weight: 600;
-  font-size: 1.1rem;
-  margin-bottom: 1rem;
-  display: block;
-}
-
-.property-row[data-property="abstract"] textarea {
-  text-align: justify;
-  line-height: 1.6;
-  font-size: 1rem;
-  width: 100%;
-  min-height: 150px;
-  padding: 0;
-  display: block;
-  resize: none;
-  overflow-y: hidden;
+.property-value {
+  flex: 1;
+  padding: 4px 0;
 }
 
 /* Common input/textarea styles */
 .property-value input,
 .property-value textarea {
   font-family: var(--font-family);
+  width: 100%;
   border: 1px solid transparent;
   background: transparent;
-  padding: 0.25rem;
-  transition: border-color 0.2s;
+  padding: 6px 8px;
+  font-size: 1rem;
+  color: #333;
   border-radius: 4px;
 }
 
+/* Title styling */
+.property-row[data-property="title"] input {
+  font-size: 1.4rem;
+  font-weight: 600;
+}
+
+/* Subtitle styling */
+.property-row[data-property="subtitle"] input {
+  font-size: 1.2rem;
+  font-weight: 500;
+  color: #444;
+}
+
+/* Author styling */
+.property-row[data-property="author"] input,
+.property-row[data-property="authors"] input {
+  font-size: 1.1rem;
+}
+
+/* Affiliations styling */
+.property-row[data-property="affiliations"] input {
+  font-style: italic;
+  color: #666;
+}
+
+/* Date styling */
+.property-row[data-property="date"] input {
+  width: auto;
+  min-width: 200px;
+}
+
+/* Abstract styling */
+.property-row[data-property="abstract"] {
+  margin-top: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.property-row[data-property="abstract"] textarea {
+  min-height: 120px;
+  line-height: 1.6;
+  text-align: justify;
+  resize: none;
+  overflow-y: hidden;
+}
+
+/* Focus and hover states */
 .property-value input:hover,
 .property-value textarea:hover {
   border-color: #ddd;
@@ -242,41 +232,22 @@ tr[data-property] td.property-description:has(:-webkit-any(:contains("(Required)
   outline: none;
 }
 
-/* Hide labels except for abstract */
-.property-label {
-  display: none;
-}
-
-.property-row[data-property="abstract"] .property-label {
-  display: block;
-}
-
 /* Additional fields section */
 .additional-fields {
-  margin-top: 3rem;
+  margin-top: 2rem;
   border-top: 1px solid #eee;
   padding-top: 1rem;
 }
 
 .additional-fields .property-row {
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.5rem;
 }
 
-.additional-fields .property-label {
-  display: inline-block;
-  font-size: 0.9rem;
-  color: #666;
-  width: 120px;
-  margin-right: 1rem;
-}
-
-.additional-fields .property-value {
-  display: inline-block;
-}
-
-.additional-fields input {
-  width: auto;
-  min-width: 200px;
+/* Make inputs non-draggable */
+.property-value input,
+.property-value textarea {
+  -webkit-user-drag: none;
+  user-drag: none;
 }
 
 .frontpage-content {
