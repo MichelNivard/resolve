@@ -137,59 +137,75 @@ tr[data-property] td.property-description:has(:-webkit-any(:contains("(Required)
 
 .properties-table {
   font-family: var(--font-family);
-  max-width: 800px;
-  margin: 2rem auto;
-  padding: 0 1rem;
+  width: 100%;
+  padding: 2rem 3rem;
 }
 
 .property-row {
   margin-bottom: 1.5rem;
-  display: flex;
-  flex-direction: column;
+  width: 100%;
 }
 
 /* Title styling */
 .property-row[data-property="title"] input {
-  font-size: 1.75rem;
+  font-size: 2rem;
   font-weight: 600;
-  margin-bottom: 0.5rem;
+  margin-bottom: 1rem;
   line-height: 1.3;
   width: 100%;
+  display: block;
 }
 
 /* Subtitle styling */
 .property-row[data-property="subtitle"] input {
-  font-size: 1.25rem;
+  font-size: 1.4rem;
   font-weight: 500;
   color: #444;
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
   width: 100%;
+  display: block;
 }
 
 /* Author styling */
 .property-row[data-property="author"] input,
 .property-row[data-property="authors"] input {
-  font-size: 1.1rem;
-  margin-bottom: 0.5rem;
+  font-size: 1.2rem;
+  margin-bottom: 0.75rem;
   width: 100%;
+  display: block;
+}
+
+/* Affiliations styling */
+.property-row[data-property="affiliations"] input {
+  font-size: 1rem;
+  color: #666;
+  font-style: italic;
+  margin-bottom: 1rem;
+  width: 100%;
+  display: block;
 }
 
 /* Date styling */
 .property-row[data-property="date"] input {
   font-size: 1rem;
   color: #666;
-  margin-bottom: 1.5rem;
-  width: 100%;
+  margin-bottom: 2rem;
+  width: auto;
+  min-width: 200px;
+  display: block;
 }
 
 /* Abstract styling */
 .property-row[data-property="abstract"] {
   margin-top: 2rem;
+  margin-bottom: 2rem;
 }
 
 .property-row[data-property="abstract"] .property-label {
   font-weight: 600;
-  margin-bottom: 0.5rem;
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+  display: block;
 }
 
 .property-row[data-property="abstract"] textarea {
@@ -197,7 +213,11 @@ tr[data-property] td.property-description:has(:-webkit-any(:contains("(Required)
   line-height: 1.6;
   font-size: 1rem;
   width: 100%;
-  padding: 0.5rem;
+  min-height: 150px;
+  padding: 0;
+  display: block;
+  resize: none;
+  overflow-y: hidden;
 }
 
 /* Common input/textarea styles */
@@ -222,34 +242,41 @@ tr[data-property] td.property-description:has(:-webkit-any(:contains("(Required)
   outline: none;
 }
 
-/* Label styling */
+/* Hide labels except for abstract */
 .property-label {
   display: none;
 }
 
+.property-row[data-property="abstract"] .property-label {
+  display: block;
+}
+
 /* Additional fields section */
 .additional-fields {
-  margin-top: 2rem;
+  margin-top: 3rem;
   border-top: 1px solid #eee;
   padding-top: 1rem;
 }
 
+.additional-fields .property-row {
+  margin-bottom: 0.75rem;
+}
+
 .additional-fields .property-label {
-  display: block;
+  display: inline-block;
   font-size: 0.9rem;
   color: #666;
-  margin-bottom: 0.25rem;
+  width: 120px;
+  margin-right: 1rem;
 }
 
-/* Affiliations styling */
-.property-row[data-property="affiliations"] {
-  margin-bottom: 1rem;
+.additional-fields .property-value {
+  display: inline-block;
 }
 
-.property-row[data-property="affiliations"] input {
-  font-size: 0.95rem;
-  color: #444;
-  font-style: italic;
+.additional-fields input {
+  width: auto;
+  min-width: 200px;
 }
 
 .frontpage-content {
