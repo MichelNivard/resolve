@@ -104,6 +104,17 @@ export const RawCell = Node.create({
           const table = document.createElement('div');
           table.classList.add('properties-table');
           
+          // Primary fields that should always be at the top
+          const primaryFields = ['title', 'subtitle', 'author', 'authors', 'affiliations', 'date', 'abstract'];
+          
+          // Create primary fields section
+          const primarySection = document.createElement('div');
+          primarySection.classList.add('primary-fields');
+          
+          // Create additional fields section
+          const additionalSection = document.createElement('div');
+          additionalSection.classList.add('additional-fields');
+          
           // Helper function to create a property row
           const createPropertyRow = (key, value) => {
             const row = document.createElement('div');
@@ -111,8 +122,10 @@ export const RawCell = Node.create({
             
             const labelDiv = document.createElement('div');
             labelDiv.classList.add('property-label');
-            // Capitalize first letter of key for label
-            labelDiv.textContent = key.charAt(0).toUpperCase() + key.slice(1);
+            // Special case for authors/author
+            const label = key === 'authors' ? 'Author(s)' : 
+                         key.charAt(0).toUpperCase() + key.slice(1);
+            labelDiv.textContent = label;
             
             const valueDiv = document.createElement('div');
             valueDiv.classList.add('property-value');
@@ -171,10 +184,43 @@ export const RawCell = Node.create({
             return row;
           };
           
-          // Add all YAML properties dynamically
+          // Sort fields into primary and additional
           Object.entries(yaml).forEach(([key, value]) => {
-            table.appendChild(createPropertyRow(key, value));
+            if (primaryFields.includes(key.toLowerCase())) {
+              primarySection.appendChild(createPropertyRow(key, value));
+            } else {
+              additionalSection.appendChild(createPropertyRow(key, value));
+            }
           });
+          
+          // Create additional fields header with dropdown
+          const additionalHeader = document.createElement('div');
+          additionalHeader.classList.add('additional-fields-header');
+          additionalHeader.innerHTML = `
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Additional Fields
+          `;
+          
+          const additionalContent = document.createElement('div');
+          additionalContent.classList.add('additional-fields-content');
+          
+          // Add click handler for dropdown
+          additionalHeader.addEventListener('click', () => {
+            additionalHeader.classList.toggle('expanded');
+            additionalContent.classList.toggle('expanded');
+          });
+          
+          // Only add additional section if there are additional fields
+          if (additionalSection.children.length > 0) {
+            additionalContent.appendChild(additionalSection);
+            table.appendChild(primarySection);
+            table.appendChild(additionalHeader);
+            table.appendChild(additionalContent);
+          } else {
+            table.appendChild(primarySection);
+          }
           
           dom.appendChild(table);
         } else {
