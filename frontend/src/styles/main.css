@@ -12,5 +12,5 @@
 @import './components/editor/_table.css';
 @import './components/editor/_changes.css';
 @import './components/editor/_raw-cell.css';
-@import './components/editor/_code-cell.css';
+@import './components/_code-cell.css';
 @import './components/comments/_sidebar.css';
