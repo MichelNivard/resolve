@@ -181,71 +181,115 @@ export const RawCell = Node.create({
     },
 
     addNodeView() {
-      console.log('RawCell addNodeView called');
       return ({ node, getPos, editor }) => {
         console.log('RawCell nodeView rendering with node:', node);
         const dom = document.createElement('div');
         dom.setAttribute('data-type', 'raw-cell');
         dom.classList.add('raw-cell');
+        dom.contentEditable = 'true';
 
-        const handlePropertyChange = (key, value) => {
-          const currentYaml = node.attrs.parsedYaml || {};
-          const updatedYaml = { ...currentYaml, [key]: value };
+        if (node.attrs.isYamlHeader && node.attrs.isAcademicArticle) {
+          console.log('Rendering academic frontpage');
+          dom.classList.add('academic-frontpage');
+          const yaml = node.attrs.parsedYaml || {};
           
-          // Convert to YAML string
-          const yamlString = `---\n${yaml.dump(updatedYaml)}---`;
+          // Create the frontpage content
+          const content = document.createElement('div');
+          content.classList.add('frontpage-content');
           
-          editor.chain()
-            .updateAttributes('rawCell', {
-              content: yamlString,
-              parsedYaml: updatedYaml,
-              formattedYaml: yaml.dump(updatedYaml)
-            })
-            .run();
-        };
-
-        const setupInputHandlers = () => {
-          if (!node.attrs.isYamlHeader || !node.attrs.isAcademicArticle) return;
-
-          const inputs = dom.querySelectorAll('input, textarea, select');
+          // Title section
+          const titleSection = document.createElement('div');
+          titleSection.classList.add('title-section');
+          
+          const titleInput = document.createElement('input');
+          titleInput.classList.add('title-input');
+          titleInput.type = 'text';
+          titleInput.value = yaml.title || '';
+          titleInput.placeholder = 'Title';
+          titleInput.setAttribute('data-property', 'title');
+          
+          const subtitleInput = document.createElement('input');
+          subtitleInput.classList.add('subtitle-input');
+          subtitleInput.type = 'text';
+          subtitleInput.value = yaml.subtitle || '';
+          subtitleInput.placeholder = 'Subtitle';
+          subtitleInput.setAttribute('data-property', 'subtitle');
+          
+          titleSection.appendChild(titleInput);
+          titleSection.appendChild(subtitleInput);
+          
+          // Author section
+          const authorSection = document.createElement('div');
+          authorSection.classList.add('author-section');
+          
+          const authorInput = document.createElement('input');
+          authorInput.classList.add('author-input');
+          authorInput.type = 'text';
+          authorInput.value = yaml.author || '';
+          authorInput.placeholder = 'Author';
+          authorInput.setAttribute('data-property', 'author');
+          
+          const dateInput = document.createElement('input');
+          dateInput.classList.add('date-input');
+          dateInput.type = 'text';
+          dateInput.value = yaml.date || '';
+          dateInput.placeholder = 'Date';
+          dateInput.setAttribute('data-property', 'date');
+          
+          authorSection.appendChild(authorInput);
+          authorSection.appendChild(dateInput);
+          
+          // Abstract section
+          const abstractSection = document.createElement('div');
+          abstractSection.classList.add('abstract-section');
+          
+          const abstractLabel = document.createElement('div');
+          abstractLabel.classList.add('abstract-label');
+          abstractLabel.textContent = 'Abstract';
+          
+          const abstractInput = document.createElement('textarea');
+          abstractInput.classList.add('abstract-input');
+          abstractInput.rows = '6';
+          abstractInput.value = yaml.abstract || '';
+          abstractInput.placeholder = 'Enter abstract...';
+          abstractInput.setAttribute('data-property', 'abstract');
+          
+          abstractSection.appendChild(abstractLabel);
+          abstractSection.appendChild(abstractInput);
+          
+          // Add all sections to content
+          content.appendChild(titleSection);
+          content.appendChild(authorSection);
+          content.appendChild(abstractSection);
+          
+          // Add content to dom
+          dom.appendChild(content);
+          
+          // Add event listeners for input changes
+          const inputs = dom.querySelectorAll('input, textarea');
           inputs.forEach(input => {
-            const property = input.dataset.property;
-            if (!property) return;
-
-            // Handle changes
-            input.addEventListener('change', (e) => {
-              handlePropertyChange(property, e.target.value);
-            });
-
-            // Handle input for real-time updates
-            input.addEventListener('input', (e) => {
-              handlePropertyChange(property, e.target.value);
-            });
-
-            // Handle tab navigation
-            input.addEventListener('keydown', (e) => {
-              if (e.key === 'Tab') {
-                e.preventDefault();
-                const allInputs = Array.from(dom.querySelectorAll('input, textarea, select'));
-                const currentIndex = allInputs.indexOf(input);
-                const nextInput = allInputs[currentIndex + 1] || allInputs[0];
-                nextInput.focus();
+            input.addEventListener('input', () => {
+              const property = input.getAttribute('data-property');
+              if (property) {
+                const newYaml = { ...yaml };
+                newYaml[property] = input.value;
+                editor.commands.updateAttributes('rawCell', {
+                  parsedYaml: newYaml
+                });
               }
             });
           });
-        };
-
-        const update = (node) => {
-          // Let renderHTML handle the content
-          setupInputHandlers();
-          return true;
-        };
-
-        update(node);
+        } else {
+          // For non-YAML content
+          dom.textContent = node.attrs.content || '';
+        }
 
         return {
           dom,
-          update,
+          update: (updatedNode) => {
+            console.log('Node update called with:', updatedNode);
+            return true;
+          },
           destroy: () => {
             // Cleanup if needed
           }
