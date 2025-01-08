@@ -89,8 +89,8 @@ export const RawCell = Node.create({
       }];
     },
 
-    addNodeView() {
-      return ({ node, getPos, editor }) => {
+    addNodeView(editor => {
+      return (node, view, getPos) => {
         console.log('RawCell nodeView rendering with node:', node);
         const dom = document.createElement('div');
         dom.setAttribute('data-type', 'raw-cell');
@@ -295,6 +295,90 @@ export const RawCell = Node.create({
           dom.appendChild(content);
         }
 
+        const setupInputHandling = (input) => {
+          // Prevent deletion of the field itself
+          input.addEventListener('keydown', (e) => {
+            if (e.key === 'Backspace') {
+              // If at start of field or field is empty, prevent deletion
+              if (input.selectionStart === 0 && input.selectionEnd === 0) {
+                e.preventDefault();
+                e.stopPropagation();
+              }
+            }
+            // Prevent deletion via Cut or Delete
+            if (e.key === 'Delete' || (e.key === 'x' && (e.ctrlKey || e.metaKey))) {
+              if (input.selectionStart === 0 && input.selectionEnd === input.value.length) {
+                e.preventDefault();
+                e.stopPropagation();
+              }
+            }
+          });
+
+          // Handle click events to maintain focus
+          input.addEventListener('mousedown', (e) => {
+            e.stopPropagation();
+          });
+          
+          input.addEventListener('click', (e) => {
+            e.stopPropagation();
+            input.focus();
+          });
+          
+          // Make the input non-draggable
+          input.draggable = false;
+
+          // Add input event handler
+          input.addEventListener('input', (e) => {
+            const newYaml = { ...yaml };
+            
+            // Handle nested properties
+            const path = e.target.getAttribute('data-property').split('.');
+            let current = newYaml;
+            
+            for (let i = 0; i < path.length - 1; i++) {
+              if (!current[path[i]]) {
+                current[path[i]] = {};
+              }
+              current = current[path[i]];
+            }
+            
+            current[path[path.length - 1]] = e.target.value;
+
+            // For textareas, adjust height
+            if (e.target.tagName.toLowerCase() === 'textarea') {
+              e.target.style.height = 'auto';
+              e.target.style.height = e.target.scrollHeight + 'px';
+            }
+            
+            // Format the YAML
+            const formattedYaml = Object.entries(newYaml)
+              .map(([k, v]) => `${k}: ${typeof v === 'string' ? JSON.stringify(v) : v}`)
+              .join('\n');
+            
+            const yamlContent = `---\n${formattedYaml}\n---`;
+            
+            // Get the current position
+            const pos = getPos();
+            
+            // Create a transaction to update the node
+            const tr = view.state.tr;
+            
+            // Update the node's attributes and content
+            if (typeof pos === 'number') {
+              tr.setNodeMarkup(pos, undefined, {
+                content: yamlContent,
+                parsedYaml: newYaml,
+                formattedYaml: formattedYaml,
+                isYamlHeader: true,
+                isAcademicArticle: true
+              });
+              
+              // Dispatch the transaction
+              view.dispatch(tr);
+            }
+          });
+        };
+
         return {
           dom,
           update: (updatedNode) => {
@@ -308,90 +392,3 @@ export const RawCell = Node.create({
       };
     }
 });
-
-// Common input event handling setup
-const setupInputHandling = (input) => {
-  // Prevent deletion of the field itself
-  input.addEventListener('keydown', (e) => {
-    if (e.key === 'Backspace') {
-      // If at start of field or field is empty, prevent deletion
-      if (input.selectionStart === 0 && input.selectionEnd === 0) {
-        e.preventDefault();
-        e.stopPropagation();
-      }
-    }
-    // Prevent deletion via Cut or Delete
-    if (e.key === 'Delete' || (e.key === 'x' && (e.ctrlKey || e.metaKey))) {
-      if (input.selectionStart === 0 && input.selectionEnd === input.value.length) {
-        e.preventDefault();
-        e.stopPropagation();
-      }
-    }
-  });
-
-  // Handle click events to maintain focus
-  input.addEventListener('mousedown', (e) => {
-    e.stopPropagation();
-  });
-  
-  input.addEventListener('click', (e) => {
-    e.stopPropagation();
-    input.focus();
-  });
-  
-  // Make the input non-draggable
-  input.draggable = false;
-
-  // Add input event handler
-  input.addEventListener('input', (e) => {
-    const newYaml = { ...yaml };
-    
-    // Handle nested properties
-    const path = e.target.getAttribute('data-property').split('.');
-    let current = newYaml;
-    
-    for (let i = 0; i < path.length - 1; i++) {
-      if (!current[path[i]]) {
-        current[path[i]] = {};
-      }
-      current = current[path[i]];
-    }
-    
-    current[path[path.length - 1]] = e.target.value;
-
-    // For textareas, adjust height
-    if (e.target.tagName.toLowerCase() === 'textarea') {
-      e.target.style.height = 'auto';
-      e.target.style.height = e.target.scrollHeight + 'px';
-    }
-    
-    // Format the YAML
-    const formattedYaml = Object.entries(newYaml)
-      .map(([k, v]) => `${k}: ${typeof v === 'string' ? JSON.stringify(v) : v}`)
-      .join('\n');
-    
-    const yamlContent = `---\n${formattedYaml}\n---`;
-    
-    // Get the current position
-    const pos = getPos();
-    
-    // Create a transaction to update the node
-    const tr = editor.state.tr;
-    
-    // Update the node's attributes and content
-    if (typeof pos === 'number') {
-      console.log('Updating YAML at position:', pos, 'with content:', yamlContent);
-      tr.setNodeMarkup(pos, undefined, {
-        content: yamlContent,
-        parsedYaml: newYaml,
-        formattedYaml: formattedYaml,
-        isYamlHeader: true,
-        isAcademicArticle: true
-      });
-      
-      // Dispatch the transaction
-      editor.view.dispatch(tr);
-      console.log('Transaction dispatched');
-    }
-  });
-};
