@@ -290,6 +290,11 @@ input[data-property="jupyter"] {
 textarea[data-property="abstract"] {
   overflow: hidden;
   height: auto;
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 1.6;
+  text-align: justify;
+  resize: vertical;
 }
 
 /* Auto-expand textarea to fit content */
