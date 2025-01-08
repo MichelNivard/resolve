@@ -50,7 +50,9 @@ const YAML_PROPERTIES = {
 export const RawCell = Node.create({
     name: 'rawCell',
     group: 'block',
-    content: '',
+    content: 'inline*',
+    draggable: true,
+    selectable: true,
 
     addAttributes() {
       return {
@@ -68,22 +70,8 @@ export const RawCell = Node.create({
         },
         isAcademicArticle: {
           default: false
-        },
-        displayMode: {
-          default: 'view',
-          rendered: true
         }
       }
-    },
-
-    addCommands() {
-      return {
-        setRawCellAttribute: attributes => ({ chain }) => {
-          return chain()
-            .updateAttributes('rawCell', attributes)
-            .run();
-        }
-      };
     },
 
     parseHTML() {
@@ -91,13 +79,17 @@ export const RawCell = Node.create({
         tag: 'div[data-type="raw-cell"]'
       }]
     },
-  
+
     renderHTML({ node }) {
-      if (node.attrs.isYamlHeader && node.attrs.isAcademicArticle) {
-        const yaml = node.attrs.parsedYaml || {};
+      const yaml = node.attrs.parsedYaml || {};
+      const isYamlHeader = node.attrs.isYamlHeader;
+      const isAcademicArticle = node.attrs.isAcademicArticle;
+
+      if (isYamlHeader && isAcademicArticle) {
         return ['div', { 
           'data-type': 'raw-cell', 
-          class: 'raw-cell academic-frontpage'
+          class: 'raw-cell academic-frontpage',
+          contenteditable: 'true'
         },
           ['div', { class: 'frontpage-content' },
             ['div', { class: 'title-section' },
@@ -163,7 +155,12 @@ export const RawCell = Node.create({
           ]
         ];
       }
-      return ['div', { 'data-type': 'raw-cell', class: 'raw-cell' }, node.attrs.content || ''];
+
+      return ['div', { 
+        'data-type': 'raw-cell', 
+        class: 'raw-cell',
+        contenteditable: 'true'
+      }, node.attrs.content || ''];
     },
 
     addNodeView() {
@@ -189,6 +186,8 @@ export const RawCell = Node.create({
         };
 
         const setupInputHandlers = () => {
+          if (!node.attrs.isYamlHeader || !node.attrs.isAcademicArticle) return;
+
           const inputs = dom.querySelectorAll('input, textarea, select');
           inputs.forEach(input => {
             const property = input.dataset.property;
@@ -218,12 +217,8 @@ export const RawCell = Node.create({
         };
 
         const update = (node) => {
-          if (node.attrs.isYamlHeader && node.attrs.isAcademicArticle) {
-            // Content is rendered via renderHTML
-            setupInputHandlers();
-          } else {
-            dom.textContent = node.attrs.content || '';
-          }
+          // Let renderHTML handle the content
+          setupInputHandlers();
           return true;
         };
 
@@ -238,4 +233,4 @@ export const RawCell = Node.create({
         };
       };
     }
-  });
+});

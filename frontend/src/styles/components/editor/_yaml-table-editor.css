@@ -127,12 +127,28 @@ tr[data-property] td.property-description:has(:-webkit-any(:contains("(Required)
   max-width: 800px;
   margin: 0 auto;
   font-family: "Times New Roman", Times, serif;
+  position: relative;
+}
+
+.academic-frontpage[contenteditable="true"] {
+  cursor: text;
 }
 
 .frontpage-content {
   display: flex;
   flex-direction: column;
   gap: 2rem;
+  pointer-events: auto;
+}
+
+/* Make sure inputs are always editable */
+.academic-frontpage input,
+.academic-frontpage textarea,
+.academic-frontpage select {
+  pointer-events: auto !important;
+  cursor: text;
+  -webkit-user-select: text;
+  user-select: text;
 }
 
 .title-section {
