@@ -1,0 +1,21 @@
+.editor-container {
+  display: flex;
+  gap: 20px;
+  height: calc(100vh - 100px);
+  padding: 20px;
+}
+
+.editor-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background: white;
+}
+
+.editor-content {
+  flex: 1;
+  padding: 1rem;
+  overflow-y: auto;
+}

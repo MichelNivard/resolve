@@ -4,6 +4,7 @@
 
 /* Layouts */
 @import './layouts/_app.css';
+@import './layouts/_editor.css';
 
 /* Components */
 @import './components/editor/_toolbar.css';
