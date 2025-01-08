@@ -98,3 +98,26 @@ tr[data-property] td.property-description:has(:-webkit-any(:contains("(Required)
   color: #e03131;
   font-weight: 500;
 }
+
+/* View mode styles */
+.article-content {
+  cursor: pointer;
+  padding: 1rem;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  transition: background-color 0.15s ease-in-out;
+}
+
+.article-content:hover {
+  background-color: #f8f9fa;
+}
+
+.article-content::after {
+  content: "Click to edit";
+  display: block;
+  margin-top: 0.5rem;
+  text-align: right;
+  color: #868e96;
+  font-size: 0.875rem;
+  font-style: italic;
+}

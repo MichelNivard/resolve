@@ -228,122 +228,21 @@ export const RawCell = Node.create({
           }
         };
 
-        let popup = null;
-
-        const createPopupEditor = () => {
-          const overlay = document.createElement('div');
-          overlay.className = 'yaml-editor-overlay';
-          
-          const popupEl = document.createElement('div');
-          popupEl.className = 'yaml-editor-popup';
-          
-          const header = document.createElement('div');
-          header.className = 'yaml-editor-header';
-          
-          const title = document.createElement('div');
-          title.className = 'yaml-editor-title';
-          title.textContent = 'Edit YAML Header';
-          
-          const closeBtn = document.createElement('button');
-          closeBtn.className = 'yaml-editor-close';
-          closeBtn.innerHTML = '×';
-          closeBtn.onclick = () => {
-            const currentContent = popup.textarea.value;
-            const parsed = tryParseYaml(currentContent);
-            editor.chain()
-              .updateAttributes('rawCell', {
-                content: currentContent,
-                parsedYaml: parsed?.parsed || null,
-                formattedYaml: parsed?.formatted || null,
-                displayMode: 'view'
-              })
-              .run();
-          };
-          
-          header.appendChild(title);
-          header.appendChild(closeBtn);
-          
-          const textarea = document.createElement('textarea');
-          textarea.className = 'yaml-editor-textarea';
-          const initialContent = node.attrs.content;
-          textarea.value = initialContent || '';
-          
-          textarea.addEventListener('input', (e) => {
-            const newContent = e.target.value;
-            const parsed = tryParseYaml(newContent);
-            
-            let content = newContent;
-            if (parsed?.parsed) {
-              content = `---\n${parsed.formatted}---`;
+        const setupViewModeHandler = () => {
+          if (node.attrs.isYamlHeader && node.attrs.isAcademicArticle && node.attrs.displayMode === 'view') {
+            const articleContent = dom.querySelector('.article-content');
+            if (articleContent) {
+              articleContent.addEventListener('click', () => {
+                editor.chain()
+                  .updateAttributes('rawCell', {
+                    displayMode: 'edit'
+                  })
+                  .run();
+              });
             }
-            
-            editor.chain()
-              .updateAttributes('rawCell', {
-                content,
-                parsedYaml: parsed?.parsed || null,
-                formattedYaml: parsed?.formatted || null
-              })
-              .run();
-            
-            requestAnimationFrame(() => {
-              textarea.focus();
-            });
-          });
-
-          textarea.addEventListener('keydown', (e) => {
-            if (e.key === 'Tab') {
-              e.preventDefault();
-              const start = textarea.selectionStart;
-              const end = textarea.selectionEnd;
-              textarea.value = textarea.value.substring(0, start) + '  ' + textarea.value.substring(end);
-              textarea.selectionStart = textarea.selectionEnd = start + 2;
-            } else if (e.key === 'Escape') {
-              closeBtn.click();
-            }
-          });
-          
-          textarea.addEventListener('focus', (e) => {
-            e.stopPropagation();
-          });
-          
-          textarea.addEventListener('mousedown', (e) => {
-            e.stopPropagation();
-          });
-          
-          popupEl.appendChild(header);
-          popupEl.appendChild(textarea);
-          overlay.appendChild(popupEl);
-          
-          overlay.addEventListener('mousedown', (e) => {
-            if (e.target === overlay) {
-              closeBtn.click();
-            }
-          });
-          
-          return {
-            element: overlay,
-            textarea,
-            destroy: () => {
-              if (overlay.parentNode) {
-                overlay.parentNode.removeChild(overlay);
-              }
-            }
-          };
+          }
         };
 
-        if (typeof getPos === 'function' && editor && node.attrs.isAcademicArticle) {
-          dom.addEventListener('click', () => {
-            if (node.attrs.displayMode === 'view') {
-              editor.chain()
-                .updateAttributes('rawCell', {
-                  displayMode: 'edit',
-                  content: node.attrs.content, // Ensure we use the latest content
-                })
-                .run();
-            }
-          });
-        }
-        
         const update = (node) => {
           if (node.attrs.isYamlHeader && node.attrs.isAcademicArticle) {
             if (node.attrs.displayMode === 'edit') {
@@ -361,23 +260,21 @@ export const RawCell = Node.create({
                   <div class="article-abstract">${yaml.abstract || ''}</div>
                 </div>
               `;
+              setupViewModeHandler();
             }
           } else {
             dom.textContent = node.attrs.content || '';
           }
           return true;
         };
-        
+
         update(node);
-        
+
         return {
           dom,
           update,
           destroy: () => {
-            if (popup) {
-              popup.destroy();
-              popup = null;
-            }
+            // Cleanup if needed
           }
         };
       };
