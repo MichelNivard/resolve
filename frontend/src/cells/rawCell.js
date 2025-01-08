@@ -135,6 +135,7 @@ export const RawCell = Node.create({
             if (key === 'abstract' || (value && value.length > 100)) {
               input = document.createElement('textarea');
               input.rows = '4';
+              input.spellcheck = false;
               
               // Auto-expand textarea
               const adjustHeight = () => {
@@ -142,25 +143,17 @@ export const RawCell = Node.create({
                 input.style.height = input.scrollHeight + 'px';
               };
               
-              // Only stop propagation, don't prevent default
+              // Only handle backspace to prevent node deletion
               input.addEventListener('keydown', (e) => {
-                e.stopPropagation();
-              });
-              
-              input.addEventListener('keypress', (e) => {
-                e.stopPropagation();
-              });
-              
-              input.addEventListener('keyup', (e) => {
-                e.stopPropagation();
+                if (e.key === 'Backspace' && !e.target.value) {
+                  e.stopPropagation();
+                }
               });
               
               input.addEventListener('input', (e) => {
-                e.stopPropagation();
-                adjustHeight();
-                
                 const newYaml = { ...yaml };
                 newYaml[key] = e.target.value;
+                adjustHeight();
                 
                 // Format the YAML
                 const formattedYaml = Object.entries(newYaml)
@@ -180,23 +173,16 @@ export const RawCell = Node.create({
             } else {
               input = document.createElement('input');
               input.type = 'text';
+              input.spellcheck = false;
               
-              // Only stop propagation, don't prevent default
+              // Only handle backspace to prevent node deletion
               input.addEventListener('keydown', (e) => {
-                e.stopPropagation();
-              });
-              
-              input.addEventListener('keypress', (e) => {
-                e.stopPropagation();
-              });
-              
-              input.addEventListener('keyup', (e) => {
-                e.stopPropagation();
+                if (e.key === 'Backspace' && !e.target.value) {
+                  e.stopPropagation();
+                }
               });
               
               input.addEventListener('input', (e) => {
-                e.stopPropagation();
-                
                 const newYaml = { ...yaml };
                 newYaml[key] = e.target.value;
                 
@@ -217,21 +203,14 @@ export const RawCell = Node.create({
             input.value = value || '';
             input.setAttribute('data-property', key);
             
-            // Prevent editor from handling mouse/focus events
+            // Handle click events to maintain focus
             input.addEventListener('mousedown', (e) => {
               e.stopPropagation();
             });
             
             input.addEventListener('click', (e) => {
               e.stopPropagation();
-            });
-            
-            input.addEventListener('focus', (e) => {
-              e.stopPropagation();
-            });
-            
-            input.addEventListener('blur', (e) => {
-              e.stopPropagation();
+              input.focus();
             });
             
             // Make the input non-draggable
