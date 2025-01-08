@@ -123,15 +123,79 @@ tr[data-property] td.property-description:has(:-webkit-any(:contains("(Required)
 }
 
 .academic-frontpage {
-  padding: 2rem;
-  max-width: 800px;
-  margin: 0 auto;
-  font-family: "Times New Roman", Times, serif;
-  position: relative;
+  padding: 1rem;
+  font-family: system-ui, -apple-system, sans-serif;
 }
 
-.academic-frontpage[contenteditable="true"] {
-  cursor: text;
+.properties-table {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.property-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 0.5rem;
+  border-radius: 4px;
+}
+
+.property-row:hover {
+  background-color: #f5f5f5;
+}
+
+.property-label {
+  flex: 0 0 120px;
+  font-weight: 500;
+  color: #666;
+  padding-top: 6px;
+}
+
+.property-value {
+  flex: 1;
+}
+
+.property-value input,
+.property-value textarea {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-family: inherit;
+  font-size: inherit;
+  background: white;
+}
+
+.property-value input:focus,
+.property-value textarea:focus {
+  outline: none;
+  border-color: #0066cc;
+  box-shadow: 0 0 0 2px rgba(0, 102, 204, 0.2);
+}
+
+.property-value textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+/* Icons for properties */
+.property-label::before {
+  content: "≡";
+  display: inline-block;
+  margin-right: 0.5rem;
+  color: #999;
+}
+
+/* Date input specific styling */
+input[data-property="date"] {
+  max-width: 150px;
+}
+
+/* Format specific styling */
+input[data-property="format"] {
+  max-width: 100px;
 }
 
 .frontpage-content {

@@ -186,108 +186,85 @@ export const RawCell = Node.create({
         const dom = document.createElement('div');
         dom.setAttribute('data-type', 'raw-cell');
         dom.classList.add('raw-cell');
-        dom.contentEditable = 'true';
 
         if (node.attrs.isYamlHeader && node.attrs.isAcademicArticle) {
           console.log('Rendering academic frontpage');
           dom.classList.add('academic-frontpage');
           const yaml = node.attrs.parsedYaml || {};
           
-          // Create the frontpage content
-          const content = document.createElement('div');
-          content.classList.add('frontpage-content');
+          // Create the properties table
+          const table = document.createElement('div');
+          table.classList.add('properties-table');
           
-          // Title section
-          const titleSection = document.createElement('div');
-          titleSection.classList.add('title-section');
-          
-          const titleInput = document.createElement('input');
-          titleInput.classList.add('title-input');
-          titleInput.type = 'text';
-          titleInput.value = yaml.title || '';
-          titleInput.placeholder = 'Title';
-          titleInput.setAttribute('data-property', 'title');
-          
-          const subtitleInput = document.createElement('input');
-          subtitleInput.classList.add('subtitle-input');
-          subtitleInput.type = 'text';
-          subtitleInput.value = yaml.subtitle || '';
-          subtitleInput.placeholder = 'Subtitle';
-          subtitleInput.setAttribute('data-property', 'subtitle');
-          
-          titleSection.appendChild(titleInput);
-          titleSection.appendChild(subtitleInput);
-          
-          // Author section
-          const authorSection = document.createElement('div');
-          authorSection.classList.add('author-section');
-          
-          const authorInput = document.createElement('input');
-          authorInput.classList.add('author-input');
-          authorInput.type = 'text';
-          authorInput.value = yaml.author || '';
-          authorInput.placeholder = 'Author';
-          authorInput.setAttribute('data-property', 'author');
-          
-          const dateInput = document.createElement('input');
-          dateInput.classList.add('date-input');
-          dateInput.type = 'text';
-          dateInput.value = yaml.date || '';
-          dateInput.placeholder = 'Date';
-          dateInput.setAttribute('data-property', 'date');
-          
-          authorSection.appendChild(authorInput);
-          authorSection.appendChild(dateInput);
-          
-          // Abstract section
-          const abstractSection = document.createElement('div');
-          abstractSection.classList.add('abstract-section');
-          
-          const abstractLabel = document.createElement('div');
-          abstractLabel.classList.add('abstract-label');
-          abstractLabel.textContent = 'Abstract';
-          
-          const abstractInput = document.createElement('textarea');
-          abstractInput.classList.add('abstract-input');
-          abstractInput.rows = '6';
-          abstractInput.value = yaml.abstract || '';
-          abstractInput.placeholder = 'Enter abstract...';
-          abstractInput.setAttribute('data-property', 'abstract');
-          
-          abstractSection.appendChild(abstractLabel);
-          abstractSection.appendChild(abstractInput);
-          
-          // Add all sections to content
-          content.appendChild(titleSection);
-          content.appendChild(authorSection);
-          content.appendChild(abstractSection);
-          
-          // Add content to dom
-          dom.appendChild(content);
-          
-          // Add event listeners for input changes
-          const inputs = dom.querySelectorAll('input, textarea');
-          inputs.forEach(input => {
-            input.addEventListener('input', () => {
-              const property = input.getAttribute('data-property');
-              if (property) {
-                const newYaml = { ...yaml };
-                newYaml[property] = input.value;
-                editor.commands.updateAttributes('rawCell', {
-                  parsedYaml: newYaml
-                });
+          // Helper function to create a property row
+          const createPropertyRow = (label, value, property, type = 'text') => {
+            const row = document.createElement('div');
+            row.classList.add('property-row');
+            
+            const labelDiv = document.createElement('div');
+            labelDiv.classList.add('property-label');
+            labelDiv.textContent = label;
+            
+            const valueDiv = document.createElement('div');
+            valueDiv.classList.add('property-value');
+            
+            let input;
+            if (type === 'textarea') {
+              input = document.createElement('textarea');
+              input.rows = '4';
+            } else {
+              input = document.createElement('input');
+              input.type = type;
+            }
+            
+            input.value = value || '';
+            input.setAttribute('data-property', property);
+            input.addEventListener('input', (e) => {
+              e.stopPropagation();
+              const newYaml = { ...yaml };
+              newYaml[property] = e.target.value;
+              editor.commands.updateAttributes('rawCell', {
+                parsedYaml: newYaml
+              });
+            });
+            
+            // Prevent backspace from deleting the node
+            input.addEventListener('keydown', (e) => {
+              if (e.key === 'Backspace' && e.target.value === '') {
+                e.stopPropagation();
+                e.preventDefault();
               }
             });
-          });
+            
+            valueDiv.appendChild(input);
+            row.appendChild(labelDiv);
+            row.appendChild(valueDiv);
+            return row;
+          };
+          
+          // Add all properties
+          table.appendChild(createPropertyRow('Title', yaml.title, 'title'));
+          table.appendChild(createPropertyRow('Subtitle', yaml.subtitle, 'subtitle'));
+          table.appendChild(createPropertyRow('Author', yaml.author, 'author'));
+          table.appendChild(createPropertyRow('Date', yaml.date, 'date'));
+          table.appendChild(createPropertyRow('Abstract', yaml.abstract, 'abstract', 'textarea'));
+          table.appendChild(createPropertyRow('Format', yaml.format, 'format'));
+          table.appendChild(createPropertyRow('Bibliography', yaml.bibliography, 'bibliography'));
+          
+          dom.appendChild(table);
         } else {
           // For non-YAML content
-          dom.textContent = node.attrs.content || '';
+          const content = document.createElement('div');
+          content.classList.add('raw-content');
+          content.textContent = node.attrs.content || '';
+          content.contentEditable = 'true';
+          dom.appendChild(content);
         }
 
         return {
           dom,
           update: (updatedNode) => {
-            console.log('Node update called with:', updatedNode);
+            if (updatedNode.type.name !== node.type.name) return false;
             return true;
           },
           destroy: () => {
