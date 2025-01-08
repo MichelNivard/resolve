@@ -94,78 +94,75 @@ export const RawCell = Node.create({
   
     renderHTML({ node }) {
       if (node.attrs.isYamlHeader && node.attrs.isAcademicArticle) {
-        if (node.attrs.displayMode === 'edit') {
-          return ['div', { 
-            'data-type': 'raw-cell', 
-            class: 'raw-cell yaml-table-editor',
-            'data-display-mode': 'edit'
-          },
-            ['table', { class: 'yaml-properties-table' },
-              ['thead', {},
-                ['tr', {},
-                  ['th', {}, 'Property'],
-                  ['th', {}, 'Value'],
-                  ['th', {}, 'Description']
-                ]
-              ],
-              ['tbody', {}, 
-                Object.entries(YAML_PROPERTIES).map(([key, config]) => {
-                  const value = (node.attrs.parsedYaml || {})[key] || '';
-                  return ['tr', { 'data-property': key },
-                    ['td', { class: 'property-name' }, config.label],
-                    ['td', { class: 'property-value' },
-                      config.type === 'select' 
-                        ? ['select', { class: 'yaml-select' },
-                            config.options.map(opt => 
-                              ['option', { 
-                                value: opt,
-                                selected: value === opt ? 'selected' : null 
-                              }, opt]
-                            )
-                          ]
-                        : config.type === 'textarea'
-                          ? ['textarea', { 
-                              class: 'yaml-textarea',
-                              rows: '4'
-                            }, value]
-                          : ['input', { 
-                              type: 'text',
-                              class: 'yaml-input',
-                              value
-                            }]
-                    ],
-                    ['td', { class: 'property-description' },
-                      config.required ? '(Required)' : '(Optional)'
-                    ]
-                  ];
-                })
-              ]
-            ],
-            ['div', { class: 'yaml-actions' },
-              ['button', { 
-                class: 'yaml-save-btn',
-                type: 'button'
-              }, 'Save Changes']
-            ]
-          ];
-        }
         const yaml = node.attrs.parsedYaml || {};
         return ['div', { 
           'data-type': 'raw-cell', 
-          class: 'raw-cell',
-          'data-display-mode': 'view'
-        }, 
-          ['div', { class: 'article-content' },
-            ['h1', { class: 'article-title' }, yaml.title || ''],
-            ['h2', { class: 'article-subtitle' }, yaml.subtitle || ''],
-            ['div', { class: 'article-author' }, yaml.author || ''],
-            ['div', { class: 'article-date' }, yaml.date || ''],
-            ['h3', { class: 'article-abstract-header' }, 'Abstract'],
-            ['div', { class: 'article-abstract' }, yaml.abstract || '']
+          class: 'raw-cell academic-frontpage'
+        },
+          ['div', { class: 'frontpage-content' },
+            ['div', { class: 'title-section' },
+              ['input', {
+                class: 'title-input',
+                type: 'text',
+                value: yaml.title || '',
+                placeholder: 'Title',
+                'data-property': 'title'
+              }],
+              ['input', {
+                class: 'subtitle-input',
+                type: 'text',
+                value: yaml.subtitle || '',
+                placeholder: 'Subtitle',
+                'data-property': 'subtitle'
+              }]
+            ],
+            ['div', { class: 'author-section' },
+              ['input', {
+                class: 'author-input',
+                type: 'text',
+                value: yaml.author || '',
+                placeholder: 'Author',
+                'data-property': 'author'
+              }],
+              ['input', {
+                class: 'date-input',
+                type: 'text',
+                value: yaml.date || '',
+                placeholder: 'Date',
+                'data-property': 'date'
+              }]
+            ],
+            ['div', { class: 'abstract-section' },
+              ['div', { class: 'abstract-label' }, 'Abstract'],
+              ['textarea', {
+                class: 'abstract-input',
+                rows: '6',
+                'data-property': 'abstract',
+                placeholder: 'Enter abstract...'
+              }, yaml.abstract || '']
+            ],
+            ['div', { class: 'metadata-section' },
+              ['div', { class: 'metadata-row' },
+                ['select', {
+                  class: 'format-select',
+                  'data-property': 'format'
+                },
+                  ['option', { value: 'html', selected: yaml.format === 'html' }, 'HTML'],
+                  ['option', { value: 'pdf', selected: yaml.format === 'pdf' }, 'PDF'],
+                  ['option', { value: 'docx', selected: yaml.format === 'docx' }, 'DOCX']
+                ],
+                ['input', {
+                  class: 'bibliography-input',
+                  type: 'text',
+                  value: yaml.bibliography || '',
+                  placeholder: 'Bibliography file',
+                  'data-property': 'bibliography'
+                }]
+              ]
+            ]
           ]
         ];
       }
-      
       return ['div', { 'data-type': 'raw-cell', class: 'raw-cell' }, node.attrs.content || ''];
     },
 
@@ -191,93 +188,39 @@ export const RawCell = Node.create({
             .run();
         };
 
-        const setupTableHandlers = () => {
-          const inputs = dom.querySelectorAll('.yaml-input, .yaml-select, .yaml-textarea');
+        const setupInputHandlers = () => {
+          const inputs = dom.querySelectorAll('input, textarea, select');
           inputs.forEach(input => {
-            const property = input.closest('tr').dataset.property;
-            
+            const property = input.dataset.property;
+            if (!property) return;
+
+            // Handle changes
             input.addEventListener('change', (e) => {
               handlePropertyChange(property, e.target.value);
             });
-            
+
+            // Handle input for real-time updates
+            input.addEventListener('input', (e) => {
+              handlePropertyChange(property, e.target.value);
+            });
+
+            // Handle tab navigation
             input.addEventListener('keydown', (e) => {
               if (e.key === 'Tab') {
                 e.preventDefault();
-                const rows = Array.from(dom.querySelectorAll('tr'));
-                const currentRow = input.closest('tr');
-                const currentIndex = rows.indexOf(currentRow);
-                const nextRow = rows[currentIndex + 1];
-                
-                if (nextRow) {
-                  const nextInput = nextRow.querySelector('.yaml-input, .yaml-select, .yaml-textarea');
-                  if (nextInput) nextInput.focus();
-                }
+                const allInputs = Array.from(dom.querySelectorAll('input, textarea, select'));
+                const currentIndex = allInputs.indexOf(input);
+                const nextInput = allInputs[currentIndex + 1] || allInputs[0];
+                nextInput.focus();
               }
             });
           });
-
-          const saveButton = dom.querySelector('.yaml-save-btn');
-          if (saveButton) {
-            saveButton.addEventListener('click', (e) => {
-              e.stopPropagation();
-              editor.chain()
-                .updateAttributes('rawCell', {
-                  displayMode: 'view'
-                })
-                .run();
-            });
-          }
-        };
-
-        // Setup click handler for view mode
-        const setupViewModeHandler = () => {
-          if (node.attrs.isYamlHeader && node.attrs.isAcademicArticle && node.attrs.displayMode === 'view') {
-            const articleContent = dom.querySelector('.article-content');
-            if (articleContent) {
-              const handleClick = (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                
-                if (typeof getPos === 'function') {
-                  editor.chain()
-                    .setNodeSelection(getPos())
-                    .updateAttributes('rawCell', {
-                      displayMode: 'edit'
-                    })
-                    .run();
-                }
-              };
-
-              articleContent.addEventListener('click', handleClick);
-              return () => articleContent.removeEventListener('click', handleClick);
-            }
-          }
-          return () => {};
         };
 
         const update = (node) => {
           if (node.attrs.isYamlHeader && node.attrs.isAcademicArticle) {
-            if (node.attrs.displayMode === 'edit') {
-              // Table is rendered via renderHTML
-              setupTableHandlers();
-            } else {
-              const yaml = node.attrs.parsedYaml || {};
-              dom.innerHTML = `
-                <div class="article-content">
-                  <h1 class="article-title">${yaml.title || ''}</h1>
-                  <h2 class="article-subtitle">${yaml.subtitle || ''}</h2>
-                  <div class="article-author">${yaml.author || ''}</div>
-                  <div class="article-date">${yaml.date || ''}</div>
-                  <h3 class="article-abstract-header">Abstract</h3>
-                  <div class="article-abstract">${yaml.abstract || ''}</div>
-                </div>
-              `;
-              
-              // Setup click handler and store cleanup function
-              const cleanup = setupViewModeHandler();
-              // Store cleanup function for later
-              dom.dataset.cleanup = cleanup;
-            }
+            // Content is rendered via renderHTML
+            setupInputHandlers();
           } else {
             dom.textContent = node.attrs.content || '';
           }
@@ -290,10 +233,7 @@ export const RawCell = Node.create({
           dom,
           update,
           destroy: () => {
-            // Run cleanup function if it exists
-            if (dom.dataset.cleanup) {
-              dom.dataset.cleanup();
-            }
+            // Cleanup if needed
           }
         };
       };

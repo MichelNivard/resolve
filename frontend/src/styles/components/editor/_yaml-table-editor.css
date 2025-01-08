@@ -121,3 +121,129 @@ tr[data-property] td.property-description:has(:-webkit-any(:contains("(Required)
   font-size: 0.875rem;
   font-style: italic;
 }
+
+.academic-frontpage {
+  padding: 2rem;
+  max-width: 800px;
+  margin: 0 auto;
+  font-family: "Times New Roman", Times, serif;
+}
+
+.frontpage-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.title-section {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.title-input,
+.subtitle-input {
+  width: 100%;
+  text-align: center;
+  border: none;
+  background: transparent;
+  font-family: inherit;
+}
+
+.title-input {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 1rem;
+}
+
+.subtitle-input {
+  font-size: 18px;
+  font-style: italic;
+}
+
+.author-section {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.author-input,
+.date-input {
+  width: auto;
+  text-align: center;
+  border: none;
+  background: transparent;
+  font-family: inherit;
+  font-size: 16px;
+}
+
+.author-input {
+  margin-bottom: 0.5rem;
+}
+
+.abstract-section {
+  width: 80%;
+  margin: 0 auto;
+  text-align: justify;
+}
+
+.abstract-label {
+  font-weight: bold;
+  font-size: 18px;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.abstract-input {
+  width: 100%;
+  border: none;
+  background: transparent;
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 1.6;
+  text-align: justify;
+  resize: vertical;
+}
+
+.metadata-section {
+  margin-top: 2rem;
+  border-top: 1px solid #eee;
+  padding-top: 1rem;
+}
+
+.metadata-row {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  font-size: 14px;
+}
+
+.format-select,
+.bibliography-input {
+  border: none;
+  background: transparent;
+  font-family: inherit;
+  color: #666;
+  font-size: 14px;
+}
+
+/* Style placeholders */
+.academic-frontpage input::placeholder,
+.academic-frontpage textarea::placeholder {
+  color: #999;
+  font-style: italic;
+  opacity: 0.7;
+}
+
+/* Style focus states */
+.academic-frontpage input:focus,
+.academic-frontpage textarea:focus,
+.academic-frontpage select:focus {
+  outline: none;
+  background-color: rgba(0, 0, 0, 0.02);
+}
+
+/* Hover states to indicate editability */
+.academic-frontpage input:hover,
+.academic-frontpage textarea:hover,
+.academic-frontpage select:hover {
+  background-color: rgba(0, 0, 0, 0.02);
+}
