@@ -12,7 +12,7 @@ import { MdFormatClear } from 'react-icons/md';
 import { RiDoubleQuotesL } from 'react-icons/ri';
 import { AiOutlineSplitCells, AiOutlineInsertRowBelow } from 'react-icons/ai';
 import { BsTable } from 'react-icons/bs';
-import './EditorToolbar.css';
+import '../../styles/components/editor/_toolbar.css';
 import { useAuth } from '../../contexts/AuthContext';  
 
 const EditorToolbar = ({ editor, onToggleComments }) => {

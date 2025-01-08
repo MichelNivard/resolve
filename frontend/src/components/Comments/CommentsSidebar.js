@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef, useContext } from 'react';
 import { FaCheck } from 'react-icons/fa';
 import { formatTimeAgo } from '../../utils/timeUtils';
 import { AuthContext } from '../../contexts/AuthContext';
-import './CommentsSidebar.css';
+import '../../styles/components/comments/_sidebar.css';
 
 export const CommentsSidebar = ({ editor }) => {
   const [comments, setComments] = useState([]);

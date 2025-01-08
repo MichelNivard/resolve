@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Mathematics from 'tiptap-math';
-import 'katex/dist/katex.min.css';
 import Underline from '@tiptap/extension-underline';
 import Highlight from '@tiptap/extension-highlight';
 import Table from '@tiptap/extension-table';
@@ -11,18 +10,14 @@ import TableCell from '@tiptap/extension-table-cell';
 import TableHeader from '@tiptap/extension-table-header';
 import { CitationMark } from '../Citation/CitationMark';
 import EditorBubbleMenuManager from './EditorBubbleMenuManager';
-import './TrackChangesBubble.css';
-import './TableStyles.css';
 import { TrackChangeExtension } from '../../utils/TrackChanges';
 import { CommentMark } from '../../utils/CommentMark';
 import { RawCell } from '../../rawCell';
-import '../../rawCell.css'
 import { CodeCell } from '../../codeCell';
 import { ipynbToTiptapDoc } from '../../utils/notebookConversionUtils';
 import EditorToolbar from './EditorToolbar';
 import { CommentsSidebar } from '../Comments/CommentsSidebar';
 import LoginButton from '../Auth/LoginButton';
-import './EditorContent.css';
 import { fetchNotebooksInRepo } from '../../utils/api';
 
 const ReferencesList = ({ references }) => {

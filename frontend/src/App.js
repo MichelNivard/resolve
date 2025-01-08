@@ -4,12 +4,12 @@ import { fetchNotebook, fetchRepositories, fetchUser } from './utils/api';
 import { tiptapDocToIpynb } from './utils/notebookConversionUtils';
 import { saveToGitHub } from './utils/savetoGitHub';
 import { getCurrentTime, get30MinutesAgo } from './utils/timeUtils';
-import './App.css';
+import './styles/main.css';
+import 'katex/dist/katex.min.css';
 import EditorWrapper from './components/Editor/EditorWrapper';
 import WarningBanner from './components/WarningBanner';
 import LoginButton from './components/Auth/LoginButton';
 import { GitHubReferenceManager } from './utils/GitHubReferenceManager';
-import 'katex/dist/katex.min.css';
 
 // Import TipTap extensions
 import StarterKit from '@tiptap/starter-kit';

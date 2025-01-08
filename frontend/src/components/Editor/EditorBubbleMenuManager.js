@@ -4,7 +4,7 @@ import { getMarkRange } from '@tiptap/core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheck, faTimes, faComment, faQuoteLeft } from '@fortawesome/free-solid-svg-icons';
 import { AuthContext } from '../../contexts/AuthContext';
-import '../Comments/CommentsSidebar.css';
+import '../../styles/components/comments/_sidebar.css';
 
 export default function EditorBubbleMenuManager({ editor }) {
   const [isCommentInputVisible, setIsCommentInputVisible] = useState(false);
