@@ -20,6 +20,9 @@ import { CommentMark } from './CommentMark';
 import { CitationMark } from '../components/Citation/CitationMark';
 
 export function ipynbToTiptapDoc(ipynb, editor) {
+  console.log('ipynbToTiptapDoc called with editor:', editor);
+  console.log('Editor extensions:', editor.extensionManager.extensions);
+  console.log('Editor schema:', editor.schema);
   // Temporarily disable track changes while loading content
   const trackChangeExtension = editor.extensionManager.extensions.find(
     ext => ext.name === 'trackchange'

@@ -54,6 +54,10 @@ export const RawCell = Node.create({
     editable: true,
     selectable: true,
 
+    constructor() {
+      console.log('RawCell extension created');
+    },
+
     addAttributes() {
       return {
         content: {
@@ -177,7 +181,9 @@ export const RawCell = Node.create({
     },
 
     addNodeView() {
+      console.log('RawCell addNodeView called');
       return ({ node, getPos, editor }) => {
+        console.log('RawCell nodeView rendering with node:', node);
         const dom = document.createElement('div');
         dom.setAttribute('data-type', 'raw-cell');
         dom.classList.add('raw-cell');
