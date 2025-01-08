@@ -1,10 +1,10 @@
 /* Import all stylesheets */
+@import './_index.css';
 @import './base/_reset.css';
 @import './base/_variables.css';
 
 /* Layouts */
 @import './layouts/_app.css';
-@import './layouts/_editor.css';
 
 /* Components */
 @import './components/editor/_toolbar.css';
