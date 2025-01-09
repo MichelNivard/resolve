@@ -214,21 +214,20 @@ const EditorToolbar = ({ editor, onToggleComments }) => {
   };
 
   const headingLevels = [
-    { label: 'Paragraph', level: null },
-    { label: 'Heading 1', level: 1 },
-    { label: 'Heading 2', level: 2 },
-    { label: 'Heading 3', level: 3 },
-    { label: 'Heading 4', level: 4 },
-    { label: 'Heading 5', level: 5 },
-    { label: 'Heading 6', level: 6 },
+    { name: 'Normal Text', value: 0 },
+    { name: 'Heading 1', value: 1 },
+    { name: 'Heading 2', value: 2 },
+    { name: 'Heading 3', value: 3 },
+    { name: 'Heading 4', value: 4 },
+    { name: 'Heading 5', value: 5 },
+    { name: 'Heading 6', value: 6 }
   ];
 
   const fontSizes = [
-    { label: 'Default', size: null },
-    { label: 'Small', size: '0.9em' },
-    { label: 'Normal', size: '1em' },
-    { label: 'Large', size: '1.2em' },
-    { label: 'X-Large', size: '1.5em' },
+    { name: 'Small', value: 'small' },
+    { name: 'Normal', value: 'normal' },
+    { name: 'Large', value: 'large' },
+    { name: 'Huge', value: 'huge' }
   ];
 
   const colors = ['#000000', '#FF0000', '#00FF00', '#0000FF', '#FFA500', '#800080'];
@@ -270,45 +269,51 @@ const EditorToolbar = ({ editor, onToggleComments }) => {
         <button className="toolbar-btn" onClick={handleUndo} title="Undo"><FaUndo /></button>
         <button className="toolbar-btn" onClick={handleRedo} title="Redo"><FaRedo /></button>
         
-        {/* Heading dropdown */}
-        <div className="heading-dropdown" ref={headingMenuRef} style={{ position:'relative' }}>
-          <button className="toolbar-btn" onClick={toggleHeadingMenu} title="Heading Levels">
-            Heading ▼
-          </button>
-          {showHeadingMenu && (
-            <div className="heading-menu" style={{ position:'absolute', background:'#fff', border:'1px solid #ccc', borderRadius:'4px', zIndex:9999, top:'100%', left:0 }}>
-              {headingLevels.map((h, index) => (
-                <div key={index} className="heading-item" 
-                  style={{ padding:'0.5rem 1rem', cursor:'pointer' }}
-                  onClick={() => applyHeading(h.level)}>{h.label}</div>
-              ))}
-            </div>
-          )}
+        {/* Heading Level Select */}
+        <div className="toolbar-item">
+          <select
+            onChange={(e) => {
+              const level = parseInt(e.target.value);
+              editor.chain().focus().toggleHeading({ level }).run();
+            }}
+            value={(() => {
+              for (let i = 1; i <= 6; i++) {
+                if (editor.isActive('heading', { level: i })) return i;
+              }
+              return 0;
+            })()}
+            className="glass-select"
+            title="Heading Level"
+          >
+            {headingLevels.map((heading) => (
+              <option key={heading.value} value={heading.value}>
+                {heading.name}
+              </option>
+            ))}
+          </select>
         </div>
 
-        {/* Font size dropdown */}
-        <div className="font-size-dropdown" ref={fontSizeMenuRef} style={{ position:'relative' }}>
-          <button className="toolbar-btn" onClick={toggleFontSizeMenu} title="Font Size">
-            <FaTextHeight /> ▼
-          </button>
-          {showFontSizeMenu && (
-            <div className="font-size-menu" style={{ position:'absolute', background:'#fff', border:'1px solid #ccc', borderRadius:'4px', zIndex:9999, top:'100%', left:0 }}>
-              {fontSizes.map((f, index) => (
-                <div key={index} className="font-size-item" 
-                  style={{ padding:'0.5rem 1rem', cursor:'pointer' }}
-                  onClick={() => f.size ? applyFontSize(f.size) : editor.chain().focus().unsetTextStyle().run() }>
-                  {f.label}
-                </div>
-              ))}
-            </div>
-          )}
+        {/* Font Size Select */}
+        <div className="toolbar-item">
+          <select
+            onChange={(e) => editor.chain().focus().setFontSize(e.target.value).run()}
+            value={editor.getAttributes('textStyle').fontSize || 'normal'}
+            className="glass-select"
+            title="Font Size"
+          >
+            {fontSizes.map((size) => (
+              <option key={size.value} value={size.value}>
+                {size.name}
+              </option>
+            ))}
+          </select>
         </div>
 
         {/* Font Family Select */}
         <div className="toolbar-item">
           <select
             onChange={(e) => setFontFamily(e.target.value)}
-            className="toolbar-select"
+            className="glass-select"
             title="Font Family"
             style={{ fontFamily: 'var(--ui-font)' }}
           >
@@ -324,10 +329,8 @@ const EditorToolbar = ({ editor, onToggleComments }) => {
           </select>
         </div>
 
-            
         {/* Separator */}
         <div style={{ width:'1px', height:'24px', background:'#ddd', margin:'0 0.5rem' }}></div>
-
 
         {/* Bold / Italic / Underline / Strike / Highlight */}
         <button className="toolbar-btn" onClick={handleBold} title="Bold"><FaBold /></button>

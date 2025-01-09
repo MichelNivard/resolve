@@ -7,6 +7,7 @@
   position: relative;
   overflow: visible;
   flex-wrap: nowrap;
+  align-items: center;
 }
 
 .toolbar-btn {
@@ -111,23 +112,34 @@
   flex-shrink: 0;
 }
 
-.toolbar-select {
-  padding: 4px 8px;
-  border: 1px solid #eee;
-  border-radius: 4px;
-  background: white;
-  cursor: pointer;
+/* Glass select styling for all toolbar selects */
+.glass-select {
+  padding: 0 32px 0 12px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 6px;
+  background: #fff;
   font-size: 14px;
   color: #333;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  cursor: pointer;
+  min-width: 120px;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23333' d='M2.9 4h6.2L6 8 2.9 4z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  line-height: 30px;
+}
+
+.glass-select:focus {
   outline: none;
+  border-color: rgba(0, 0, 0, 0.2);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-.toolbar-select:hover {
-  border-color: #ddd;
-  background: #f9f9f9;
-}
-
-.toolbar-select:focus {
-  border-color: #007bff;
-  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+.glass-select option {
+  padding: 8px;
+  font-size: 14px;
 }
