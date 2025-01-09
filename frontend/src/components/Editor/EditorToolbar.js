@@ -316,14 +316,25 @@ const EditorToolbar = ({ editor, onToggleComments }) => {
         {/* Font Family Dropdown */}
         <div className="toolbar-item" ref={fontFamilyMenuRef}>
           <button
-            onClick={() => setShowFontFamilyMenu(!showFontFamilyMenu)}
+            onClick={(e) => {
+              const buttonRect = e.currentTarget.getBoundingClientRect();
+              setShowFontFamilyMenu(!showFontFamilyMenu);
+              // Set dropdown position after a small delay to ensure DOM is updated
+              setTimeout(() => {
+                const dropdown = fontFamilyMenuRef.current?.querySelector('.font-family-menu');
+                if (dropdown) {
+                  dropdown.style.top = `${buttonRect.bottom}px`;
+                  dropdown.style.left = `${buttonRect.left}px`;
+                }
+              }, 0);
+            }}
             className="toolbar-button"
             title="Font Family"
           >
             <span style={{ fontFamily: 'var(--ui-font)' }}>Font</span>
           </button>
           {showFontFamilyMenu && (
-            <div className="dropdown-menu font-family-menu">
+            <div className="dropdown-menu font-family-menu" style={{ position: 'fixed' }}>
               {fontFamilies.map((font) => (
                 <button
                   key={font.name}

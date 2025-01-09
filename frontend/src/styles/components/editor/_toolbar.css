@@ -4,6 +4,9 @@
   padding: 0.5rem;
   border-bottom: 1px solid #eee;
   background-color: rgba(255, 255, 255, 0.95);
+  position: relative;
+  overflow: visible;
+  flex-wrap: nowrap;
 }
 
 .toolbar-btn {
@@ -105,12 +108,12 @@
 
 .toolbar-item {
   position: relative;
+  flex-shrink: 0;
 }
 
 .font-family-menu {
-  position: absolute;
-  top: 100%;
-  left: 0;
+  position: fixed;
+  margin-top: 2px;
   min-width: 180px;
   max-height: 300px;
   overflow-y: auto;
