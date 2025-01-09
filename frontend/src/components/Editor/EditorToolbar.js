@@ -21,6 +21,7 @@ const EditorToolbar = ({ editor, onToggleComments }) => {
   const [showFontSizeMenu, setShowFontSizeMenu] = useState(false);
   const [showTextColorMenu, setShowTextColorMenu] = useState(false);
   const [showBgColorMenu, setShowBgColorMenu] = useState(false);
+  const [showFontFamilyMenu, setShowFontFamilyMenu] = useState(false);
 
   // State for the comment dialog
   const [showCommentDialog, setShowCommentDialog] = useState(false);
@@ -30,6 +31,7 @@ const EditorToolbar = ({ editor, onToggleComments }) => {
   const fontSizeMenuRef = useRef(null);
   const textColorMenuRef = useRef(null);
   const bgColorMenuRef = useRef(null);
+  const fontFamilyMenuRef = useRef(null);
 
   const { user } = useAuth();
 
@@ -48,12 +50,15 @@ const EditorToolbar = ({ editor, onToggleComments }) => {
       if (showBgColorMenu && bgColorMenuRef.current && !bgColorMenuRef.current.contains(e.target)) {
         setShowBgColorMenu(false);
       }
+      if (showFontFamilyMenu && fontFamilyMenuRef.current && !fontFamilyMenuRef.current.contains(e.target)) {
+        setShowFontFamilyMenu(false);
+      }
     };
     document.addEventListener('mousedown', handleClickOutside);
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [showHeadingMenu, showFontSizeMenu, showTextColorMenu, showBgColorMenu]);
+  }, [showHeadingMenu, showFontSizeMenu, showTextColorMenu, showBgColorMenu, showFontFamilyMenu]);
 
   if (!editor) return null;
 
@@ -229,6 +234,27 @@ const EditorToolbar = ({ editor, onToggleComments }) => {
   const colors = ['#000000', '#FF0000', '#00FF00', '#0000FF', '#FFA500', '#800080'];
   const bgColors = ['#ffff00', '#ffeb3b', '#caffbf', '#b2fef5', '#f9c2ff', '#ffd6e0'];
 
+  const fontFamilies = [
+    { name: 'Inter', value: 'var(--editor-font-primary)' },
+    { name: 'Times New Roman', value: 'var(--editor-font-times)' },
+    { name: 'Helvetica', value: 'var(--editor-font-helvetica)' },
+    { name: 'Georgia', value: 'var(--editor-font-georgia)' },
+    { name: 'Garamond', value: 'var(--editor-font-garamond)' }
+  ];
+
+  const setFontFamily = async (fontFamily) => {
+    // Check if the font is loaded
+    const fontName = fontFamily.split(',')[0].replace(/['"]/g, '').replace('var(--editor-font-', '').replace(')', '');
+    try {
+      await document.fonts.load(`16px ${fontName}`);
+    } catch (e) {
+      console.warn(`Font ${fontName} loading check failed, proceeding anyway:`, e);
+    }
+    
+    document.documentElement.style.setProperty('--editor-current-font', fontFamily);
+    setShowFontFamilyMenu(false);
+  };
+
   const addComment = () => {
     if (!editor) return;
 
@@ -282,6 +308,31 @@ const EditorToolbar = ({ editor, onToggleComments }) => {
                   onClick={() => f.size ? applyFontSize(f.size) : editor.chain().focus().unsetTextStyle().run() }>
                   {f.label}
                 </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Font Family Dropdown */}
+        <div className="toolbar-item" ref={fontFamilyMenuRef}>
+          <button
+            onClick={() => setShowFontFamilyMenu(!showFontFamilyMenu)}
+            className="toolbar-button"
+            title="Font Family"
+          >
+            <span style={{ fontFamily: 'var(--ui-font)' }}>Font</span>
+          </button>
+          {showFontFamilyMenu && (
+            <div className="dropdown-menu font-family-menu">
+              {fontFamilies.map((font) => (
+                <button
+                  key={font.name}
+                  onClick={() => setFontFamily(font.value)}
+                  className="dropdown-item"
+                  data-font={font.name}
+                >
+                  {font.name}
+                </button>
               ))}
             </div>
           )}
