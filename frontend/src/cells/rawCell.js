@@ -115,10 +115,11 @@ export const RawCell = Node.create({
           const additionalSection = document.createElement('div');
           additionalSection.classList.add('additional-fields');
           
-          // Helper function to create a property row
-          const createPropertyRow = (key, value) => {
+          // Helper function to create a basic property row
+          const createBasicRow = (key, value) => {
             const row = document.createElement('div');
             row.classList.add('property-row');
+            row.setAttribute('data-property', key);
             
             const labelDiv = document.createElement('div');
             labelDiv.classList.add('property-label');
@@ -142,7 +143,6 @@ export const RawCell = Node.create({
               input.spellcheck = false;
             }
             
-            // Common input event handling setup
             const setupInputHandling = (input) => {
               // Prevent deletion of the field itself
               input.addEventListener('keydown', (e) => {
@@ -225,11 +225,33 @@ export const RawCell = Node.create({
             } else {
               input.addEventListener('input', (e) => {
                 const newYaml = { ...yaml };
-                newYaml[key] = e.target.value;
+                
+                // Handle nested properties
+                const parent = e.target.closest('.property-row').getAttribute('data-parent');
+                const property = e.target.getAttribute('data-property');
+                
+                if (parent) {
+                  // This is a nested property
+                  if (!newYaml[parent]) {
+                    newYaml[parent] = {};
+                  }
+                  newYaml[parent][property] = e.target.value;
+                } else {
+                  // This is a top-level property
+                  newYaml[property] = e.target.value;
+                }
                 
                 // Format the YAML
                 const formattedYaml = Object.entries(newYaml)
-                  .map(([k, v]) => `${k}: ${typeof v === 'string' ? JSON.stringify(v) : v}`)
+                  .map(([k, v]) => {
+                    if (typeof v === 'object') {
+                      const nested = Object.entries(v)
+                        .map(([sk, sv]) => `  ${sk}: ${JSON.stringify(sv)}`)
+                        .join('\n');
+                      return `${k}:\n${nested}`;
+                    }
+                    return `${k}: ${JSON.stringify(v)}`;
+                  })
                   .join('\n');
                 
                 const yamlContent = `---\n${formattedYaml}\n---`;
@@ -260,11 +282,35 @@ export const RawCell = Node.create({
             
             input.value = value || '';
             input.setAttribute('data-property', key);
-            
             valueDiv.appendChild(input);
+            
             row.appendChild(labelDiv);
             row.appendChild(valueDiv);
             return row;
+          };
+
+          // Helper function to create a property row
+          const createPropertyRow = (key, value) => {
+            // If value is an object or array, create rows for each nested entry
+            if (typeof value === 'object' && value !== null) {
+              const container = document.createElement('div');
+              
+              // Create the parent row first
+              const parentRow = createBasicRow(key, '');
+              container.appendChild(parentRow);
+              
+              // Then create child rows for each property in the object/array
+              Object.entries(value).forEach(([subKey, subValue]) => {
+                const childRow = createBasicRow(subKey, subValue);
+                childRow.setAttribute('data-parent', key);
+                container.appendChild(childRow);
+              });
+              
+              return container;
+            }
+            
+            // For primitive values, just create a basic row
+            return createBasicRow(key, value);
           };
           
           // Sort fields into primary and additional
