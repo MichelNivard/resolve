@@ -193,18 +193,22 @@ textarea[data-property="abstract"] {
 
 /* Nested YAML entries */
 .property-row[data-parent] {
-  margin-left: 24px;
-  border-left: 2px solid #eaebef;
-  padding-left: 12px;
-  font-size: 14px;
+  margin-left: 16px;
+  border-left: 1px solid #eaebef;
+  padding-left: 8px;
+  font-size: 13px;
+  margin-top: 1px;
+  margin-bottom: 1px;
 }
 
-/* Nested fields styling */
-.nested-fields {
-  margin-left: 24px;
-  border-left: 2px solid #eaebef;
-  padding-left: 12px;
-  margin-top: 4px;
+.property-row[data-parent] .property-label {
+  color: #666;
+  font-size: 12px;
+}
+
+.property-row[data-parent] input {
+  font-size: 13px;
+  padding: 4px 6px;
 }
 
 .property-row[data-level="1"] .property-label {
