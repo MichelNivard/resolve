@@ -191,6 +191,20 @@ textarea[data-property="abstract"] {
   border-bottom: 1px solid rgb(234, 235, 237);
 }
 
+/* Nested YAML entries */
+.property-row[data-property="name"],
+.property-row[data-property="url"],
+.property-row[data-property="affiliation"],
+.property-row[data-property="affiliation-url"],
+.property-row[data-property="type"],
+.property-row[data-property="container-title"],
+.property-row[data-property="doi"] {
+  margin-left: 24px;
+  border-left: 2px solid #eaebef;
+  padding-left: 12px;
+  font-size: 14px;
+}
+
 /* Nested fields styling */
 .nested-fields {
   margin-left: 24px;
