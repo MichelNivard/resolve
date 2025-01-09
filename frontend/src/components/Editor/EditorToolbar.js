@@ -18,7 +18,6 @@ import { useAuth } from '../../contexts/AuthContext';
 const EditorToolbar = ({ editor, onToggleComments }) => {
   const [trackChangesEnabled, setTrackChangesEnabled] = useState(false);
   const [showHeadingMenu, setShowHeadingMenu] = useState(false);
-  const [showFontSizeMenu, setShowFontSizeMenu] = useState(false);
   const [showTextColorMenu, setShowTextColorMenu] = useState(false);
   const [showBgColorMenu, setShowBgColorMenu] = useState(false);
   const [showFontFamilyMenu, setShowFontFamilyMenu] = useState(false);
@@ -28,7 +27,6 @@ const EditorToolbar = ({ editor, onToggleComments }) => {
   const [commentText, setCommentText] = useState('');
 
   const headingMenuRef = useRef(null);
-  const fontSizeMenuRef = useRef(null);
   const textColorMenuRef = useRef(null);
   const bgColorMenuRef = useRef(null);
   const fontFamilyMenuRef = useRef(null);
@@ -40,9 +38,6 @@ const EditorToolbar = ({ editor, onToggleComments }) => {
     const handleClickOutside = (e) => {
       if (showHeadingMenu && headingMenuRef.current && !headingMenuRef.current.contains(e.target)) {
         setShowHeadingMenu(false);
-      }
-      if (showFontSizeMenu && fontSizeMenuRef.current && !fontSizeMenuRef.current.contains(e.target)) {
-        setShowFontSizeMenu(false);
       }
       if (showTextColorMenu && textColorMenuRef.current && !textColorMenuRef.current.contains(e.target)) {
         setShowTextColorMenu(false);
@@ -58,7 +53,7 @@ const EditorToolbar = ({ editor, onToggleComments }) => {
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [showHeadingMenu, showFontSizeMenu, showTextColorMenu, showBgColorMenu, showFontFamilyMenu]);
+  }, [showHeadingMenu, showTextColorMenu, showBgColorMenu, showFontFamilyMenu]);
 
   if (!editor) return null;
 
@@ -192,13 +187,6 @@ const EditorToolbar = ({ editor, onToggleComments }) => {
     setShowHeadingMenu(false);
   };
 
-  // Font size logic (requires textStyle extension)
-  const toggleFontSizeMenu = () => setShowFontSizeMenu(prev => !prev);
-  const applyFontSize = (size) => {
-    editor.chain().focus().setTextStyle({ fontSize: size }).run();
-    setShowFontSizeMenu(false);
-  };
-
   // Text color logic
   const toggleTextColorMenu = () => setShowTextColorMenu(prev => !prev);
   const applyTextColor = (color) => {
@@ -221,13 +209,6 @@ const EditorToolbar = ({ editor, onToggleComments }) => {
     { name: 'Heading 4', value: 4 },
     { name: 'Heading 5', value: 5 },
     { name: 'Heading 6', value: 6 }
-  ];
-
-  const fontSizes = [
-    { name: 'Small', value: 'small' },
-    { name: 'Normal', value: 'normal' },
-    { name: 'Large', value: 'large' },
-    { name: 'Huge', value: 'huge' }
   ];
 
   const colors = ['#000000', '#FF0000', '#00FF00', '#0000FF', '#FFA500', '#800080'];
@@ -288,22 +269,6 @@ const EditorToolbar = ({ editor, onToggleComments }) => {
             {headingLevels.map((heading) => (
               <option key={heading.value} value={heading.value}>
                 {heading.name}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {/* Font Size Select */}
-        <div className="toolbar-item">
-          <select
-            onChange={(e) => editor.chain().focus().setFontSize(e.target.value).run()}
-            value={editor.getAttributes('textStyle').fontSize || 'normal'}
-            className="glass-select"
-            title="Font Size"
-          >
-            {fontSizes.map((size) => (
-              <option key={size.value} value={size.value}>
-                {size.name}
               </option>
             ))}
           </select>
