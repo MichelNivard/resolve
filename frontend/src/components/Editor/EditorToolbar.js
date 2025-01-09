@@ -242,17 +242,8 @@ const EditorToolbar = ({ editor, onToggleComments }) => {
     { name: 'Garamond', value: 'var(--editor-font-garamond)' }
   ];
 
-  const setFontFamily = async (fontFamily) => {
-    // Check if the font is loaded
-    const fontName = fontFamily.split(',')[0].replace(/['"]/g, '').replace('var(--editor-font-', '').replace(')', '');
-    try {
-      await document.fonts.load(`16px ${fontName}`);
-    } catch (e) {
-      console.warn(`Font ${fontName} loading check failed, proceeding anyway:`, e);
-    }
-    
+  const setFontFamily = (fontFamily) => {
     document.documentElement.style.setProperty('--editor-current-font', fontFamily);
-    setShowFontFamilyMenu(false);
   };
 
   const addComment = () => {
@@ -313,40 +304,24 @@ const EditorToolbar = ({ editor, onToggleComments }) => {
           )}
         </div>
 
-        {/* Font Family Dropdown */}
-        <div className="toolbar-item" ref={fontFamilyMenuRef}>
-          <button
-            onClick={(e) => {
-              const buttonRect = e.currentTarget.getBoundingClientRect();
-              setShowFontFamilyMenu(!showFontFamilyMenu);
-              // Set dropdown position after a small delay to ensure DOM is updated
-              setTimeout(() => {
-                const dropdown = fontFamilyMenuRef.current?.querySelector('.font-family-menu');
-                if (dropdown) {
-                  dropdown.style.top = `${buttonRect.bottom}px`;
-                  dropdown.style.left = `${buttonRect.left}px`;
-                }
-              }, 0);
-            }}
-            className="toolbar-button"
+        {/* Font Family Select */}
+        <div className="toolbar-item">
+          <select
+            onChange={(e) => setFontFamily(e.target.value)}
+            className="toolbar-select"
             title="Font Family"
+            style={{ fontFamily: 'var(--ui-font)' }}
           >
-            <span style={{ fontFamily: 'var(--ui-font)' }}>Font</span>
-          </button>
-          {showFontFamilyMenu && (
-            <div className="dropdown-menu font-family-menu" style={{ position: 'fixed' }}>
-              {fontFamilies.map((font) => (
-                <button
-                  key={font.name}
-                  onClick={() => setFontFamily(font.value)}
-                  className="dropdown-item"
-                  data-font={font.name}
-                >
-                  {font.name}
-                </button>
-              ))}
-            </div>
-          )}
+            {fontFamilies.map((font) => (
+              <option 
+                key={font.name} 
+                value={font.value}
+                style={{ fontFamily: font.value }}
+              >
+                {font.name}
+              </option>
+            ))}
+          </select>
         </div>
 
             
