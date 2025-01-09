@@ -192,13 +192,7 @@ textarea[data-property="abstract"] {
 }
 
 /* Nested YAML entries */
-.property-row[data-property="name"],
-.property-row[data-property="url"],
-.property-row[data-property="affiliation"],
-.property-row[data-property="affiliation-url"],
-.property-row[data-property="type"],
-.property-row[data-property="container-title"],
-.property-row[data-property="doi"] {
+.property-row[data-parent] {
   margin-left: 24px;
   border-left: 2px solid #eaebef;
   padding-left: 12px;

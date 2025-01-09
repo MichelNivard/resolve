@@ -105,7 +105,7 @@ export const RawCell = Node.create({
           table.classList.add('properties-table');
           
           // Primary fields that should always be at the top
-          const primaryFields = ['title', 'subtitle', 'author', 'authors', 'affiliations', 'date', 'abstract'];
+          const primaryFields = ['title', 'subtitle', 'author', 'affiliations', 'date', 'abstract'];
           
           // Create primary fields section
           const primarySection = document.createElement('div');
@@ -123,10 +123,7 @@ export const RawCell = Node.create({
             
             const labelDiv = document.createElement('div');
             labelDiv.classList.add('property-label');
-            // Special case for authors/author
-            const label = key === 'authors' ? 'Author(s)' : 
-                         key.charAt(0).toUpperCase() + key.slice(1);
-            labelDiv.textContent = label;
+            labelDiv.textContent = key.charAt(0).toUpperCase() + key.slice(1);
             
             const valueDiv = document.createElement('div');
             valueDiv.classList.add('property-value');
