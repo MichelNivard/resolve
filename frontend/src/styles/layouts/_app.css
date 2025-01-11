@@ -83,8 +83,7 @@
 .modern-toolbar {
   padding: 0.5rem 1rem;
   background: rgb(251, 251, 251);
-  border-bottom: 1px solid #b4b4b4;
-  display: flex;
+  border-radius: 8px;
   align-items: center;
   gap: 0.5rem;
   overflow-x: auto;
