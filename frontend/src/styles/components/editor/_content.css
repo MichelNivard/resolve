@@ -8,7 +8,7 @@
   background: #ffffff; /* Clean white background */
   padding: 1rem 2rem; /* Consistent padding inside editor */
   border-radius: 8px; /* Rounded corners for a modern look */
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05); /* Subtle shadow for floating effect */
+  /*  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05); /* Subtle shadow for floating effect */ 
   height: auto;
   min-height: 100%;
   overflow: visible;
