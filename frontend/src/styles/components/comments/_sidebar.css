@@ -67,7 +67,6 @@
   flex: 1;
   padding: 16px;
   position: relative;
-  box-shadow: 0 1px 1px rgba(0,0,0.5,0.5);
 }
 
 /* Basic comment styling */
@@ -79,6 +78,7 @@
   padding: 12px;
   width: calc(100% - 48px);
   margin: 0;
+  box-shadow: 0 1px 1px rgba(0,0,0,0.5);
   z-index: 1;
   left: 16px;
   height: auto;
