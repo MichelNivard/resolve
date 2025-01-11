@@ -60,7 +60,6 @@
   display: flex;
   flex-direction: column;
   background: rgb(248, 248, 248);
-  border-left: 1px solid #eee;
 }
 
 .comments-container {
