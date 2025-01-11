@@ -4,7 +4,6 @@
   font-size: 11pt; /* Slightly larger for better readability */
   line-height: 1.8; /* Better spacing between lines */
   color: #2d2d2d; /* Neutral dark gray */
-  border: 1px solid #767676;
   font-weight: 200;
   background: #ffffff; /* Clean white background */
   padding: 1rem 2rem; /* Consistent padding inside editor */
@@ -420,17 +419,16 @@
 
 .editor-main {
   height: 100%;
-  padding: 1rem;
+  padding: 2rem;
+  border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .editor-content-container {
   max-width: 1000px;
   margin: 0 auto;
   background: rgb(255, 255, 255);
-  padding: 2rem;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .notification {
