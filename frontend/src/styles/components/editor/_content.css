@@ -397,7 +397,11 @@
 .content-container {
   height: 100%;
   overflow: hidden;
-  background: rgb(243, 243, 243);
+  background: rgb(247, 247, 247);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 .editor-with-sidebar {
