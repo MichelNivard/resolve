@@ -423,12 +423,13 @@
 .editor-main {
   height: 100%;
   padding: 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
 }
 
 .editor-content-container {
   max-width: 1000px;
   margin: 0 auto;
-  background: rgb(243, 243, 243);
+  background: rgb(255, 255, 255);
   padding: 2rem;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
