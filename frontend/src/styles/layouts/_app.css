@@ -93,7 +93,6 @@
 /* Main Content */
 .app-main {
   flex: 1;
-  background: white;
   display: flex;
   flex-direction: column;
   overflow: hidden;
