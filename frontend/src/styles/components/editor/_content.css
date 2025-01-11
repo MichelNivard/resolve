@@ -392,6 +392,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  background: rgb(243, 243, 243);
 }
 
 .header-title {
@@ -403,6 +404,7 @@
 .content-container {
   height: 100%;
   overflow: hidden;
+  background: rgb(243, 243, 243);
 }
 
 .editor-with-sidebar {
@@ -426,7 +428,7 @@
 .editor-content-container {
   max-width: 1000px;
   margin: 0 auto;
-  background: white;
+  background: rgb(243, 243, 243);
   padding: 2rem;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
