@@ -4,6 +4,7 @@
   font-size: 11pt; /* Slightly larger for better readability */
   line-height: 1.8; /* Better spacing between lines */
   color: #2d2d2d; /* Neutral dark gray */
+  border: 1px solid #767676;
   font-weight: 200;
   background: #ffffff; /* Clean white background */
   padding: 1rem 2rem; /* Consistent padding inside editor */
