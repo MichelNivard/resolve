@@ -22,6 +22,7 @@
   align-items: center;
   justify-content: space-between;
   border-bottom: 1px solid #eee;
+  background: rgb(251, 251, 251);
 }
 
 .header-title {
@@ -81,7 +82,7 @@
 
 .modern-toolbar {
   padding: 0.5rem 1rem;
-  background: rgb(243, 243, 243);
+  background: rgb(251, 251, 251);
   border-bottom: 1px solid #eee;
   display: flex;
   align-items: center;

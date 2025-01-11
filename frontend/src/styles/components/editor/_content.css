@@ -390,10 +390,7 @@
 
 
 .header-content {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: rgb(243, 243, 243);
+
 }
 
 .header-title {
