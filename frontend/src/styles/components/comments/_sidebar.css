@@ -59,7 +59,7 @@
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
-  background: rgb(243, 243, 243);
+  background: rgb(248, 248, 248);
   border-left: 1px solid #eee;
 }
 
