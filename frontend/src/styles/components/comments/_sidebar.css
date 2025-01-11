@@ -78,7 +78,7 @@
   padding: 12px;
   width: calc(100% - 48px);
   margin: 0;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  box-shadow: 0 1px 1px rgba(0,0,0,0.5);
   z-index: 1;
   left: 16px;
   height: auto;
