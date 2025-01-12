@@ -400,10 +400,10 @@
 /* Common styles for all controls */
 
 .header-title-R {
-  font-size: 24pt;
+  font-size: 20pt;
   font-weight: 200;
   font-family: 'Inter', sans-serif;
-  padding: 4px;
+  padding: 2px 4px;
   margin: 0;
   color: #ffffff;
   background-color: #4ca5ff;
@@ -412,7 +412,7 @@
 }
 
 .header-title {
-  font-size: 24pt;
+  font-size: 20pt;
   margin: 0;
   color: #333;
   align-self: left;
