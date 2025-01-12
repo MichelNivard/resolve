@@ -420,8 +420,9 @@
 }
 
 .header-title {
-  font-size: 22pt;
+  font-size: 20pt;
   margin: 0;
+  padding: 6px 6px 3px 0px;
   color: #333;
   align-self: left;
   font-family: 'Inter', sans-serif;
