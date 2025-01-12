@@ -407,7 +407,7 @@
 .editor-with-sidebar {
   display: flex;
   height: 100%;
-  max-width: 1400px;
+  max-width: 1600px;
   margin: 0 auto;
 }
 
@@ -426,7 +426,7 @@
 
 .editor-main {
   height: 100%;
-  padding: 2rem;
+  padding: clamp(2rem, 5vw, 2.5rem);
   margin: 12px;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
@@ -440,7 +440,7 @@
 }
 
 .editor-content-container {
-  max-width: 1000px;
+  max-width: 1200px;
   margin: 0 auto;
   background: rgb(255, 255, 255);
 }
