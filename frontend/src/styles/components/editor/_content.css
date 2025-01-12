@@ -431,7 +431,8 @@
 
 /* File controls container */
 .file-controls {
-  gap: 1rem;
+  gap: 12px;
+  display: flex;
   align-items: right;
   height: 36px;
 }
