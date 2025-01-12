@@ -431,9 +431,9 @@
 
 /* File controls container */
 .file-controls {
+  margin-left: auto;
   gap: 12px;
   display: flex;
-  align-items: right;
   height: 36px;
 }
 
