@@ -1,7 +1,4 @@
-.editor-container {
-  display: flex;
-  height: calc(100vh - 100px);
-}
+
 
 .editor-main {
   flex: 1;

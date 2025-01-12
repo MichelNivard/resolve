@@ -30,6 +30,10 @@
     color: #e21111;
     text-decoration: line-through;
   }
+
+
+/* Bubble Menu Styling */
+
   .bubble-menu-container {
     display: flex;
     align-items: center;
@@ -167,7 +171,7 @@
     color: #f44336;
   }
 
- /* buttomns on app.js header */
+
 
 
 /* Common styles for all controls */
@@ -218,6 +222,7 @@
 .glass-button:active {
   background-color: #dee2e6;
 }
+
 
 /* File controls container */
 .file-controls {
@@ -388,6 +393,12 @@
 }
 
 
+
+
+
+/* Common styles for all controls */
+
+
 .header-title {
   font-size: 1.5rem;
   margin: 0;
@@ -402,6 +413,8 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  display: flex;
+  height: calc(100vh - 100px);
 }
 
 .editor-with-sidebar {
