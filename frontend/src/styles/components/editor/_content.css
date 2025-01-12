@@ -499,18 +499,25 @@
 .notification {
   position: fixed;
   top: 1rem;
-  right: 1rem;
+  left: 1rem;
   padding: 0.5rem 1rem;
   border-radius: 4px;
-  background: rgb(20, 124, 13);
+  background: green;
+  color: white;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   width: 300px;
   z-index: 1000;
 }
 
 .notification.error {
-  background: rgba(255, 0, 0, 0.1);
-  color: #d32f2f;
+  background: rgb(255, 0, 0);
+  color: white;
+  top: 1rem;
+  left: 1rem;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  width: 300px;
+  z-index: 1000;
 }
 
 .citation {
