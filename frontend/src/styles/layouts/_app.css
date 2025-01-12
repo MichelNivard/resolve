@@ -25,12 +25,6 @@
   background: rgb(254, 254, 254);
 }
 
-.header-title {
-  margin: 0;
-  font-family: 'Inter', sans-serif;
-  font-weight: 200;
-  font-size: 1.25rem;
-}
 
 .file-controls {
   display: flex;
