@@ -400,16 +400,19 @@
 
 .header-title-R {
   font-size: 1.5rem;
+  font-weight: 200;
   margin: 0;
   color: #ffffff;
   background-color: #4ca5ff;
-  border-radius: 8px;
+  border-radius: 4px;
+  align-self: left;
 }
 
 .header-title {
   font-size: 1.5rem;
   margin: 0;
   color: #333;
+  align-self: left;
 }
 
 .content-container {
