@@ -224,18 +224,6 @@
 }
 
 
-/* File controls container */
-.file-controls {
-  display: flex;
-  gap: 12px;
-  align-items: left;
-  align-items: center;
-  height: 36px;
-  display: flex;
-  align-items: left;
-  gap: 1rem;
-}
-
 .load-button {
   display: inline-block;
   padding: 0 16px;
@@ -398,6 +386,27 @@
 
 /* Common styles the entire 1st row of the header, defined in EditoWrapper: */
 
+
+.app-header {
+  width: 100%;
+  background: #ffffff00;
+  border-bottom: 1px solid #eee;
+  position: sticky;
+  padding: 0rem;
+  top: 0;
+}
+
+.header-content {
+  padding: 0.5rem 1rem;
+  font-family: 'Inter', sans-serif;
+  display: flex;
+  /* align-items: center; */
+  /* justify-content: space-between; */
+  border-bottom: 1px solid #eee;
+  background: rgb(254, 254, 254);
+}
+
+
 .header-title-R {
   font-size: 20pt;
   font-weight: 200;
@@ -419,24 +428,18 @@
   font-weight: 200;
 }
 
-.app-header {
-  width: 100%;
-  background: #ffffff00;
-  border-bottom: 1px solid #eee;
-  position: sticky;
-  padding: 0rem;
-  top: 0;
+
+/* File controls container */
+.file-controls {
+  display: flex;
+  gap: 12px;
+  align-items: left;
+  height: 36px;
+  display: flex;
+  gap: 1rem;
 }
 
-.header-content {
-  padding: 0.5rem 1rem;
-  font-family: 'Inter', sans-serif;
-  display: flex;
-  /* align-items: center; */
-  /* justify-content: space-between; */
-  border-bottom: 1px solid #eee;
-  background: rgb(254, 254, 254);
-}
+
 
 
 /* Common styles the contents of the text editor, defined in EditoWrapper: */
