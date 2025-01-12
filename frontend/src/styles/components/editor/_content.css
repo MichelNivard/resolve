@@ -426,7 +426,7 @@
 
 .editor-main {
   height: 100%;
-  padding: clamp(2rem, 5vw, 2.5rem);
+  padding: clamp(35px, 5vw, 55px);
   margin: 12px;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
