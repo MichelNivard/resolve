@@ -393,10 +393,6 @@
   color: white !important; /* Match the background color of the bubble */
 }
 
-
-
-
-
 /* Common styles for all controls */
 
 .header-title-R {
@@ -412,7 +408,7 @@
 }
 
 .header-title {
-  font-size: 20pt;
+  font-size: 22pt;
   margin: 0;
   color: #333;
   align-self: left;

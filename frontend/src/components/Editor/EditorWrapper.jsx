@@ -205,7 +205,7 @@ const EditorWrapper = ({
       <header className="app-header">
         <div className="header-content">
           <h1 className="header-title-R">R</h1> <h1 className="header-title">esolve</h1>
-          <div>
+          
             <div className="file-controls">
               <select
                 value={selectedRepo?.fullName || ''}
@@ -245,7 +245,6 @@ const EditorWrapper = ({
                 Save Notebook
               </button>
             </div>
-          </div>
         </div>
         {editor && <EditorToolbar editor={editor} />}
       </header>
