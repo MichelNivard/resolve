@@ -411,8 +411,8 @@
   font-size: 20pt;
   font-weight: 200;
   font-family: 'Inter', sans-serif;
-  padding: 3px 6px;
-  margin: 0;
+  padding: 6px 6px 3px 6px;
+  margin-right: 1px;
   color: #ffffff;
   background-color: #4ca5ff;
   border-radius: 4px;
