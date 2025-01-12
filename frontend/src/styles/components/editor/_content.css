@@ -497,6 +497,7 @@
 }
 
 .notification {
+  font-family: var(--ui-font);
   position: fixed;
   top: 1rem;
   left: 1rem;
@@ -510,6 +511,7 @@
 }
 
 .notification.error {
+  font-family: var(--ui-font);
   background: rgb(255, 0, 0);
   color: white;
   top: 1rem;
