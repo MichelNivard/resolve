@@ -228,6 +228,7 @@
 .file-controls {
   display: flex;
   gap: 12px;
+  align-items: left;
   align-items: center;
   height: 36px;
 }
