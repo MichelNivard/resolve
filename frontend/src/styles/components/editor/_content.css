@@ -426,13 +426,13 @@
   align-self: left;
   font-family: 'Inter', sans-serif;
   font-weight: 200;
-  gap:12px;
+  gap:5rem;
 }
 
 
 /* File controls container */
 .file-controls {
-  gap: 12px;
+  gap: 1rem;
   align-items: left;
   height: 36px;
 }
