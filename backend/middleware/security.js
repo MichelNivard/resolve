@@ -2,7 +2,7 @@ import rateLimit from 'express-rate-limit';
 import path from 'path';
 
 // Rate limiting middleware
-export const createRateLimiter = (windowMs = 15 * 60 * 1000, max = 100) => {
+export const createRateLimiter = (windowMs = 15 * 60 * 1000, max = 400) => {
     return rateLimit({
         windowMs,
         max,
@@ -29,7 +29,7 @@ export const secureCookies = (req, res, next) => {
             secure: true,
             sameSite: 'none', // Changed from 'strict' to 'none' for cross-domain
             domain: '.resolve.pub', // Added domain for cross-subdomain support
-            maxAge: 24 * 60 * 60 * 1000 // 24 hours
+            maxAge: 24 * 60  * 1000 // 24 hours
         });
     }
     next();
@@ -44,7 +44,7 @@ export const sessionConfig = {
         secure: true,
         sameSite: 'none',
         domain: '.resolve.pub',
-        maxAge: 24 * 60 * 60 * 1000 // 24 hours
+        maxAge: 24 * 60 * 1000 // 24 hours
     }
 };
 
