@@ -204,7 +204,7 @@ const EditorWrapper = ({
       )}
       <header className="app-header">
         <div className="header-content">
-          <h1 className="header-title">Resolve</h1>
+          <h1 className="header-title-R">R</h1> <h1 className="header-title">esolve</h1>
           <div>
             <div className="file-controls">
               <select
