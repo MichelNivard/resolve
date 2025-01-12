@@ -231,6 +231,9 @@
   align-items: left;
   align-items: center;
   height: 36px;
+  display: flex;
+  align-items: left;
+  gap: 1rem;
 }
 
 .load-button {
@@ -393,7 +396,7 @@
   color: white !important; /* Match the background color of the bubble */
 }
 
-/* Common styles for all controls */
+/* Common styles the entire 1st row of the header, defined in EditoWrapper: */
 
 .header-title-R {
   font-size: 20pt;
@@ -415,6 +418,28 @@
   font-family: 'Inter', sans-serif;
   font-weight: 200;
 }
+
+.app-header {
+  width: 100%;
+  background: #ffffff00;
+  border-bottom: 1px solid #eee;
+  position: sticky;
+  padding: 0rem;
+  top: 0;
+}
+
+.header-content {
+  padding: 0.5rem 1rem;
+  font-family: 'Inter', sans-serif;
+  display: flex;
+  /* align-items: center; */
+  /* justify-content: space-between; */
+  border-bottom: 1px solid #eee;
+  background: rgb(254, 254, 254);
+}
+
+
+/* Common styles the contents of the text editor, defined in EditoWrapper: */
 
 .content-container {
   height: 100%;

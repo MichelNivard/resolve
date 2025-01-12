@@ -6,39 +6,7 @@
   margin: 0;
 }
 
-.app-header {
-  width: 100%;
-  background: #ffffff00;
-  border-bottom: 1px solid #eee;
-  position: sticky;
-  padding: 0rem;
-  top: 0;
-}
 
-.header-content {
-  padding: 0.5rem 1rem;
-  font-family: 'Inter', sans-serif;
-  display: flex;
-  /* align-items: center; */
-  /* justify-content: space-between; */
-  border-bottom: 1px solid #eee;
-  background: rgb(254, 254, 254);
-}
-
-
-.file-controls {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.file-path-input {
-  width: 300px;
-  padding: 0.5rem;
-  font-size: 0.9rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
 
 .glass-button {
   display: inline-block;
