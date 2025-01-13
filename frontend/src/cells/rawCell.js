@@ -371,62 +371,32 @@ export const RawCell = Node.create({
         };
       };
     },
+    
+    addKeyboardShortcuts() {
+      return {
+        Backspace: ({ editor, state }) => {
+          const { selection } = state;
+          const { $from } = selection;
 
-    addProseMirrorPlugins() {
-      return [
-        new Plugin({
-          props: {
-            // Handle keydown events
-            handleKeyDown(view, event) {
-              const { selection } = view.state;
-              const { $from, $to } = selection;
+          // Prevent deletion if the cursor is at the start of the rawCell node
+          if ($from.parent.type.name === 'rawCell' && $from.parentOffset === 0) {
+            return true; // Block the backspace
+          }
+
+          return false; // Allow default behavior
+        },
+        Delete: ({ editor, state }) => {
+          const { selection } = state;
+          const { $from } = selection;
+
+          // Prevent deletion if the cursor is at the end of the rawCell node
+          if ($from.parent.type.name === 'rawCell' && $from.parentOffset === $from.parent.nodeSize - 2) {
+            return true; // Block the delete
+          }
+
+          return false; // Allow default behavior
+        },
+      };
+    },
     
-              // Check if the current node is a `rawCell` node
-              const isRawCellNode = $from.parent.type.name === 'rawCell';
-    
-              if (isRawCellNode) {
-                // Prevent deletion of the entire node on Backspace or Delete
-                if (
-                  event.key === 'Backspace' &&
-                  $from.parentOffset === 0 &&
-                  $from.depth === $to.depth // Ensure no nested deletion
-                ) {
-                  event.preventDefault();
-                  return true;
-                }
-    
-                if (
-                  event.key === 'Delete' &&
-                  $from.parentOffset === $from.parent.nodeSize - 2 &&
-                  $from.depth === $to.depth // Ensure no nested deletion
-                ) {
-                  event.preventDefault();
-                  return true;
-                }
-              }
-    
-              return false; // Allow default behavior for other keys
-            },
-    
-            // Prevent deletion of the node through transactions
-            handleDOMEvents: {
-              beforeinput(view, event) {
-                if (event.inputType === 'deleteContentBackward' || event.inputType === 'deleteContentForward') {
-                  const { selection } = view.state;
-                  const { $from } = selection;
-    
-                  // Prevent deletion of the entire `rawCell` node
-                  if ($from.parent.type.name === 'rawCell') {
-                    event.preventDefault();
-                    return true;
-                  }
-                }
-    
-                return false; // Allow other DOM events
-              },
-            },
-          },
-        }),
-      ];
-    }
 });
