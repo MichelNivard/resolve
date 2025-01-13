@@ -34,7 +34,7 @@ function tryParseYaml(content) {
 export const RawCell = Node.create({
     name: 'rawCell',
     group: 'block',
-    atom: false,
+    atom: true,
     selectable: false,
     draggable: false,
     defining: true,
