@@ -35,7 +35,7 @@ export const RawCell = Node.create({
     name: 'rawCell',
     group: 'block',
     atom: false,
-    selectable: true,
+    selectable: false,
     draggable: false,
 
     addAttributes() {
