@@ -370,5 +370,63 @@ export const RawCell = Node.create({
           }
         };
       };
+    },
+
+    addProseMirrorPlugins() {
+      return [
+        new Plugin({
+          props: {
+            // Handle keydown events
+            handleKeyDown(view, event) {
+              const { selection } = view.state;
+              const { $from, $to } = selection;
+    
+              // Check if the current node is a `rawCell` node
+              const isRawCellNode = $from.parent.type.name === 'rawCell';
+    
+              if (isRawCellNode) {
+                // Prevent deletion of the entire node on Backspace or Delete
+                if (
+                  event.key === 'Backspace' &&
+                  $from.parentOffset === 0 &&
+                  $from.depth === $to.depth // Ensure no nested deletion
+                ) {
+                  event.preventDefault();
+                  return true;
+                }
+    
+                if (
+                  event.key === 'Delete' &&
+                  $from.parentOffset === $from.parent.nodeSize - 2 &&
+                  $from.depth === $to.depth // Ensure no nested deletion
+                ) {
+                  event.preventDefault();
+                  return true;
+                }
+              }
+    
+              return false; // Allow default behavior for other keys
+            },
+    
+            // Prevent deletion of the node through transactions
+            handleDOMEvents: {
+              beforeinput(view, event) {
+                if (event.inputType === 'deleteContentBackward' || event.inputType === 'deleteContentForward') {
+                  const { selection } = view.state;
+                  const { $from } = selection;
+    
+                  // Prevent deletion of the entire `rawCell` node
+                  if ($from.parent.type.name === 'rawCell') {
+                    event.preventDefault();
+                    return true;
+                  }
+                }
+    
+                return false; // Allow other DOM events
+              },
+            },
+          },
+        }),
+      ];
     }
 });
