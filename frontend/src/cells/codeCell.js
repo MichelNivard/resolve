@@ -9,7 +9,7 @@ import { faChevronUp, faChevronDown } from '@fortawesome/free-solid-svg-icons';
 export const CodeCell = Node.create({
   name: 'codeCell',
   group: 'block', // Ensure it belongs to the block group
-  content: '', // No inner content, treated as an atomic block
+  content: 'text*',
   atom: true, // Makes it a single, indivisible unit
   isolating: true, // Prevents merging with other nodes
 
