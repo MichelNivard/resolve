@@ -48,6 +48,36 @@ export const CodeCell = Node.create({
   addNodeView() {
     return ReactNodeViewRenderer(CodeCellNodeView);
   },
+
+  addKeyboardShortcuts() {
+    return {
+      Backspace: ({ editor, state }) => {
+        const { selection, tr } = state;
+        const { $from } = selection;
+
+        // Case 1: Prevent Backspace when cursor is below the node
+        const prevNode = tr.doc.nodeAt($from.before($from.depth));
+        if (prevNode && prevNode.type.name === 'codeCell') {
+          return true; // Block Backspace from deleting the node
+        }
+
+        return false; // Allow default behavior
+      },
+
+      Delete: ({ editor, state }) => {
+        const { selection, tr } = state;
+        const { $from } = selection;
+
+        // Case 1: Prevent Delete when cursor is above the node
+        const nextNode = tr.doc.nodeAt($from.after($from.depth));
+        if (nextNode && nextNode.type.name === 'codeCell') {
+          return true; // Block Delete from deleting the node
+        }
+
+        return false; // Allow default behavior
+      },
+    };
+  },
 });
 
 function CodeCellNodeView({ node, editor, getPos }) {
