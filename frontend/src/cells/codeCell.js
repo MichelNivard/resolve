@@ -9,7 +9,6 @@ import { faChevronUp, faChevronDown } from '@fortawesome/free-solid-svg-icons';
 export const CodeCell = Node.create({
   name: 'codeCell',
   group: 'block', // Ensure it belongs to the block group
-  content: 'text*',
   atom: true, // Makes it a single, indivisible unit
   isolating: true, // Prevents merging with other nodes
 
@@ -53,71 +52,67 @@ export const CodeCell = Node.create({
   addKeyboardShortcuts() {
     return {
       Backspace: ({ editor }) => {
-        try {
-          console.log('Backspace triggered');
-          console.log('Document structure:', editor.getJSON());
-          const selection = editor.state.selection;
-          const { $from } = selection;
+        const { state } = editor;
+        const { selection } = state;
+        const { $from } = selection;
   
-          if (!$from || !$from.depth) {
-            console.error('$from is invalid or has no depth:', $from);
-            return false;
-          }
+        console.log('Backspace triggered');
+        console.log('Cursor position:', $from.pos);
   
-          // Detect the previous node using Tiptap's getAttributes method
-          const posBefore = $from.before($from.depth);
-          const prevNodeType = editor.state.doc.nodeAt(posBefore)?.type?.name;
+        // Detect the top-level node at the cursor's depth
+        const parentNode = $from.node($from.depth);
+        console.log('Parent Node:', parentNode);
   
-          console.log('Position before cursor:', posBefore);
-          console.log('Previous node type:', prevNodeType);
-  
-          if (prevNodeType === 'codeCell') {
-            console.log('Backspace blocked: Cursor is adjacent to a codeCell');
-            editor.commands.setTextSelection(posBefore); // Move the cursor to the start of the codeCell
-            return true; // Block Backspace
-          }
-  
-          console.log('Backspace allowed: Default behavior');
-          return false; // Allow default behavior
-  
-        } catch (error) {
-          console.error('Error in Backspace handler:', error);
-          return false;
+        if (parentNode?.type.name === 'codeCell') {
+          console.log('Backspace blocked: Cursor is inside a codeCell');
+          return true; // Block Backspace
         }
+  
+        // Check for previous node
+        const posBefore = $from.before($from.depth);
+        const prevNode = state.doc.nodeAt(posBefore);
+        console.log('Previous node:', prevNode);
+  
+        if (prevNode?.type.name === 'codeCell') {
+          console.log('Backspace blocked: Adjacent to a codeCell');
+          editor.commands.setTextSelection(posBefore); // Move the cursor to the codeCell
+          return true; // Block Backspace
+        }
+  
+        console.log('Backspace allowed: Default behavior');
+        return false;
       },
   
       Delete: ({ editor }) => {
-        try {
-          console.log('Delete triggered');
+        const { state } = editor;
+        const { selection } = state;
+        const { $from } = selection;
   
-          const selection = editor.state.selection;
-          const { $from } = selection;
+        console.log('Delete triggered');
+        console.log('Cursor position:', $from.pos);
   
-          if (!$from || !$from.depth) {
-            console.error('$from is invalid or has no depth:', $from);
-            return false;
-          }
+        // Detect the top-level node at the cursor's depth
+        const parentNode = $from.node($from.depth);
+        console.log('Parent Node:', parentNode);
   
-          // Detect the next node using Tiptap's getAttributes method
-          const posAfter = $from.after($from.depth);
-          const nextNodeType = editor.state.doc.nodeAt(posAfter)?.type?.name;
-  
-          console.log('Position after cursor:', posAfter);
-          console.log('Next node type:', nextNodeType);
-  
-          if (nextNodeType === 'codeCell') {
-            console.log('Delete blocked: Cursor is adjacent to a codeCell');
-            editor.commands.setTextSelection(posAfter + 1); // Move the cursor to the end of the codeCell
-            return true; // Block Delete
-          }
-  
-          console.log('Delete allowed: Default behavior');
-          return false; // Allow default behavior
-  
-        } catch (error) {
-          console.error('Error in Delete handler:', error);
-          return false;
+        if (parentNode?.type.name === 'codeCell') {
+          console.log('Delete blocked: Cursor is inside a codeCell');
+          return true; // Block Delete
         }
+  
+        // Check for next node
+        const posAfter = $from.after($from.depth);
+        const nextNode = state.doc.nodeAt(posAfter);
+        console.log('Next node:', nextNode);
+  
+        if (nextNode?.type.name === 'codeCell') {
+          console.log('Delete blocked: Adjacent to a codeCell');
+          editor.commands.setTextSelection(posAfter + 1); // Move the cursor to the codeCell
+          return true; // Block Delete
+        }
+  
+        console.log('Delete allowed: Default behavior');
+        return false;
       },
     };
   }
