@@ -55,12 +55,12 @@ export const CodeCell = Node.create({
         const { selection } = state;
         const { $from } = selection;
   
-        // Case 1: Prevent Backspace when the cursor is directly after the codeCell
+        // Get the position of the node before the cursor
         const posBefore = $from.before($from.depth);
-        const prevNode = state.doc.nodeAt(posBefore);
+        const prevNode = posBefore >= 0 ? state.doc.nodeAt(posBefore) : null;
   
+        // Case 1: Prevent Backspace when the cursor is directly after the codeCell
         if (prevNode && prevNode.type.name === 'codeCell') {
-          console.log('Backspace: codeCell found');
           // Move the cursor to the start of the codeCell
           editor.commands.setTextSelection(posBefore - 1); // Set selection before the node
           return true; // Block backspace
@@ -73,10 +73,11 @@ export const CodeCell = Node.create({
         const { selection } = state;
         const { $from } = selection;
   
-        // Case 1: Prevent Delete when the cursor is directly before the codeCell
+        // Get the position of the node after the cursor
         const posAfter = $from.after($from.depth);
-        const nextNode = state.doc.nodeAt(posAfter);
+        const nextNode = posAfter < state.doc.content.size ? state.doc.nodeAt(posAfter) : null;
   
+        // Case 1: Prevent Delete when the cursor is directly before the codeCell
         if (nextNode && nextNode.type.name === 'codeCell') {
           // Move the cursor to the end of the codeCell
           editor.commands.setTextSelection(posAfter + 1); // Set selection after the node
@@ -87,6 +88,8 @@ export const CodeCell = Node.create({
       },
     };
   }
+  
+  
   
   
 });
