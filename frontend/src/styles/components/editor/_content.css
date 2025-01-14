@@ -402,6 +402,7 @@
   display: flex;
   /* align-items: center; */
   /* justify-content: space-between; */
+  z-index: 10;
   border-bottom: 1px solid #eee;
   background: rgb(254, 254, 254);
 }
@@ -474,6 +475,7 @@
   min-width: 0;
   border-radius: 8px;
   height: fit-content;
+  z-index: 10;
 }
 
 .editor-main {
