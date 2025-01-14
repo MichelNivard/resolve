@@ -375,6 +375,7 @@ export const RawCell = Node.create({
     addKeyboardShortcuts() {
       return {
         Backspace: ({ editor, state }) => {
+          const { state } = editor;
           const { selection } = state;
           const { $from } = selection;
     
@@ -403,6 +404,7 @@ export const RawCell = Node.create({
         },
     
         Delete: ({ editor, state }) => {
+          const { state } = editor;
           const { selection } = state;
           const { $from } = selection;
     
