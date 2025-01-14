@@ -383,6 +383,13 @@ export const RawCell = Node.create({
             return true; // Block the backspace
           }
 
+                // Case 2: Prevent deletion when cursor is outside the node (below it)
+      const prevNode = tr.doc.nodeAt($from.before($from.depth));
+      if (prevNode && prevNode.type.name === 'rawCell') {
+        return true; // Block backspace from deleting the rawCell
+      }
+
+
           return false; // Allow default behavior
         },
         Delete: ({ editor, state }) => {
@@ -393,6 +400,12 @@ export const RawCell = Node.create({
           if ($from.parent.type.name === 'rawCell' && $from.parentOffset === $from.parent.nodeSize - 2) {
             return true; // Block the delete
           }
+
+                // Case 2: Prevent deletion when cursor is outside the node (above it)
+      const nextNode = tr.doc.nodeAt($from.after($from.depth));
+      if (nextNode && nextNode.type.name === 'rawCell') {
+        return true; // Block delete from removing the rawCell
+      }
 
           return false; // Allow default behavior
         },
