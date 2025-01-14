@@ -407,6 +407,18 @@ export const RawCell = Node.create({
         return true; // Block delete from removing the rawCell
       }
 
+       // Case 32: Prevent Backspace when merging blocks (text exists before the node)
+       const posBefore = $from.before($from.depth);
+       const nodeBefore = tr.doc.nodeAt(posBefore);
+       if (
+         nodeBefore && 
+         nodeBefore.type.name === 'rawCell' && 
+         $from.parentOffset === 0 // Cursor is at the start of the block following the node
+       ) {
+         return true; // Block Backspace
+       }
+
+
           return false; // Allow default behavior
         },
       };

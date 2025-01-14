@@ -61,6 +61,17 @@ export const CodeCell = Node.create({
           return true; // Block Backspace from deleting the node
         }
 
+      // Case 2: Prevent Backspace when merging blocks (text exists before the node)
+      const posBefore = $from.before($from.depth);
+      const nodeBefore = tr.doc.nodeAt(posBefore);
+      if (
+        nodeBefore && 
+        nodeBefore.type.name === 'codeCell' && 
+        $from.parentOffset === 0 // Cursor is at the start of the block following the node
+      ) {
+        return true; // Block Backspace
+      }
+
         return false; // Allow default behavior
       },
 
