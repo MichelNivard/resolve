@@ -55,7 +55,7 @@ export const CodeCell = Node.create({
       Backspace: ({ editor }) => {
         try {
           console.log('Backspace triggered');
-  
+          console.log('Document structure:', editor.getJSON());
           const selection = editor.state.selection;
           const { $from } = selection;
   
