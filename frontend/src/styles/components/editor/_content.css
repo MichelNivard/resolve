@@ -490,6 +490,7 @@
   flex-direction: column;
   min-width: 0;
   height: fit-content;
+  z-index: 0.5;
 }
 
 .editor-content-container {
