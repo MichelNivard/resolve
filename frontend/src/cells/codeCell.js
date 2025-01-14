@@ -55,20 +55,15 @@ export const CodeCell = Node.create({
         const { selection } = state;
         const { $from } = selection;
   
-        // Case 1: Prevent Backspace when cursor is inside or directly below the node
+        // Case 1: Prevent Backspace when the cursor is directly after the codeCell
         const posBefore = $from.before($from.depth);
         const prevNode = state.doc.nodeAt(posBefore);
-        if (prevNode && prevNode.type.name === 'codeCell') {
-          return true; // Block Backspace
-        }
   
-        // Case 2: Prevent Backspace when merging blocks (text exists before the node)
-        if (
-          prevNode &&
-          prevNode.type.name === 'codeCell' &&
-          $from.parentOffset === 0 // Cursor is at the start of the block following the node
-        ) {
-          return true; // Block Backspace
+        if (prevNode && prevNode.type.name === 'codeCell') {
+          console.log('Backspace: codeCell found');
+          // Move the cursor to the start of the codeCell
+          editor.commands.setTextSelection(posBefore - 1); // Set selection before the node
+          return true; // Block backspace
         }
   
         return false; // Allow default behavior
@@ -78,17 +73,21 @@ export const CodeCell = Node.create({
         const { selection } = state;
         const { $from } = selection;
   
-        // Case 1: Prevent Delete when cursor is inside or directly above the node
+        // Case 1: Prevent Delete when the cursor is directly before the codeCell
         const posAfter = $from.after($from.depth);
         const nextNode = state.doc.nodeAt(posAfter);
+  
         if (nextNode && nextNode.type.name === 'codeCell') {
-          return true; // Block Delete
+          // Move the cursor to the end of the codeCell
+          editor.commands.setTextSelection(posAfter + 1); // Set selection after the node
+          return true; // Block delete
         }
   
         return false; // Allow default behavior
       },
     };
   }
+  
   
 });
 
