@@ -51,11 +51,11 @@ export const CodeCell = Node.create({
 
   addKeyboardShortcuts() {
     return {
-      Backspace: ({ editor, state }) => {
+      Backspace: ({ editor }) => {
         try {
           console.log('Backspace triggered');
           
-          // Log the entire state
+          const state = editor.state; // Access the state directly from the editor
           console.log('Editor state:', state);
   
           const { selection } = state;
@@ -82,7 +82,7 @@ export const CodeCell = Node.create({
   
           if (prevNode && prevNode.type.name === 'codeCell') {
             console.log('Backspace blocked: Cursor is directly after a codeCell');
-            editor.commands.setTextSelection(posBefore);
+            editor.commands.setTextSelection(posBefore); // Safe cursor movement
             return true;
           }
   
@@ -95,11 +95,11 @@ export const CodeCell = Node.create({
         }
       },
   
-      Delete: ({ editor, state }) => {
+      Delete: ({ editor }) => {
         try {
           console.log('Delete triggered');
   
-          // Log the entire state
+          const state = editor.state; // Access the state directly from the editor
           console.log('Editor state:', state);
   
           const { selection } = state;
@@ -126,7 +126,7 @@ export const CodeCell = Node.create({
   
           if (nextNode && nextNode.type.name === 'codeCell') {
             console.log('Delete blocked: Cursor is directly before a codeCell');
-            editor.commands.setTextSelection(posAfter + 1);
+            editor.commands.setTextSelection(posAfter + 1); // Safe cursor movement
             return true;
           }
   
@@ -140,6 +140,7 @@ export const CodeCell = Node.create({
       },
     };
   }
+  
   
   
   
