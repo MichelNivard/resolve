@@ -59,20 +59,14 @@ export const CodeCell = Node.create({
         console.log('Backspace triggered');
         console.log('Cursor position:', $from.pos);
   
-        // Detect the top-level node at the cursor's depth
-        const parentNode = $from.node($from.depth);
-        console.log('Parent Node:', parentNode);
+        // Directly calculate the previous position
+        const posBefore = $from.pos - 1;
+        const prevNode = posBefore >= 0 ? state.doc.nodeAt(posBefore) : null;
   
-        if (parentNode?.type.name === 'codeCell') {
-          console.log('Backspace blocked: Cursor is inside a codeCell');
-          return true; // Block Backspace
-        }
-  
-        // Check for previous node
-        const posBefore = $from.before($from.depth);
-        const prevNode = state.doc.nodeAt(posBefore);
+        console.log('Position before cursor:', posBefore);
         console.log('Previous node:', prevNode);
   
+        // Check if the previous node is a codeCell
         if (prevNode?.type.name === 'codeCell') {
           console.log('Backspace blocked: Adjacent to a codeCell');
           editor.commands.setTextSelection(posBefore); // Move the cursor to the codeCell
@@ -91,20 +85,14 @@ export const CodeCell = Node.create({
         console.log('Delete triggered');
         console.log('Cursor position:', $from.pos);
   
-        // Detect the top-level node at the cursor's depth
-        const parentNode = $from.node($from.depth);
-        console.log('Parent Node:', parentNode);
+        // Directly calculate the next position
+        const posAfter = $from.pos + 1;
+        const nextNode = posAfter < state.doc.content.size ? state.doc.nodeAt(posAfter) : null;
   
-        if (parentNode?.type.name === 'codeCell') {
-          console.log('Delete blocked: Cursor is inside a codeCell');
-          return true; // Block Delete
-        }
-  
-        // Check for next node
-        const posAfter = $from.after($from.depth);
-        const nextNode = state.doc.nodeAt(posAfter);
+        console.log('Position after cursor:', posAfter);
         console.log('Next node:', nextNode);
   
+        // Check if the next node is a codeCell
         if (nextNode?.type.name === 'codeCell') {
           console.log('Delete blocked: Adjacent to a codeCell');
           editor.commands.setTextSelection(posAfter + 1); // Move the cursor to the codeCell
