@@ -52,66 +52,91 @@ export const CodeCell = Node.create({
   addKeyboardShortcuts() {
     return {
       Backspace: ({ editor, state }) => {
-        console.log('Backspace triggered');
-        const { selection } = state;
-        console.log('selection constructed');
-        const { $from } = selection;
+        try {
+          console.log('Backspace triggered');
+          
+          // Log the entire state
+          console.log('Editor state:', state);
   
-        console.log('Backspace triggered and selection:', selection);
+          const { selection } = state;
+          console.log('Selection object:', selection);
   
-        // Ensure $from has a valid parent to avoid undefined behavior
-        if (!$from || !$from.depth) {
-          console.log('Invalid $from or depth:', $from, $from.depth);
+          if (!selection) {
+            console.error('Selection is undefined!');
+            return false;
+          }
+  
+          const { $from } = selection;
+          console.log('$from object:', $from);
+  
+          if (!$from || !$from.depth) {
+            console.error('$from is invalid or has no depth:', $from);
+            return false;
+          }
+  
+          const posBefore = $from.before($from.depth);
+          console.log('Position before cursor:', posBefore);
+  
+          const prevNode = posBefore >= 0 ? state.doc.nodeAt(posBefore) : null;
+          console.log('Previous node:', prevNode);
+  
+          if (prevNode && prevNode.type.name === 'codeCell') {
+            console.log('Backspace blocked: Cursor is directly after a codeCell');
+            editor.commands.setTextSelection(posBefore);
+            return true;
+          }
+  
+          console.log('Backspace allowed: Default behavior');
+          return false;
+  
+        } catch (error) {
+          console.error('Error in Backspace handler:', error);
           return false;
         }
-  
-        // Get the position of the node before the cursor
-        const posBefore = $from.before($from.depth);
-        console.log('PosBefore:', posBefore);
-  
-        const prevNode = posBefore >= 0 ? state.doc.nodeAt(posBefore) : null;
-        console.log('PrevNode:', prevNode);
-  
-        if (prevNode && prevNode.type.name === 'codeCell') {
-          console.log('Backspace blocked: Cursor is directly after a codeCell');
-          // Move the cursor to the start of the codeCell
-          editor.commands.setTextSelection(posBefore); // Safe cursor movement
-          return true; // Block backspace
-        }
-  
-        console.log('Backspace allowed: Default behavior');
-        return false; // Allow default behavior
       },
   
       Delete: ({ editor, state }) => {
-        const { selection } = state;
-        const { $from } = selection;
+        try {
+          console.log('Delete triggered');
   
-        console.log('Delete triggered');
-        console.log('Selection:', selection);
+          // Log the entire state
+          console.log('Editor state:', state);
   
-        // Ensure $from has a valid parent to avoid undefined behavior
-        if (!$from || !$from.depth) {
-          console.log('Invalid $from or depth:', $from, $from.depth);
+          const { selection } = state;
+          console.log('Selection object:', selection);
+  
+          if (!selection) {
+            console.error('Selection is undefined!');
+            return false;
+          }
+  
+          const { $from } = selection;
+          console.log('$from object:', $from);
+  
+          if (!$from || !$from.depth) {
+            console.error('$from is invalid or has no depth:', $from);
+            return false;
+          }
+  
+          const posAfter = $from.after($from.depth);
+          console.log('Position after cursor:', posAfter);
+  
+          const nextNode = posAfter < state.doc.content.size ? state.doc.nodeAt(posAfter) : null;
+          console.log('Next node:', nextNode);
+  
+          if (nextNode && nextNode.type.name === 'codeCell') {
+            console.log('Delete blocked: Cursor is directly before a codeCell');
+            editor.commands.setTextSelection(posAfter + 1);
+            return true;
+          }
+  
+          console.log('Delete allowed: Default behavior');
+          return false;
+  
+        } catch (error) {
+          console.error('Error in Delete handler:', error);
           return false;
         }
-  
-        // Get the position of the node after the cursor
-        const posAfter = $from.after($from.depth);
-        console.log('PosAfter:', posAfter);
-  
-        const nextNode = posAfter < state.doc.content.size ? state.doc.nodeAt(posAfter) : null;
-        console.log('NextNode:', nextNode);
-  
-        if (nextNode && nextNode.type.name === 'codeCell') {
-          console.log('Delete blocked: Cursor is directly before a codeCell');
-          // Move the cursor to the end of the codeCell
-          editor.commands.setTextSelection(posAfter + 1); // Safe cursor movement
-          return true; // Block delete
-        }
-  
-        console.log('Delete allowed: Default behavior');
-        return false; // Allow default behavior
       },
     };
   }
