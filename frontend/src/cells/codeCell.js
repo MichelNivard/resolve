@@ -59,18 +59,20 @@ export const CodeCell = Node.create({
         console.log('Backspace triggered');
         console.log('Cursor position:', $from.pos);
   
-        // Traverse upward to detect the top-level node
-        let currentDepth = $from.depth;
-        while (currentDepth > 0) {
-          const node = $from.node(currentDepth);
-          console.log(`Node at depth ${currentDepth}:`, node);
+        // Directly calculate the position before the cursor
+        const posBefore = $from.pos - 1;
   
-          if (node?.type.name === 'codeCell') {
-            console.log('Backspace blocked: Cursor is inside or adjacent to a codeCell');
-            return true; // Block Backspace
-          }
+        // Fetch the node at the calculated position
+        const prevNode = posBefore >= 0 ? state.doc.nodeAt(posBefore) : null;
   
-          currentDepth -= 1; // Move up the tree
+        console.log('Position before cursor:', posBefore);
+        console.log('Previous node:', prevNode);
+  
+        // Block backspace if the previous node is a codeCell
+        if (prevNode?.type.name === 'codeCell') {
+          console.log('Backspace blocked: Adjacent to a codeCell');
+          editor.commands.setTextSelection(posBefore); // Move cursor to the codeCell
+          return true; // Block Backspace
         }
   
         console.log('Backspace allowed: Default behavior');
@@ -85,18 +87,20 @@ export const CodeCell = Node.create({
         console.log('Delete triggered');
         console.log('Cursor position:', $from.pos);
   
-        // Traverse upward to detect the top-level node
-        let currentDepth = $from.depth;
-        while (currentDepth > 0) {
-          const node = $from.node(currentDepth);
-          console.log(`Node at depth ${currentDepth}:`, node);
+        // Directly calculate the position after the cursor
+        const posAfter = $from.pos + 1;
   
-          if (node?.type.name === 'codeCell') {
-            console.log('Delete blocked: Cursor is inside or adjacent to a codeCell');
-            return true; // Block Delete
-          }
+        // Fetch the node at the calculated position
+        const nextNode = posAfter < state.doc.content.size ? state.doc.nodeAt(posAfter) : null;
   
-          currentDepth -= 1; // Move up the tree
+        console.log('Position after cursor:', posAfter);
+        console.log('Next node:', nextNode);
+  
+        // Block delete if the next node is a codeCell
+        if (nextNode?.type.name === 'codeCell') {
+          console.log('Delete blocked: Adjacent to a codeCell');
+          editor.commands.setTextSelection(posAfter + 1); // Move cursor to the codeCell
+          return true; // Block Delete
         }
   
         console.log('Delete allowed: Default behavior');
