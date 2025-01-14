@@ -54,6 +54,7 @@ export const CodeCell = Node.create({
       Backspace: ({ editor, state }) => {
         console.log('Backspace triggered');
         const { selection } = state;
+        console.log('selection constructed');
         const { $from } = selection;
   
         console.log('Backspace triggered and selection:', selection);
