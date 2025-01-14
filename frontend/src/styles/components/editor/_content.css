@@ -476,7 +476,7 @@
   min-width: 0;
   border-radius: 8px;
   height: fit-content;
-  z-index: 10;
+  z-index: 1;
 }
 
 .editor-main {
