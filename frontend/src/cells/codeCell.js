@@ -52,11 +52,11 @@ export const CodeCell = Node.create({
   addKeyboardShortcuts() {
     return {
       Backspace: ({ editor, state }) => {
+        console.log('Backspace triggered');
         const { selection } = state;
         const { $from } = selection;
   
-        console.log('Backspace triggered');
-        console.log('Selection:', selection);
+        console.log('Backspace triggered and selection:', selection);
   
         // Ensure $from has a valid parent to avoid undefined behavior
         if (!$from || !$from.depth) {
