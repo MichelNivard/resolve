@@ -378,18 +378,23 @@ export const RawCell = Node.create({
           const { selection } = state;
           const { $from } = selection;
     
-          // Case 1: Prevent Backspace when cursor is inside or directly below the node
-          const posBefore = $from.before($from.depth);
-          const prevNode = state.doc.nodeAt(posBefore);
-          if (prevNode && prevNode.type.name === 'codeCell') {
-            return true; // Block Backspace
+          // Case 1: Prevent Backspace when the cursor is inside the rawCell node
+          if ($from.parent.type.name === 'rawCell' && $from.parentOffset === 0) {
+            return true; // Block the backspace
           }
     
-          // Case 2: Prevent Backspace when merging blocks (text exists before the node)
+          // Case 2: Prevent Backspace when the cursor is directly below the rawCell node
+          const posBefore = $from.before($from.depth);
+          const prevNode = state.doc.nodeAt(posBefore);
+          if (prevNode && prevNode.type.name === 'rawCell') {
+            return true; // Block backspace from deleting the rawCell
+          }
+    
+          // Case 3: Prevent Backspace when merging blocks (text exists before the rawCell node)
           if (
             prevNode &&
-            prevNode.type.name === 'codeCell' &&
-            $from.parentOffset === 0 // Cursor is at the start of the block following the node
+            prevNode.type.name === 'rawCell' &&
+            $from.parentOffset === 0 // Cursor is at the start of the block following the rawCell
           ) {
             return true; // Block Backspace
           }
@@ -401,11 +406,19 @@ export const RawCell = Node.create({
           const { selection } = state;
           const { $from } = selection;
     
-          // Case 1: Prevent Delete when cursor is inside or directly above the node
+          // Case 1: Prevent Delete when the cursor is inside the rawCell node
+          if (
+            $from.parent.type.name === 'rawCell' &&
+            $from.parentOffset === $from.parent.nodeSize - 2
+          ) {
+            return true; // Block the delete
+          }
+    
+          // Case 2: Prevent Delete when the cursor is directly above the rawCell node
           const posAfter = $from.after($from.depth);
           const nextNode = state.doc.nodeAt(posAfter);
-          if (nextNode && nextNode.type.name === 'codeCell') {
-            return true; // Block Delete
+          if (nextNode && nextNode.type.name === 'rawCell') {
+            return true; // Block delete from removing the rawCell
           }
     
           return false; // Allow default behavior

@@ -52,43 +52,44 @@ export const CodeCell = Node.create({
   addKeyboardShortcuts() {
     return {
       Backspace: ({ editor, state }) => {
-        const { selection, tr } = state;
+        const { selection } = state;
         const { $from } = selection;
-
-        // Case 1: Prevent Backspace when cursor is below the node
-        const prevNode = tr.doc.nodeAt($from.before($from.depth));
+  
+        // Case 1: Prevent Backspace when cursor is inside or directly below the node
+        const posBefore = $from.before($from.depth);
+        const prevNode = state.doc.nodeAt(posBefore);
         if (prevNode && prevNode.type.name === 'codeCell') {
-          return true; // Block Backspace from deleting the node
+          return true; // Block Backspace
         }
-
-      // Case 2: Prevent Backspace when merging blocks (text exists before the node)
-      const posBefore = $from.before($from.depth);
-      const nodeBefore = tr.doc.nodeAt(posBefore);
-      if (
-        nodeBefore && 
-        nodeBefore.type.name === 'codeCell' && 
-        $from.parentOffset === 0 // Cursor is at the start of the block following the node
-      ) {
-        return true; // Block Backspace
-      }
-
+  
+        // Case 2: Prevent Backspace when merging blocks (text exists before the node)
+        if (
+          prevNode &&
+          prevNode.type.name === 'codeCell' &&
+          $from.parentOffset === 0 // Cursor is at the start of the block following the node
+        ) {
+          return true; // Block Backspace
+        }
+  
         return false; // Allow default behavior
       },
-
+  
       Delete: ({ editor, state }) => {
-        const { selection, tr } = state;
+        const { selection } = state;
         const { $from } = selection;
-
-        // Case 1: Prevent Delete when cursor is above the node
-        const nextNode = tr.doc.nodeAt($from.after($from.depth));
+  
+        // Case 1: Prevent Delete when cursor is inside or directly above the node
+        const posAfter = $from.after($from.depth);
+        const nextNode = state.doc.nodeAt(posAfter);
         if (nextNode && nextNode.type.name === 'codeCell') {
-          return true; // Block Delete from deleting the node
+          return true; // Block Delete
         }
-
+  
         return false; // Allow default behavior
       },
     };
-  },
+  }
+  
 });
 
 function CodeCellNodeView({ node, editor, getPos }) {
