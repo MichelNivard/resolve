@@ -8,10 +8,10 @@ import { faChevronUp, faChevronDown } from '@fortawesome/free-solid-svg-icons';
 
 export const CodeCell = Node.create({
   name: 'codeCell',
-  group: 'block',
-  content: 'text*',
-  atom: false,
-  selectable: true,
+  group: 'block', // Ensure it belongs to the block group
+  content: '', // No inner content, treated as an atomic block
+  atom: true, // Makes it a single, indivisible unit
+  isolating: true, // Prevents merging with other nodes
 
   addAttributes() {
     return {
@@ -43,7 +43,7 @@ export const CodeCell = Node.create({
   },
 
   renderHTML() {
-    return ['div', { 'data-type': 'code-cell' }['p', {}, 'Placeholder']];
+    return ['div', { 'data-type': 'code-cell', contenteditable: false }];
   },
 
   addNodeView() {
