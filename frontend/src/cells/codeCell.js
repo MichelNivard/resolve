@@ -54,40 +54,30 @@ export const CodeCell = Node.create({
       Backspace: ({ editor }) => {
         try {
           console.log('Backspace triggered');
-          
-          const state = editor.state; // Access the state directly from the editor
-          console.log('Editor state:', state);
   
-          const { selection } = state;
-          console.log('Selection object:', selection);
-  
-          if (!selection) {
-            console.error('Selection is undefined!');
-            return false;
-          }
-  
+          const selection = editor.state.selection;
           const { $from } = selection;
-          console.log('$from object:', $from);
   
           if (!$from || !$from.depth) {
             console.error('$from is invalid or has no depth:', $from);
             return false;
           }
   
+          // Detect the previous node using Tiptap's getAttributes method
           const posBefore = $from.before($from.depth);
+          const prevNodeType = editor.state.doc.nodeAt(posBefore)?.type?.name;
+  
           console.log('Position before cursor:', posBefore);
+          console.log('Previous node type:', prevNodeType);
   
-          const prevNode = posBefore >= 0 ? state.doc.nodeAt(posBefore) : null;
-          console.log('Previous node:', prevNode);
-  
-          if (prevNode && prevNode.type.name === 'codeCell') {
-            console.log('Backspace blocked: Cursor is directly after a codeCell');
-            editor.commands.setTextSelection(posBefore); // Safe cursor movement
-            return true;
+          if (prevNodeType === 'codeCell') {
+            console.log('Backspace blocked: Cursor is adjacent to a codeCell');
+            editor.commands.setTextSelection(posBefore); // Move the cursor to the start of the codeCell
+            return true; // Block Backspace
           }
   
           console.log('Backspace allowed: Default behavior');
-          return false;
+          return false; // Allow default behavior
   
         } catch (error) {
           console.error('Error in Backspace handler:', error);
@@ -99,39 +89,29 @@ export const CodeCell = Node.create({
         try {
           console.log('Delete triggered');
   
-          const state = editor.state; // Access the state directly from the editor
-          console.log('Editor state:', state);
-  
-          const { selection } = state;
-          console.log('Selection object:', selection);
-  
-          if (!selection) {
-            console.error('Selection is undefined!');
-            return false;
-          }
-  
+          const selection = editor.state.selection;
           const { $from } = selection;
-          console.log('$from object:', $from);
   
           if (!$from || !$from.depth) {
             console.error('$from is invalid or has no depth:', $from);
             return false;
           }
   
+          // Detect the next node using Tiptap's getAttributes method
           const posAfter = $from.after($from.depth);
+          const nextNodeType = editor.state.doc.nodeAt(posAfter)?.type?.name;
+  
           console.log('Position after cursor:', posAfter);
+          console.log('Next node type:', nextNodeType);
   
-          const nextNode = posAfter < state.doc.content.size ? state.doc.nodeAt(posAfter) : null;
-          console.log('Next node:', nextNode);
-  
-          if (nextNode && nextNode.type.name === 'codeCell') {
-            console.log('Delete blocked: Cursor is directly before a codeCell');
-            editor.commands.setTextSelection(posAfter + 1); // Safe cursor movement
-            return true;
+          if (nextNodeType === 'codeCell') {
+            console.log('Delete blocked: Cursor is adjacent to a codeCell');
+            editor.commands.setTextSelection(posAfter + 1); // Move the cursor to the end of the codeCell
+            return true; // Block Delete
           }
   
           console.log('Delete allowed: Default behavior');
-          return false;
+          return false; // Allow default behavior
   
         } catch (error) {
           console.error('Error in Delete handler:', error);
@@ -140,6 +120,7 @@ export const CodeCell = Node.create({
       },
     };
   }
+  
   
   
   
