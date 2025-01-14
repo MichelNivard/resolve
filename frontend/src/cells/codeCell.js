@@ -60,7 +60,7 @@ export const CodeCell = Node.create({
         console.log('Cursor position:', $from.pos);
   
         // Directly calculate the position before the cursor
-        const posBefore = $from.pos - 1;
+        const posBefore = $from.pos - 2;
   
         // Fetch the node at the calculated position
         const prevNode = posBefore >= 0 ? state.doc.nodeAt(posBefore) : null;
