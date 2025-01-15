@@ -17,6 +17,7 @@ const LoginButton = () => {
     <><p>
     Resolve is your seamless solution for collaborating on Quarto and Jupyter (`.ipynb`) documents. To get started, please sign in with your GitHub account.
   </p>
+  <p>Don't have any .ipynb files to test Resolve? Go to GitHub and fork: https://github.com/MichelNivard/writing-together</p>
   <p>
     Don't have a GitHub account yet?{' '}
     <a href="https://github.com/join" style={{ fontWeight: 'bold' }}>

@@ -268,30 +268,9 @@ function App() {
         <div className="login-container">
           <div className="login-card">
           <h1>Sign in to Resolve</h1>
-            {!betaCodeVerified ? (
-              
-              <form className="beta-test-form" onSubmit={(e) => e.preventDefault()}>
-                <p>Welcome Resolve is in preview testing, for a beta code reach out to Michel Nivard (find me on bluesky or GitHub). Please enter the beta test code to continue</p>
-                <input
-                  type="text"
-                  className="beta-test-input"
-                  value={betaCode}
-                  onChange={(e) => setBetaCode(e.target.value)}
-                  onKeyPress={handleKeyPress}
-                  placeholder="Enter beta test code"
-                  autoFocus
-                />
-                <button
-                  type="button"
-                  className="beta-confirm-button"
-                  onClick={verifyBetaCode}
-                >
-                  Confirm
-                </button>
-              </form>
-            ) : (
+            
               <LoginButton />
-            )}
+            
           </div>
         </div>
       ) : (
