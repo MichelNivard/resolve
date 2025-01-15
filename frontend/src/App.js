@@ -267,7 +267,7 @@ function App() {
       {!isAuthenticated ? (
         <div className="login-container">
           <div className="login-card">
-          <h1>Sign in to Resolve</h1>
+          <h1>Sign in to Resolve (beta)</h1>
             
               <LoginButton />
             
