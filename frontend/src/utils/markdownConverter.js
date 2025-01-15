@@ -5,7 +5,6 @@ import { tables, strikethrough } from 'turndown-plugin-gfm';
 
 function markdownItCitations(md) {
   md.inline.ruler.before('emphasis', 'quarto_citations', (state, silent) => {
-
     const start = state.pos;
     if (state.src[start] !== '[') {
       return false;
@@ -60,7 +59,7 @@ function markdownItCitations(md) {
         fullText += `@${c.key}`;
         if (c.suffix) fullText += ` ${c.suffix}`;
 
-        return `<span class="bib-mention" data-bib-key="${c.key}">${fullText}</span>`;
+        return `[<span class="bib-mention" data-bib-key="${c.key}">${fullText}</span>]`;
       } else {
         return c.prefix; // fallback for non-citation text
       }
@@ -69,6 +68,7 @@ function markdownItCitations(md) {
     return htmlPieces.join('; ');
   };
 }
+
 
 // Initialize markdown-it with plugins to support <ins> tags and tables
 const md = new MarkdownIt({
