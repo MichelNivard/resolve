@@ -21,9 +21,9 @@ This is Resolve, a modern WYSIWYG Jupyter Notebook Editor with GitHub Integratio
   
 - **Rich Text Editing**
   - WYSIWYG markdown editing
-  - Code cell execution
   - Math equation support
-  - Syntax highlighting
+  - Integrated citation support (provide doi, .bib gets updated)
+
 
 - **Collaboration Tools**
   - Real-time editor presence detection
@@ -49,46 +49,32 @@ This is Resolve, a modern WYSIWYG Jupyter Notebook Editor with GitHub Integratio
 │   │   └── user.js                # User operations
 │   └── middleware/
 │       └── security.js            # Security middleware
-│
-└── frontend/
-    ├── src/
-    │   ├── components/
-    │   │   ├── Auth/
-    │   │   │   └── LoginButton.js # GitHub login
-    │   │   ├── Citation/
-    │   │   │   └── CitationMark.js
-    │   │   ├── Comments/
-    │   │   │   └── CommentsSidebar.js
-    │   │   └── Editor/
-    │   │       ├── EditorWrapper.jsx
-    │   │       ├── EditorToolbar.js
-    │   │       ├── EditorBubbleMenuManager.js
-    │   │       ├── CoderRenderer.js
-    │   │       └── OutputRenderer.js
-    │   ├── cells/
-    │   │   ├── codeCell.js
-    │   │   ├── markdownCell.js
-    │   │   └── rawCell.js
-    │   ├── contexts/
-    │   │   └── AuthContext.js
-    │   ├── utils/
-    │   │   ├── api.js
-    │   │   ├── bibGitHub.js
-    │   │   ├── CommentMark.js
-    │   │   ├── doiUtils.js
-    │   │   ├── GitHubReferenceManager.js
-    │   │   ├── ipynbUtils.js
-    │   │   ├── markdownConverter.js
-    │   │   ├── notebookConversionUtils.js
-    │   │   ├── savetoGitHub.js
-    │   │   ├── timeUtils.js
-    │   │   └── TrackChanges.js
-    │   └── styles/
-    │       ├── components/
-    │       │   ├── editor/
-    │       │   └── comments/
-    │       └── _index.css
-    └── public/
+├── frontend/
+│   ├── src/
+│   │   ├── cells/                 # Cell type implementations
+│   │   │   ├── codeCell.js        # Code cell logic
+│   │   │   ├── markdownCell.js    # Markdown cell logic
+│   │   │   └── rawCell.js         # Raw cell logic
+│   │   ├── components/            # React components
+│   │   │   ├── Auth/              # Authentication components
+│   │   │   │   └── LoginButton.js # GitHub login button
+│   │   │   ├── Citation/          # Citation management
+│   │   │   ├── Comments/          # Commenting system
+│   │   │   └── Editor/            # Notebook editing components
+│   │   ├── contexts/              # React context providers
+│   │   │   └── AuthContext.js     # Authentication context
+│   │   ├── styles/                # CSS styling
+│   │   │   ├── base/              # Base styles and variables
+│   │   │   ├── components/        # Component-specific styles
+│   │   │   └── layouts/           # Layout styles
+│   │   └── utils/                 # Utility functions
+│   │       ├── api.js             # API interaction utilities
+│   │       ├── GitHubReferenceManager.js # GitHub reference handling
+│   │       ├── ipynbUtils.js      # Notebook file utilities
+│   │       └── markdownConverter.js # Markdown conversion utilities
+│   ├── package.json               # Frontend dependencies
+│   └── public/                    # Public assets
+└── README.md                      # Project documentation
 ```
 
 
