@@ -118,11 +118,61 @@ This is Resolve, a modern WYSIWYG Jupyter Notebook Editor with GitHub Integratio
 
 ## Technical Architecture
 
-### Backend (Serverless Functions)
+
+### Backend (Express.js Server)
+
+- **Infrastructure**
+  - Deployed on DigitalOcean droplet
+  - Behind a Caddy server for automatic HTTPS.
+  - Process managed by PM2 for robust deployment
+  - Express.js server for scalable API handling
+  - Persistent server architecture with advanced process management
+
+- **Server Characteristics**
+  - Caddy web server
+    - Automatic HTTPS
+    - Simple and powerful configuration
+    - Reverse proxy capabilities
+  - Optimized for modern web application hosting
+
+
+- **Deployment Strategy**
+  - PM2 Process Manager
+    - Automatic process restart
+    - Load balancing
+    - Zero-downtime reloads
+    - Comprehensive application monitoring
+    - Centralized logging
+
 - **Authentication**
-  - GitHub OAuth implementation (`auth.js`)
-  - Session management
-  - Token handling
+  - GitHub OAuth implementation
+  - Secure session management using express-session
+  - File-based session storage for reliability
+  - Token validation and security middleware
+
+- **Core Capabilities**
+  - Centralized API routing for:
+    - GitHub authentication
+    - File retrieval and saving
+    - Repository and notebook listing
+    - Bibliography management
+
+- **Security Features**
+  - CORS configuration with environment-specific origins
+  - Helmet.js for HTTP header security
+  - Rate limiting to prevent abuse
+  - Secure cookie management
+  - Environment-based configuration
+
+- **Performance Considerations**
+  - Modular API route structure
+  - Efficient middleware for authentication and security
+  - Configurable for both development and production environments
+
+- **Session Management**
+  - Encrypted session storage
+  - Configurable session duration
+  - Secure session secret management
 
 - **File Operations**
   - File retrieval (`fetchFile.js`)
