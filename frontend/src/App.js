@@ -54,7 +54,22 @@ function App() {
           const repos = await fetchRepositories();
           const validRepos = repos.filter(repo => repo.fullName && repo.owner?.login);
           setRepositories(validRepos);
-          if (validRepos.length > 0) {
+          
+          // If we have owner/repo from URL params, find and select that repo
+          if (owner && repo && validRepos.length > 0) {
+            const urlRepo = validRepos.find(r => 
+              r.owner.login.toLowerCase() === owner.toLowerCase() && 
+              r.name.toLowerCase() === repo.toLowerCase()
+            );
+            if (urlRepo) {
+              setSelectedRepo(urlRepo);
+              // Extract file path from URL if present
+              const pathMatch = location.pathname.match(new RegExp(`/document/${owner}/${repo}/(.*)`));
+              if (pathMatch && pathMatch[1]) {
+                setFilePath(decodeURIComponent(pathMatch[1]));
+              }
+            }
+          } else if (validRepos.length > 0) {
             setSelectedRepo(validRepos[0]);
           }
         } catch (error) {
@@ -65,7 +80,7 @@ function App() {
       }
     };
     loadRepositories();
-  }, [isAuthenticated]);
+  }, [isAuthenticated, owner, repo, location.pathname]);
 
   // Update editor extensions when reference manager changes
   useEffect(() => {

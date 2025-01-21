@@ -124,22 +124,23 @@ const EditorWrapper = ({
 
   useEffect(() => {
     const loadNotebooks = async () => {
-      if (selectedRepo?.fullName) {
+      if (selectedRepo) {
         try {
-          const notebookList = await fetchNotebooksInRepo(selectedRepo.fullName);
+          const notebookList = await fetchNotebooksInRepo(selectedRepo.owner.login, selectedRepo.name);
           setNotebooks(notebookList);
-          // Only clear the file path if we successfully loaded notebooks
-          if (notebookList && notebookList.length > 0) {
-            setFilePath('');
+          
+          // If we have a filePath from URL, try to load that file
+          if (filePath && !ipynb) {
+            handleLoadFile(filePath);
           }
-        } catch (error) {
-          setError(error.message);
+        } catch (err) {
+          setError('Failed to load notebooks');
+          console.error('Error loading notebooks:', err);
         }
       }
     };
-
     loadNotebooks();
-  }, [selectedRepo, setFilePath]);
+  }, [selectedRepo, filePath]);
 
  const onLoadFile = async () => {
     try {
