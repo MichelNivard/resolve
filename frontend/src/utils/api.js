@@ -118,10 +118,11 @@ export const saveNotebook = async (content, path, repository) => {
 };
 
 // Collaboration API functions
-export const sendCollaborationInvite = async (username, repository) => {
+export const sendCollaborationInvite = async (username, email, repository) => {
   try {
     const response = await api.post('/api/collaboration/invite', {
       username,
+      email,
       repository
     });
     return response.data;
