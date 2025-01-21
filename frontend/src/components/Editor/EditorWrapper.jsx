@@ -129,16 +129,14 @@ const EditorWrapper = ({
           const notebookList = await fetchNotebooksInRepo(selectedRepo.owner.login, selectedRepo.name);
           setNotebooks(notebookList);
           
-          if (filePath) {
-            // If we have a filePath (either from URL or selection), ensure it exists in the notebook list
-            const fileExists = notebookList.some(notebook => notebook.path === filePath);
-            if (fileExists && !ipynb) {
-              // Only load if file exists and no notebook is currently loaded
+          if (filePath && !ipynb) {
+            // If filePath exists in the list, load it
+            if (notebookList.includes(filePath)) {
               handleLoadFile(filePath);
             }
-          } else if (notebookList && notebookList.length > 0 && !ipynb) {
-            // If no specific file is requested and we have notebooks, set the first one as default
-            setFilePath(notebookList[0].path);
+          } else if (notebookList.length > 0 && !ipynb) {
+            // No filePath or not found - set first notebook as default
+            setFilePath(notebookList[0]);
           }
         } catch (err) {
           setError('Failed to load notebooks');
