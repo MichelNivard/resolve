@@ -42,6 +42,7 @@ This is Resolve, a modern WYSIWYG Jupyter Notebook Editor with GitHub Integratio
 │   │   ├── bibliography/
 │   │   │   ├── load.js            # Load BibTeX files
 │   │   │   └── save.js            # Save BibTeX files
+│   │   ├── collaboration.js        # Repository collaboration & sharing
 │   │   ├── fetchFile.js           # File retrieval
 │   │   ├── saveFile.js            # File saving
 │   │   ├── getRepositories.js     # Repository listing
@@ -60,12 +61,15 @@ This is Resolve, a modern WYSIWYG Jupyter Notebook Editor with GitHub Integratio
 │   │   │   │   └── LoginButton.js # GitHub login button
 │   │   │   ├── Citation/          # Citation management
 │   │   │   ├── Comments/          # Commenting system
+│   │   │   ├── Share/             # File sharing components
+│   │   │   │   └── ShareModal.js  # Share dialog & GitHub collab
 │   │   │   └── Editor/            # Notebook editing components
 │   │   ├── contexts/              # React context providers
 │   │   │   └── AuthContext.js     # Authentication context
 │   │   ├── styles/                # CSS styling
 │   │   │   ├── base/              # Base styles and variables
 │   │   │   ├── components/        # Component-specific styles
+│   │   │   │   └── share/         # Share modal styles
 │   │   │   └── layouts/           # Layout styles
 │   │   └── utils/                 # Utility functions
 │   │       ├── api.js             # API interaction utilities
@@ -115,6 +119,39 @@ This is Resolve, a modern WYSIWYG Jupyter Notebook Editor with GitHub Integratio
 2. Bibliography management:
    - `bibliography/load.js` retrieves BibTeX
    - `bibliography/save.js` updates BibTeX file
+
+### File Sharing Flow
+1. User initiates sharing:
+   - Clicks share button in editor toolbar
+   - `ShareModal.js` opens with sharing options
+   - User can enter GitHub username or email address
+
+2. Collaborator Resolution:
+   - If email provided:
+     - System searches GitHub for matching username
+     - Uses GitHub API to find user by email
+     - Fails if email is private or not found
+   - If username provided:
+     - Used directly for collaboration
+
+3. Repository Access:
+   - System adds user as collaborator to repository
+   - Uses GitHub API to grant write permissions
+   - Generates unique document URL in format:
+     `/document/:owner/:repo/:path`
+
+4. Invitation Process:
+   - Collaborator receives GitHub repository invitation
+   - Upon accepting invitation:
+     - Gets repository access
+     - Can use shared document link
+     - Document automatically loads correct file
+
+5. Shared Document Access:
+   - User clicks shared document link
+   - System auto-selects repository and file
+   - Editor loads with write permissions
+   - All changes tracked through GitHub
 
 ## Technical Architecture
 
