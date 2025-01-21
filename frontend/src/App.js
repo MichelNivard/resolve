@@ -10,6 +10,7 @@ import EditorWrapper from './components/Editor/EditorWrapper';
 import WarningBanner from './components/WarningBanner';
 import LoginButton from './components/Auth/LoginButton';
 import { GitHubReferenceManager } from './utils/GitHubReferenceManager';
+import { useParams, useLocation } from 'react-router-dom';
 
 // Import TipTap extensions
 import StarterKit from '@tiptap/starter-kit';
@@ -30,6 +31,8 @@ import { CitationMark } from './components/Citation/CitationMark';
 
 function App() {
   const { isAuthenticated, user } = useContext(AuthContext);
+  const { owner, repo } = useParams();
+  const location = useLocation();
   const [betaCodeVerified, setBetaCodeVerified] = useState(false);
   const [betaCode, setBetaCode] = useState('');
   const [filePath, setFilePath] = useState('');
@@ -114,6 +117,38 @@ function App() {
     const intervalId = setInterval(cleanup, 60000); // Run every minute
     return () => clearInterval(intervalId);
   }, [ipynb, isAuthenticated, user, filePath, selectedRepo]);
+
+  // Handle shared document URLs
+  useEffect(() => {
+    const handleSharedDocumentAccess = async () => {
+      if (owner && repo && isAuthenticated) {
+        try {
+          console.log('Handling shared document access:', { owner, repo });
+          const result = await handleSharedDocument(owner, repo, location.pathname.split('/').slice(4).join('/') || '');
+          
+          if (result.hasInvitation) {
+            // Show invitation UI
+            const confirmed = window.confirm(`Accept invitation to collaborate on ${owner}/${repo}?`);
+            if (confirmed) {
+              const notebook = await result.accept();
+              setIpynb(notebook);
+              setSelectedRepo({ fullName: `${owner}/${repo}`, owner: { login: owner }, name: repo });
+            }
+          } else if (result.document) {
+            // Document is already accessible
+            setIpynb(result.document);
+            setSelectedRepo({ fullName: `${owner}/${repo}`, owner: { login: owner }, name: repo });
+          }
+        } catch (error) {
+          console.error('Error handling shared document:', error);
+          // Show error UI
+          setSaveMessage('Error accessing shared document: ' + (error.response?.data?.error || error.message));
+        }
+      }
+    };
+    
+    handleSharedDocumentAccess();
+  }, [owner, repo, isAuthenticated]);
 
   const checkLastEditor = (notebook) => {
     if (!notebook?.metadata?.last_editor) return null;
