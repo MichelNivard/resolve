@@ -328,15 +328,13 @@ const EditorToolbar = ({ editor, onToggleComments, selectedRepo }) => {
         </button>
 
         {/* Share Button */}
-        { selectedRepo && (
-          <button
-            className="toolbar-btn"
-            onClick={() => setIsShareModalOpen(true)}
-            title="Share Document"
-          >
+        <button
+          className="toolbar-btn"
+          onClick={() => setIsShareModalOpen(true)}
+          title="Share Document"
+        >
            <p>Share File</p> <FaShare />
-          </button>
-        )}
+        </button>
       </div>
 
       {/* Modals */}
