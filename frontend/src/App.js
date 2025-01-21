@@ -312,8 +312,7 @@ function App() {
       {!isAuthenticated ? (
         <div className="login-container">
           <div className="login-card">
-          {!betaCodeVerified ? (
-              
+          {process.env.REACT_APP_BETA_KEY === 'yes' && !betaCodeVerified ? (
               <form className="beta-test-form" onSubmit={(e) => e.preventDefault()}>
                 <p>Welcome Resolve is in preview testing, for a beta code reach out to Michel Nivard (find me on bluesky or GitHub). Please enter the beta test code to continue</p>
                 <input
@@ -334,7 +333,6 @@ function App() {
                 </button>
               </form>
             ) : (
-            
               <LoginButton />
             )}
             
