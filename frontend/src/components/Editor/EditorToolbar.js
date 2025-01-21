@@ -13,7 +13,7 @@ import { AiOutlineSplitCells, AiOutlineInsertRowBelow } from 'react-icons/ai';
 import { BsTable } from 'react-icons/bs';
 import '../../styles/components/editor/_toolbar.css';
 import { useAuth } from '../../contexts/AuthContext';  
-import ShareModal from '../ShareModal'; // Assuming ShareModal is in the same directory
+import ShareModal from '../Share/ShareModal'; // Assuming ShareModal is in the same directory
 
 const EditorToolbar = ({ editor, onToggleComments, selectedRepo }) => {
   const [trackChangesEnabled, setTrackChangesEnabled] = useState(false);
