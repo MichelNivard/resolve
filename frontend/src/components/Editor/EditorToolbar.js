@@ -15,7 +15,7 @@ import '../../styles/components/editor/_toolbar.css';
 import { useAuth } from '../../contexts/AuthContext';  
 import ShareModal from '../Share/ShareModal'; // Assuming ShareModal is in the same directory
 
-const EditorToolbar = ({ editor, onToggleComments, selectedRepo }) => {
+const EditorToolbar = ({ editor, onToggleComments, selectedRepo, filePath }) => {
   const [trackChangesEnabled, setTrackChangesEnabled] = useState(false);
   const [showHeadingMenu, setShowHeadingMenu] = useState(false);
   const [showTextColorMenu, setShowTextColorMenu] = useState(false);
@@ -345,6 +345,7 @@ const EditorToolbar = ({ editor, onToggleComments, selectedRepo }) => {
         isOpen={isShareModalOpen}
         onClose={() => setIsShareModalOpen(false)}
         repository={selectedRepo?.fullName}
+        filePath={filePath}
       />
     </div>
   );

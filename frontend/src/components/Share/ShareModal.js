@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { sendCollaborationInvite } from '../../utils/api';
 import '../../styles/components/share/_modal.css';
 
-const ShareModal = ({ isOpen, onClose, repository }) => {
+const ShareModal = ({ isOpen, onClose, repository, filePath }) => {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [shareLink, setShareLink] = useState('');
@@ -44,7 +44,7 @@ const ShareModal = ({ isOpen, onClose, repository }) => {
     setError(null);
     
     try {
-      const result = await sendCollaborationInvite(username, email, repository);
+      const result = await sendCollaborationInvite(username, email, repository, filePath);
       setShareLink(result.shareLink);
       if (result.username !== username) {
         setUsername(result.username); // Update username if it was found via email

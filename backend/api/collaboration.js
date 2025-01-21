@@ -27,7 +27,7 @@ async function findGitHubUsername(octokit, email) {
 
 // Send invitation and generate share link
 router.post('/invite', async (req, res) => {
-  const { username, email, repository } = req.body;
+  const { username, email, repository, filePath } = req.body;
   const token = req.session?.githubToken;
   
   if (!token) {
@@ -81,9 +81,11 @@ router.post('/invite', async (req, res) => {
       throw new Error(`Unexpected response status: ${response.status}`);
     }
 
-    // Generate share link
+    // Generate share link with file path
     const frontendUrl = process.env.FRONTEND_URL || 'https://resolve.pub';
-    const shareLink = `${frontendUrl}/document/${owner}/${repo}`;
+    const shareLink = filePath 
+      ? `${frontendUrl}/document/${owner}/${repo}/${filePath}`
+      : `${frontendUrl}/document/${owner}/${repo}`;
     
     res.json({ 
       success: true, 

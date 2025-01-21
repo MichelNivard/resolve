@@ -10,6 +10,7 @@ root.render(
     <AuthProvider>
       <Routes>
         <Route path="/" element={<App />} />
+        <Route path="/document/:owner/:repo" element={<App />} />
         <Route path="/document/:owner/:repo/*" element={<App />} />
       </Routes>
     </AuthProvider>

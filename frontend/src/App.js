@@ -124,7 +124,11 @@ function App() {
       if (owner && repo && isAuthenticated) {
         try {
           console.log('Handling shared document access:', { owner, repo });
-          const result = await handleSharedDocument(owner, repo, location.pathname.split('/').slice(4).join('/') || '');
+          // Get the file path from the URL (everything after /document/owner/repo/)
+          const path = location.pathname.split(`/document/${owner}/${repo}/`)[1] || '';
+          console.log('File path from URL:', path);
+          
+          const result = await handleSharedDocument(owner, repo, path);
           
           if (result.hasInvitation) {
             // Show invitation UI
@@ -133,11 +137,17 @@ function App() {
               const notebook = await result.accept();
               setIpynb(notebook);
               setSelectedRepo({ fullName: `${owner}/${repo}`, owner: { login: owner }, name: repo });
+              if (path) {
+                setFilePath(path);
+              }
             }
           } else if (result.document) {
             // Document is already accessible
             setIpynb(result.document);
             setSelectedRepo({ fullName: `${owner}/${repo}`, owner: { login: owner }, name: repo });
+            if (path) {
+              setFilePath(path);
+            }
           }
         } catch (error) {
           console.error('Error handling shared document:', error);
@@ -148,7 +158,7 @@ function App() {
     };
     
     handleSharedDocumentAccess();
-  }, [owner, repo, isAuthenticated]);
+  }, [owner, repo, isAuthenticated, location.pathname]);
 
   const checkLastEditor = (notebook) => {
     if (!notebook?.metadata?.last_editor) return null;
