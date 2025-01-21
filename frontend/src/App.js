@@ -11,6 +11,7 @@ import WarningBanner from './components/WarningBanner';
 import LoginButton from './components/Auth/LoginButton';
 import { GitHubReferenceManager } from './utils/GitHubReferenceManager';
 import { useParams, useLocation } from 'react-router-dom';
+import { Analytics } from '@vercel/analytics/react';
 
 // Import TipTap extensions
 import StarterKit from '@tiptap/starter-kit';
@@ -308,6 +309,7 @@ function App() {
 
   return (
     <div className="App">
+      <Analytics />
       <WarningBanner editors={ipynb?.metadata?.active_editors} currentUser={user} />
       {!isAuthenticated ? (
         <div className="login-container">
