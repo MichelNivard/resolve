@@ -1,6 +1,6 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { AuthContext } from './contexts/AuthContext';
-import { fetchNotebook, fetchRepositories, fetchUser } from './utils/api';
+import { fetchNotebook, fetchRepositories, fetchUser, handleSharedDocument } from './utils/api';
 import { tiptapDocToIpynb } from './utils/notebookConversionUtils';
 import { saveToGitHub } from './utils/savetoGitHub';
 import { getCurrentTime, get30MinutesAgo } from './utils/timeUtils';
