@@ -9,6 +9,11 @@ const ShareModal = ({ isOpen, onClose, repository }) => {
   const [error, setError] = useState(null);
 
   const handleInvite = async () => {
+    if (!repository) {
+      setError('Please select a repository before sharing');
+      return;
+    }
+    
     setIsLoading(true);
     setError(null);
     
@@ -35,47 +40,55 @@ const ShareModal = ({ isOpen, onClose, repository }) => {
         </div>
         
         <div className="modal-body">
-          <div className="input-group">
-            <label htmlFor="username">GitHub Username or Email</label>
-            <input
-              id="username"
-              type="text"
-              placeholder="Enter GitHub username or email"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-            />
-          </div>
-
-          <button 
-            className="invite-button"
-            onClick={handleInvite}
-            disabled={isLoading || !username}
-          >
-            {isLoading ? 'Sending...' : 'Send Invitation'}
-          </button>
-          
-          {error && (
+          {!repository ? (
             <div className="error-message">
-              {error}
+              Please select a repository before sharing
             </div>
-          )}
-          
-          {shareLink && (
-            <div className="share-link-section">
-              <h3>Share Link Generated</h3>
-              <textarea 
-                className="share-text"
-                readOnly 
-                value={shareText}
-                onClick={(e) => e.target.select()}
-              />
+          ) : (
+            <>
+              <div className="input-group">
+                <label htmlFor="username">GitHub Username or Email</label>
+                <input
+                  id="username"
+                  type="text"
+                  placeholder="Enter GitHub username or email"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                />
+              </div>
+
               <button 
-                className="copy-button"
-                onClick={() => navigator.clipboard.writeText(shareText)}
+                className="invite-button"
+                onClick={handleInvite}
+                disabled={isLoading || !username.trim()}
               >
-                Copy Message
+                {isLoading ? 'Sending...' : 'Send Invitation'}
               </button>
-            </div>
+              
+              {error && (
+                <div className="error-message">
+                  {error}
+                </div>
+              )}
+              
+              {shareLink && (
+                <div className="share-link-section">
+                  <h3>Share Link Generated</h3>
+                  <textarea 
+                    className="share-text"
+                    readOnly 
+                    value={shareText}
+                    onClick={(e) => e.target.select()}
+                  />
+                  <button 
+                    className="copy-button"
+                    onClick={() => navigator.clipboard.writeText(shareText)}
+                  >
+                    Copy Message
+                  </button>
+                </div>
+              )}
+            </>
           )}
         </div>
       </div>
