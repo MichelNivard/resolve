@@ -13,11 +13,16 @@ router.post('/invite', async (req, res) => {
   }
 
   try {
-    const octokit = new Octokit({ auth: token });
+    const octokit = new Octokit({ 
+      auth: token,
+      headers: {
+        'X-GitHub-Api-Version': '2022-11-28'
+      }
+    });
     const [owner, repo] = repository.split('/');
     
     // Send GitHub invitation
-    await octokit.repos.addCollaborator({
+    await octokit.request('PUT /repos/{owner}/{repo}/collaborators/{username}', {
       owner,
       repo,
       username,

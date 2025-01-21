@@ -138,3 +138,45 @@
 .copy-button:hover {
   background-color: #2c974b;
 }
+
+.input-separator {
+  text-align: center;
+  margin: 15px 0;
+  position: relative;
+}
+
+.input-separator::before,
+.input-separator::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: 45%;
+  height: 1px;
+  background-color: #ddd;
+}
+
+.input-separator::before {
+  left: 0;
+}
+
+.input-separator::after {
+  right: 0;
+}
+
+.input-separator span {
+  background-color: white;
+  padding: 0 10px;
+  color: #666;
+  font-size: 0.9em;
+}
+
+.input-help {
+  display: block;
+  color: #666;
+  font-size: 0.8em;
+  margin-top: 4px;
+}
+
+.input-group + .input-group {
+  margin-top: 15px;
+}

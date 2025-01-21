@@ -141,7 +141,7 @@ const EditorWrapper = ({
     loadNotebooks();
   }, [selectedRepo, setFilePath]);
 
-  const onLoadFile = async () => {
+ const onLoadFile = async () => {
     try {
       await handleLoadFile();
     } catch (error) {

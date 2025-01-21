@@ -74,14 +74,17 @@ const ShareModal = ({ isOpen, onClose, repository }) => {
           ) : (
             <>
               <div className="input-group">
-                <label htmlFor="username">GitHub Username or Email</label>
+                <label htmlFor="username">GitHub Username</label>
                 <input
                   id="username"
                   type="text"
-                  placeholder="Enter GitHub username or email"
+                  placeholder="Enter GitHub username (not email)"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                 />
+                <small className="input-help">
+                  Please use the GitHub username, not email address. For example: "octocat"
+                </small>
               </div>
 
               <button 
