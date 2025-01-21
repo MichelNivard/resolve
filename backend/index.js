@@ -147,7 +147,8 @@ const protectedRoutes = [
     '/api/repositories',
     '/api/listNotebooks',
     '/api/bibliography/load',
-    '/api/bibliography/save'
+    '/api/bibliography/save',
+    '/api/collaboration'
 ];
 
 // Middleware to check if user is authenticated
