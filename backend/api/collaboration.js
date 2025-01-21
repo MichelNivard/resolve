@@ -10,6 +10,7 @@ async function findGitHubUsername(octokit, email) {
       q: `${email} in:email`,
       per_page: 1,
       headers: {
+        'Accept': 'application/vnd.github+json',
         'X-GitHub-Api-Version': '2022-11-28'
       }
     });
@@ -37,6 +38,7 @@ router.post('/invite', async (req, res) => {
     const octokit = new Octokit({ 
       auth: token,
       headers: {
+        'Accept': 'application/vnd.github+json',
         'X-GitHub-Api-Version': '2022-11-28'
       }
     });
@@ -62,13 +64,22 @@ router.post('/invite', async (req, res) => {
 
     const [owner, repo] = repository.split('/');
     
-    // Send GitHub invitation
-    await octokit.request('PUT /repos/{owner}/{repo}/collaborators/{username}', {
+    // Send GitHub invitation with proper headers
+    const response = await octokit.request('PUT /repos/{owner}/{repo}/collaborators/{username}', {
       owner,
       repo,
       username: targetUsername,
-      permission: 'write'
+      permission: 'write',
+      headers: {
+        'Accept': 'application/vnd.github+json',
+        'X-GitHub-Api-Version': '2022-11-28'
+      }
     });
+
+    // Check response status
+    if (response.status !== 201 && response.status !== 204) {
+      throw new Error(`Unexpected response status: ${response.status}`);
+    }
 
     // Generate share link
     const frontendUrl = process.env.FRONTEND_URL || 'https://resolve.pub';
@@ -101,6 +112,7 @@ router.get('/invitations', async (req, res) => {
     const octokit = new Octokit({ 
       auth: token,
       headers: {
+        'Accept': 'application/vnd.github+json',
         'X-GitHub-Api-Version': '2022-11-28'
       }
     });
@@ -129,6 +141,7 @@ router.post('/accept-invite', async (req, res) => {
     const octokit = new Octokit({ 
       auth: token,
       headers: {
+        'Accept': 'application/vnd.github+json',
         'X-GitHub-Api-Version': '2022-11-28'
       }
     });
