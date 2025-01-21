@@ -129,9 +129,16 @@ const EditorWrapper = ({
           const notebookList = await fetchNotebooksInRepo(selectedRepo.owner.login, selectedRepo.name);
           setNotebooks(notebookList);
           
-          // If we have a filePath from URL, try to load that file
-          if (filePath && !ipynb) {
-            handleLoadFile(filePath);
+          if (filePath) {
+            // If we have a filePath (either from URL or selection), ensure it exists in the notebook list
+            const fileExists = notebookList.some(notebook => notebook.path === filePath);
+            if (fileExists && !ipynb) {
+              // Only load if file exists and no notebook is currently loaded
+              handleLoadFile(filePath);
+            }
+          } else if (notebookList && notebookList.length > 0 && !ipynb) {
+            // If no specific file is requested and we have notebooks, set the first one as default
+            setFilePath(notebookList[0].path);
           }
         } catch (err) {
           setError('Failed to load notebooks');
@@ -140,7 +147,13 @@ const EditorWrapper = ({
       }
     };
     loadNotebooks();
-  }, [selectedRepo, filePath]);
+  }, [selectedRepo]);
+
+  useEffect(() => {
+    if (filePath && selectedRepo && !ipynb) {
+      handleLoadFile(filePath);
+    }
+  }, [filePath, selectedRepo]);
 
  const onLoadFile = async () => {
     try {
