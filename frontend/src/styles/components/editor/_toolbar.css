@@ -73,35 +73,67 @@
   align-items: center;
   gap: 0.5rem;
   padding: 0.5rem 1rem;
-  border: 1px solid rgba(255, 255, 255, 0.6);
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.3);
+  height: 36px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 6px;
+  background-color: #f8f9fa;
   color: rgb(141, 141, 141);
   font-size: 0.95rem;
   font-weight: 500;
   cursor: pointer;
-  backdrop-filter: blur(8px);
-  box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.05);
+  min-width: 120px;
+  justify-content: center;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
   transition: all 0.2s ease;
 }
 
 .action-btn:hover {
-  background: rgba(255, 255, 255, 0.5);
-  box-shadow: 0px 2px 3px rgba(0, 0, 0, 0.08);
+  background-color: #e9ecef;
+}
+
+.action-btn:active {
+  background-color: #dee2e6;
 }
 
 .action-btn.active {
-  background: rgba(255, 255, 255, 0.8);
-  border: 1px solid rgba(255, 255, 255, 0.8);
+  background-color: #e9ecef;
+  border: 1px solid rgba(0, 0, 0, 0.12);
 }
 
+/* Apply action-btn to existing buttons */
 .track-changes-btn,
 .share-btn {
-  composes: action-btn;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  height: 36px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 6px;
+  background-color: #f8f9fa;
+  color: rgb(141, 141, 141);
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  min-width: 120px;
+  justify-content: center;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+  transition: all 0.2s ease;
+}
+
+.track-changes-btn:hover,
+.share-btn:hover {
+  background-color: #e9ecef;
+}
+
+.track-changes-btn:active,
+.share-btn:active {
+  background-color: #dee2e6;
 }
 
 .track-changes-btn.active {
-  background: rgba(255, 255, 255, 0.8);
+  background-color: #e9ecef;
+  border: 1px solid rgba(0, 0, 0, 0.12);
 }
 
 .track-changes-btn span,
