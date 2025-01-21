@@ -112,6 +112,30 @@
   flex-shrink: 0;
 }
 
+.share-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.3);
+  color: rgb(141, 141, 141);
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
+}
+
+.share-btn:hover {
+  background: rgba(255, 255, 255, 0.5);
+  color: rgb(141, 141, 141);
+  box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.1);
+  transform: translateY(-1px);
+}
+
 /* Glass select styling for all toolbar selects */
 .glass-select {
   padding: 0 32px 0 12px;
