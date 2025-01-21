@@ -12,6 +12,7 @@
 }
 
 .modal-content {
+  font-family: var(--ui-font);
   background: white;
   padding: 20px;
   border-radius: 8px;
@@ -28,6 +29,7 @@
 }
 
 .modal-header h2 {
+  font-family: var(--ui-font);
   margin: 0;
   font-size: 1.5rem;
   color: #333;
@@ -63,6 +65,7 @@
 }
 
 .input-group input {
+  font-family: var(--ui-font);
   padding: 8px 12px;
   border: 1px solid #ddd;
   border-radius: 4px;
@@ -70,6 +73,7 @@
 }
 
 .invite-button {
+  font-family: var(--ui-font);
   background-color: #0366d6;
   color: white;
   border: none;
@@ -89,6 +93,7 @@
 }
 
 .error-message {
+  font-family: var(--ui-font);
   color: #d73a49;
   background-color: #ffeef0;
   padding: 10px;
@@ -103,6 +108,7 @@
 }
 
 .share-link-section h3 {
+  font-family: var(--ui-font);
   margin: 0 0 10px 0;
   font-size: 1.1rem;
   color: #24292e;
