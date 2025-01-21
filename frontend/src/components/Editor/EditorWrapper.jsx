@@ -246,7 +246,7 @@ const EditorWrapper = ({
               </button>
             </div>
         </div>
-        {editor && <EditorToolbar editor={editor} />}
+        {editor && <EditorToolbar editor={editor} selectedRepo={selectedRepo} />}
       </header>
 
       <main className="app-main flex-grow overflow-y-auto">

@@ -20,11 +20,18 @@ const ShareModal = ({ isOpen, onClose, repository }) => {
 
   // Check repository when it changes
   useEffect(() => {
+    console.log('ShareModal - repository prop:', repository);
+    console.log('ShareModal - isOpen:', isOpen);
     if (isOpen && repository) {
+      console.log('Setting hasCheckedRepo to true');
       setHasCheckedRepo(true);
       setError(null);
     }
   }, [repository, isOpen]);
+
+  useEffect(() => {
+    console.log('ShareModal - hasCheckedRepo changed to:', hasCheckedRepo);
+  }, [hasCheckedRepo]);
 
   const handleInvite = async () => {
     if (!repository) {
