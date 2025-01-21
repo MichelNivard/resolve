@@ -290,7 +290,7 @@
   padding: 4px;
   font-size: 14px;
   width: 200px;
-  font-family: inherit;
+  font-family: var(--ui-font);
 }
 
 .comment-input:focus {
@@ -532,6 +532,7 @@
 }
 
 .citation-label {
+  font-family: var(--ui-font);
   font-size: 14px;
   color: #666;
   margin-right: 8px;
