@@ -126,7 +126,9 @@ const EditorWrapper = ({
     const loadNotebooks = async () => {
       if (selectedRepo) {
         try {
-          const notebookList = await fetchNotebooksInRepo(selectedRepo.owner.login, selectedRepo.name);
+          // Format repository as "owner/repo"
+          const repository = `${selectedRepo.owner.login}/${selectedRepo.name}`;
+          const notebookList = await fetchNotebooksInRepo(repository);
           setNotebooks(notebookList);
           
           if (filePath && !ipynb) {
