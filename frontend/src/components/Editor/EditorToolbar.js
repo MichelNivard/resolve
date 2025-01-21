@@ -229,8 +229,8 @@ const EditorToolbar = ({ editor, onToggleComments, selectedRepo, filePath }) => 
     <div className="editor-container">
       <div className="modern-toolbar" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
         {/* Undo/Redo */}
-        <button className="toolbar-btn" onClick={handleUndo} title="Undo"><FaUndo /></button>
-        <button className="toolbar-btn" onClick={handleRedo} title="Redo"><FaRedo /></button>
+        <button className="toolbar-btn" onClick={handleUndo} title="Undo"><FaUndo style={{ fontSize: '1.1em' }} /></button>
+        <button className="toolbar-btn" onClick={handleRedo} title="Redo"><FaRedo style={{ fontSize: '1.1em' }} /></button>
         
         {/* Heading Level Select */}
         <div className="toolbar-item">
@@ -280,51 +280,51 @@ const EditorToolbar = ({ editor, onToggleComments, selectedRepo, filePath }) => 
         <div style={{ width:'1px', height:'24px', background:'#ddd', margin:'0 0.5rem' }}></div>
 
         {/* Bold / Italic / Underline / Strike / Highlight */}
-        <button className="toolbar-btn" onClick={handleBold} title="Bold"><FaBold /></button>
-        <button className="toolbar-btn" onClick={handleItalic} title="Italic"><FaItalic /></button>
-        <button className="toolbar-btn" onClick={handleUnderline} title="Underline"><FaUnderline /></button>
-        <button className="toolbar-btn" onClick={handleStrikethrough} title="Strikethrough"><FaStrikethrough /></button>
-        <button className="toolbar-btn" onClick={handleHighlight} title="Highlight"><FaHighlighter /></button>
+        <button className="toolbar-btn" onClick={handleBold} title="Bold"><FaBold style={{ fontSize: '1.1em' }} /></button>
+        <button className="toolbar-btn" onClick={handleItalic} title="Italic"><FaItalic style={{ fontSize: '1.1em' }} /></button>
+        <button className="toolbar-btn" onClick={handleUnderline} title="Underline"><FaUnderline style={{ fontSize: '1.1em' }} /></button>
+        <button className="toolbar-btn" onClick={handleStrikethrough} title="Strikethrough"><FaStrikethrough style={{ fontSize: '1.1em' }} /></button>
+        <button className="toolbar-btn" onClick={handleHighlight} title="Highlight"><FaHighlighter style={{ fontSize: '1.1em' }} /></button>
 
         {/* Separator */}
         <div style={{ width:'1px', height:'24px', background:'#ddd', margin:'0 0.5rem' }}></div>
         
         {/* Image */}
-        <button className="toolbar-btn" onClick={handleInsertImage} title="Insert Image"><FaImage /></button>
+        <button className="toolbar-btn" onClick={handleInsertImage} title="Insert Image"><FaImage style={{ fontSize: '1.1em' }} /></button>
 
         {/* Lists */}
-        <button className="toolbar-btn" onClick={handleBulletList} title="Bulleted List"><FaListUl /></button>
-        <button className="toolbar-btn" onClick={handleOrderedList} title="Numbered List"><FaListOl /></button>
+        <button className="toolbar-btn" onClick={handleBulletList} title="Bulleted List"><FaListUl style={{ fontSize: '1.1em' }} /></button>
+        <button className="toolbar-btn" onClick={handleOrderedList} title="Numbered List"><FaListOl style={{ fontSize: '1.1em' }} /></button>
 
         {/* Table */}
         <div className="table-controls" style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-          <button className="toolbar-btn" onClick={handleInsertTable} title="Insert Table"><BsTable /></button>
-          <button className="toolbar-btn" onClick={handleAddRowAfter} title="Add Row Below"><AiOutlineInsertRowBelow /></button>
+          <button className="toolbar-btn" onClick={handleInsertTable} title="Insert Table"><BsTable style={{ fontSize: '1.1em' }} /></button>
+          <button className="toolbar-btn" onClick={handleAddRowAfter} title="Add Row Below"><AiOutlineInsertRowBelow style={{ fontSize: '1.1em' }} /></button>
           <button className="toolbar-btn" onClick={handleAddRowBefore} title="Add Row Above">
-            <AiOutlineInsertRowBelow style={{ transform: 'rotate(180deg)' }} />
+            <AiOutlineInsertRowBelow style={{ transform: 'rotate(180deg)', fontSize: '1.1em' }} />
           </button>
           <button className="toolbar-btn" onClick={handleDeleteRow} title="Delete Row">
-            <AiOutlineInsertRowBelow style={{ transform: 'rotate(45deg)' }} />
+            <AiOutlineInsertRowBelow style={{ transform: 'rotate(45deg)', fontSize: '1.1em' }} />
           </button>
-          <button className="toolbar-btn" onClick={handleSplitCell} title="Split Cell"><AiOutlineSplitCells /></button>
+          <button className="toolbar-btn" onClick={handleSplitCell} title="Split Cell"><AiOutlineSplitCells style={{ fontSize: '1.1em' }} /></button>
           <button className="toolbar-btn" onClick={handleMergeCells} title="Merge Cells">
-            <AiOutlineSplitCells style={{ transform: 'rotate(90deg)' }} />
+            <AiOutlineSplitCells style={{ transform: 'rotate(90deg)', fontSize: '1.1em' }} />
           </button>
           <button className="toolbar-btn" onClick={handleToggleHeaderRow} title="Toggle Header Row">H↔</button>
         </div>
 
         {/* Track Changes */}
         <button
-          className={`track-changes-btn ${trackChangesEnabled ? 'active' : ''}`}
+          className="track-changes-btn"
           onClick={handleToggleTrackChanges}
           title="Track Changes"
         >
-          {trackChangesEnabled ? (
-            <FaToggleOn style={{ fontSize: '1.2em', color: '#0c0' }} />
-          ) : (
-            <FaToggleOff style={{ fontSize: '1.2em', color: '#ccc' }} />
-          )}
           <span>Track Changes</span>
+          {trackChangesEnabled ? (
+            <FaToggleOn style={{ fontSize: '1.1em' }} />
+          ) : (
+            <FaToggleOff style={{ fontSize: '1.1em' }} />
+          )}
         </button>
 
         {/* Share Button */}
@@ -337,7 +337,7 @@ const EditorToolbar = ({ editor, onToggleComments, selectedRepo, filePath }) => 
           title="Share Document"
         >
           <span>Share Document</span>
-          <FaShare style={{ fontSize: '1.2em' }} />
+          <FaShare style={{ fontSize: '1.1em' }} />
         </button>
       </div>
 
