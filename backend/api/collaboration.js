@@ -49,7 +49,7 @@ router.post('/invite', async (req, res) => {
       targetUsername = await findGitHubUsername(octokit, email);
       if (!targetUsername) {
         return res.status(404).json({ 
-          error: 'User not found', 
+          error: 'User not found based on email, their email may be private on GitHub, use their username instead', 
           details: 'Could not find a GitHub user with this email address' 
         });
       }
