@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { sendCollaborationInvite } from '../../utils/api';
 import '../../styles/components/share/_modal.css';
 
@@ -7,6 +7,24 @@ const ShareModal = ({ isOpen, onClose, repository }) => {
   const [shareLink, setShareLink] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [hasCheckedRepo, setHasCheckedRepo] = useState(false);
+
+  // Reset state when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      setError(null);
+      setShareLink('');
+      setHasCheckedRepo(false);
+    }
+  }, [isOpen]);
+
+  // Check repository when it changes
+  useEffect(() => {
+    if (isOpen && repository) {
+      setHasCheckedRepo(true);
+      setError(null);
+    }
+  }, [repository, isOpen]);
 
   const handleInvite = async () => {
     if (!repository) {
@@ -40,7 +58,9 @@ const ShareModal = ({ isOpen, onClose, repository }) => {
         </div>
         
         <div className="modal-body">
-          {!repository ? (
+          {!hasCheckedRepo ? (
+            <div>Loading...</div>
+          ) : !repository ? (
             <div className="error-message">
               Please select a repository before sharing
             </div>
