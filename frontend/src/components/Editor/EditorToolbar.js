@@ -4,8 +4,7 @@ import {
   FaListUl, FaListOl, FaQuoteRight, FaCode, 
   FaPalette, FaFill, FaComment, FaUndo, FaRedo,
   FaTextHeight, FaHighlighter, FaImage, 
-  FaTable, FaToggleOn,
-  FaToggleOff
+  FaTable, FaToggleOn, FaToggleOff, FaShare
 } from 'react-icons/fa';
 import { BiCodeBlock } from 'react-icons/bi';
 import { MdFormatClear } from 'react-icons/md';
@@ -14,17 +13,17 @@ import { AiOutlineSplitCells, AiOutlineInsertRowBelow } from 'react-icons/ai';
 import { BsTable } from 'react-icons/bs';
 import '../../styles/components/editor/_toolbar.css';
 import { useAuth } from '../../contexts/AuthContext';  
+import ShareModal from '../ShareModal'; // Assuming ShareModal is in the same directory
 
-const EditorToolbar = ({ editor, onToggleComments }) => {
+const EditorToolbar = ({ editor, onToggleComments, selectedRepo }) => {
   const [trackChangesEnabled, setTrackChangesEnabled] = useState(false);
   const [showHeadingMenu, setShowHeadingMenu] = useState(false);
   const [showTextColorMenu, setShowTextColorMenu] = useState(false);
   const [showBgColorMenu, setShowBgColorMenu] = useState(false);
   const [showFontFamilyMenu, setShowFontFamilyMenu] = useState(false);
-
-  // State for the comment dialog
   const [showCommentDialog, setShowCommentDialog] = useState(false);
   const [commentText, setCommentText] = useState('');
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
 
   const headingMenuRef = useRef(null);
   const textColorMenuRef = useRef(null);
@@ -82,23 +81,6 @@ const EditorToolbar = ({ editor, onToggleComments }) => {
     setTrackChangesEnabled(isTracking);
   };
 
-  const handleInsertLink = () => {
-    const url = window.prompt('Enter a URL:');
-    if (url) {
-      editor.chain().focus().extendMarkRange('link').setLink({ href: url }).run();
-    }
-  };
-
-  const handleRemoveLink = () => {
-    editor.chain().focus().unsetLink().run();
-  };
-
-  const handleClearFormatting = () => {
-    editor.chain().focus().unsetAllMarks().clearNodes().run();
-  };
-
-  const handleBlockquote = () => editor.chain().focus().toggleBlockquote().run();
-  const handleCodeBlock = () => editor.chain().focus().toggleCodeBlock().run();
   const handleHighlight = () => editor.chain().focus().toggleHighlight().run();
 
   // Undo/Redo
@@ -345,14 +327,24 @@ const EditorToolbar = ({ editor, onToggleComments }) => {
           <span>Track Changes</span>
         </button>
 
-        <button
-          className="toolbar-btn"
-          onClick={addComment}
-          title="Add Comment"
-        >
-          <FaComment />
-        </button>
+        {/* Share Button */}
+        {selectedRepo && (
+          <button
+            className="toolbar-button"
+            onClick={() => setIsShareModalOpen(true)}
+            title="Share Document"
+          >
+            <FaShare />
+          </button>
+        )}
       </div>
+
+      {/* Modals */}
+      <ShareModal
+        isOpen={isShareModalOpen}
+        onClose={() => setIsShareModalOpen(false)}
+        repository={selectedRepo}
+      />
     </div>
   );
 };

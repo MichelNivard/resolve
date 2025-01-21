@@ -109,14 +109,77 @@ export const fetchNotebooksInRepo = async (repository) => {
 
 export const saveNotebook = async (content, path, repository) => {
   try {
-    const response = await api.post('/api/saveFile', {
-      content,
-      path,
+    const response = await api.post('/api/saveFile', { content, path, repository });
+    return response.data;
+  } catch (error) {
+    console.error('Failed to save notebook:', error);
+    throw error;
+  }
+};
+
+// Collaboration API functions
+export const sendCollaborationInvite = async (username, repository) => {
+  try {
+    const response = await api.post('/api/collaboration/invite', {
+      username,
       repository
     });
     return response.data;
   } catch (error) {
-    console.error('Error saving notebook:', error);
+    console.error('Failed to send invitation:', error);
+    throw error;
+  }
+};
+
+export const getPendingInvitations = async () => {
+  try {
+    const response = await api.get('/api/collaboration/invitations');
+    return response.data;
+  } catch (error) {
+    console.error('Failed to fetch invitations:', error);
+    throw error;
+  }
+};
+
+export const acceptInvitation = async (invitationId) => {
+  try {
+    const response = await api.post('/api/collaboration/accept-invite', {
+      invitationId
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Failed to accept invitation:', error);
+    throw error;
+  }
+};
+
+export const handleSharedDocument = async (owner, repo, path) => {
+  try {
+    // Check for pending invitations
+    const invitations = await getPendingInvitations();
+    const invitation = invitations.find(inv => 
+      inv.repository.full_name === `${owner}/${repo}`
+    );
+    
+    if (invitation) {
+      // Return invitation info for UI handling
+      return {
+        hasInvitation: true,
+        invitation,
+        accept: async () => {
+          await acceptInvitation(invitation.id);
+          return await fetchNotebook(path, `${owner}/${repo}`);
+        }
+      };
+    }
+    
+    // No invitation, just try to load the document
+    return {
+      hasInvitation: false,
+      document: await fetchNotebook(path, `${owner}/${repo}`)
+    };
+  } catch (error) {
+    console.error('Failed to handle shared document:', error);
     throw error;
   }
 };
