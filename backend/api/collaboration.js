@@ -3,9 +3,30 @@ import { Octokit } from '@octokit/rest';
 
 const router = express.Router();
 
+// Helper function to find GitHub username by email
+async function findGitHubUsername(octokit, email) {
+  try {
+    const response = await octokit.request('GET /search/users', {
+      q: `${email} in:email`,
+      per_page: 1,
+      headers: {
+        'X-GitHub-Api-Version': '2022-11-28'
+      }
+    });
+
+    if (response.data.total_count > 0) {
+      return response.data.items[0].login;
+    }
+    return null;
+  } catch (error) {
+    console.error('Error searching for user:', error);
+    return null;
+  }
+}
+
 // Send invitation and generate share link
 router.post('/invite', async (req, res) => {
-  const { username, repository } = req.body;
+  const { username, email, repository } = req.body;
   const token = req.session?.githubToken;
   
   if (!token) {
@@ -19,24 +40,45 @@ router.post('/invite', async (req, res) => {
         'X-GitHub-Api-Version': '2022-11-28'
       }
     });
+
+    // If email is provided, try to find the username
+    let targetUsername = username;
+    if (!username && email) {
+      targetUsername = await findGitHubUsername(octokit, email);
+      if (!targetUsername) {
+        return res.status(404).json({ 
+          error: 'User not found', 
+          details: 'Could not find a GitHub user with this email address' 
+        });
+      }
+    }
+
+    if (!targetUsername) {
+      return res.status(400).json({ 
+        error: 'Invalid input', 
+        details: 'Please provide either a GitHub username or email address' 
+      });
+    }
+
     const [owner, repo] = repository.split('/');
     
     // Send GitHub invitation
     await octokit.request('PUT /repos/{owner}/{repo}/collaborators/{username}', {
       owner,
       repo,
-      username,
+      username: targetUsername,
       permission: 'write'
     });
 
-    // Generate share link - using the frontend URL from env
+    // Generate share link
     const frontendUrl = process.env.FRONTEND_URL || 'https://resolve.pub';
     const shareLink = `${frontendUrl}/document/${owner}/${repo}`;
     
     res.json({ 
       success: true, 
       shareLink,
-      message: `Invitation sent to ${username}`
+      username: targetUsername,
+      message: `Invitation sent to ${targetUsername}`
     });
   } catch (error) {
     console.error('Failed to send invitation:', error);
@@ -56,7 +98,12 @@ router.get('/invitations', async (req, res) => {
   }
 
   try {
-    const octokit = new Octokit({ auth: token });
+    const octokit = new Octokit({ 
+      auth: token,
+      headers: {
+        'X-GitHub-Api-Version': '2022-11-28'
+      }
+    });
     const { data: invitations } = await octokit.repos.listInvitationsForAuthenticatedUser();
     
     res.json(invitations);
@@ -79,7 +126,12 @@ router.post('/accept-invite', async (req, res) => {
   }
 
   try {
-    const octokit = new Octokit({ auth: token });
+    const octokit = new Octokit({ 
+      auth: token,
+      headers: {
+        'X-GitHub-Api-Version': '2022-11-28'
+      }
+    });
     await octokit.repos.acceptInvitation({ invitation_id: invitationId });
     
     res.json({ 

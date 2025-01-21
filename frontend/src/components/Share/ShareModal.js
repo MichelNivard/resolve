@@ -4,6 +4,7 @@ import '../../styles/components/share/_modal.css';
 
 const ShareModal = ({ isOpen, onClose, repository }) => {
   const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [shareLink, setShareLink] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -14,28 +15,28 @@ const ShareModal = ({ isOpen, onClose, repository }) => {
     if (isOpen) {
       setError(null);
       setShareLink('');
+      setUsername('');
+      setEmail('');
       setHasCheckedRepo(false);
     }
   }, [isOpen]);
 
   // Check repository when it changes
   useEffect(() => {
-    console.log('ShareModal - repository prop:', repository);
-    console.log('ShareModal - isOpen:', isOpen);
     if (isOpen && repository) {
-      console.log('Setting hasCheckedRepo to true');
       setHasCheckedRepo(true);
       setError(null);
     }
   }, [repository, isOpen]);
 
-  useEffect(() => {
-    console.log('ShareModal - hasCheckedRepo changed to:', hasCheckedRepo);
-  }, [hasCheckedRepo]);
-
   const handleInvite = async () => {
     if (!repository) {
       setError('Please select a repository before sharing');
+      return;
+    }
+
+    if (!username && !email) {
+      setError('Please provide either a GitHub username or email address');
       return;
     }
     
@@ -43,8 +44,11 @@ const ShareModal = ({ isOpen, onClose, repository }) => {
     setError(null);
     
     try {
-      const result = await sendCollaborationInvite(username, repository);
+      const result = await sendCollaborationInvite(username, email, repository);
       setShareLink(result.shareLink);
+      if (result.username !== username) {
+        setUsername(result.username); // Update username if it was found via email
+      }
     } catch (error) {
       setError(error.response?.data?.error || 'Failed to send invitation');
     } finally {
@@ -74,23 +78,47 @@ const ShareModal = ({ isOpen, onClose, repository }) => {
           ) : (
             <>
               <div className="input-group">
-                <label htmlFor="username">GitHub Username</label>
+                <label htmlFor="username">GitHub Username (recommended)</label>
                 <input
                   id="username"
                   type="text"
-                  placeholder="Enter GitHub username (not email)"
+                  placeholder="Enter GitHub username"
                   value={username}
-                  onChange={(e) => setUsername(e.target.value)}
+                  onChange={(e) => {
+                    setUsername(e.target.value);
+                    if (e.target.value) setEmail(''); // Clear email if username is entered
+                  }}
                 />
                 <small className="input-help">
-                  Please use the GitHub username, not email address. For example: "octocat"
+                  For example: "octocat"
+                </small>
+              </div>
+
+              <div className="input-separator">
+                <span>OR</span>
+              </div>
+
+              <div className="input-group">
+                <label htmlFor="email">GitHub Email Address</label>
+                <input
+                  id="email"
+                  type="email"
+                  placeholder="Enter GitHub email address"
+                  value={email}
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                    if (e.target.value) setUsername(''); // Clear username if email is entered
+                  }}
+                />
+                <small className="input-help">
+                  We'll look up the GitHub username associated with this email
                 </small>
               </div>
 
               <button 
                 className="invite-button"
                 onClick={handleInvite}
-                disabled={isLoading || !username.trim()}
+                disabled={isLoading || (!username.trim() && !email.trim())}
               >
                 {isLoading ? 'Sending...' : 'Send Invitation'}
               </button>
