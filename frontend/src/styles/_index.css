@@ -117,8 +117,8 @@
   bottom: 0;
   background-color: rgba(0, 0, 0, 0.5);
   display: none;  /* Hide by default */
-  justify-content: left;
-  align-items: left;
+  justify-self: center;
+  align-items: center;
   z-index: 1000;
 }
 
@@ -136,6 +136,7 @@
   overflow-y: auto;
   position: relative;
   margin: 20px;
+  align-content: left;
 }
 
 .close-button {
