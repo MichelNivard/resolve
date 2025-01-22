@@ -94,7 +94,7 @@
 }
 
 .privacy-notice {
-  text-align: center;
+  text-align: left;
   margin-top: 1rem;
 }
 
@@ -136,7 +136,7 @@
   overflow-y: auto;
   position: relative;
   margin: 20px;
-  align-content: left;
+  align-self: center;
 }
 
 .close-button {
