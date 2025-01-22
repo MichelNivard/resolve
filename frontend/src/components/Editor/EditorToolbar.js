@@ -262,13 +262,12 @@ const EditorToolbar = ({ editor, onToggleComments, selectedRepo, filePath }) => 
             onChange={(e) => setFontFamily(e.target.value)}
             className="glass-select"
             title="Font Family"
-            style={{ fontFamily: 'var(--ui-font)' }}
           >
             {fontFamilies.map((font) => (
               <option 
                 key={font.name} 
                 value={font.value}
-                style={{ fontFamily: font.value }}
+                style={{ fontFamily: font.value.replace('var(--editor-font-', '').replace(')', '') }}
               >
                 {font.name}
               </option>
