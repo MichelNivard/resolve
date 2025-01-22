@@ -81,7 +81,7 @@
   font-size: 0.95rem;
   font-weight: 500;
   cursor: pointer;
-  min-width: 120px;
+  min-width: 100px;
   justify-content: center;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
   transition: all 0.2s ease;
@@ -107,15 +107,15 @@
   align-items: center;
   gap: 0.5rem;
   padding: 0.5rem 1rem;
-  height: 36px;
+  height: 32px;
   border: 1px solid rgba(0, 0, 0, 0.08);
   border-radius: 6px;
   background-color: #f8f9fa;
   color: rgb(141, 141, 141);
-  font-size: 0.95rem;
+  font-size: 11px;
   font-weight: 500;
   cursor: pointer;
-  min-width: 120px;
+  min-width: 100px;
   justify-content: center;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
   transition: all 0.2s ease;
@@ -128,11 +128,11 @@
 
 .track-changes-btn:active,
 .share-btn:active {
-  background-color: #dee2e6;
+  background-color: #36ff47;
 }
 
 .track-changes-btn.active {
-  background-color: #e9ecef;
+  background-color: #36ff47;
   border: 1px solid rgba(0, 0, 0, 0.12);
 }
 
@@ -152,14 +152,14 @@
   border: 1px solid rgba(0, 0, 0, 0.1);
   border-radius: 6px;
   background: #fff;
-  font-size: 14px;
+  font-size: 11px;
   color: #333;
   height: 32px;
   display: inline-flex;
   align-items: center;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
   cursor: pointer;
-  min-width: 120px;
+  min-width: 100px;
   appearance: none;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23333' d='M2.9 4h6.2L6 8 2.9 4z'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
@@ -175,5 +175,5 @@
 
 .glass-select option {
   padding: 8px;
-  font-size: 14px;
+  font-size: 11px;
 }
