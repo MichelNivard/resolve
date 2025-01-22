@@ -46,7 +46,9 @@
    - Enter a valid DOI to automatically add a reference 
    - The system will automatically update your `references.bib` file
 
-   ![citation](image.png)
+   <p align="center">
+   ![citation](assets/image.png)
+   </p>
 
 ### Citation Syntax
 1. In markdown cells:
@@ -59,17 +61,21 @@
 2. You can:
    - Select text and a comment icon will appear
 
-   ![alt text](image-1.png)
+   <p align="center">
+   ![alt text](assets/image-1.png)
+   </p>
 
    - Enter your comment in the textfield
 
-   ![alt text](image-2.png)
+   <p align="center">
+   ![alt text](assets/image-2.png)
+   </p>
 
    - The comment will be added to the selected text and appear in the sidebar.
 
-   ![alt text](image-3.png)
-
-
+   <p align="center">
+   ![alt text](assets/image-3.png)
+   </p>
 
 
 
@@ -81,7 +87,9 @@ Resolve does **not** support simultaneous collaborative editing. Instead:
 - This presence detection helps prevent concurrent editing conflicts
 - Only one user should edit the document at a time
 
-![alt text](image-4.png)
+<p align="center">
+![alt text](assets/image-4.png)
+</p>
 
 ### Track Changes
 1. **Activating Track Changes**
@@ -89,14 +97,17 @@ Resolve does **not** support simultaneous collaborative editing. Instead:
    - When activated, all your edits will be marked as suggestions
    - Track changes mode is indicated by a highlighted icon in the toolbar
 
-   ![alt text](image-5.png)
+   <p align="center">
+   ![alt text](assets/image-5.png)
+   </p>
 
 2. **Working with Track Changes**
    - Added text appears in a different color (in blue)
    - Deleted text appears struck through (in red)
 
-![alt text](image-6.png)
-
+<p align="center">
+![alt text](assets/image-6.png)
+</p>
 
 3. **Reviewing Changes**
 
@@ -111,8 +122,9 @@ Resolve does **not** support simultaneous collaborative editing. Instead:
    - Invite collaborators through GitHub Usernames
    - Share direct links to the document
 
-![alt text](image-7.png)
-
+<p align="center">
+![alt text](assets/image-7.png)
+</p>
 
 ## Best Practices
 1. Always ensure your `references.bib` file is up to date
