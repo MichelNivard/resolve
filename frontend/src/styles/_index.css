@@ -94,7 +94,7 @@
 }
 
 .privacy-notice {
-  text-align: left;
+  text-align: center;
   margin-top: 1rem;
 }
 
@@ -118,7 +118,8 @@
   background-color: rgba(0, 0, 0, 0.5);
   display: none;  /* Hide by default */
   justify-self: center;
-  align-items: center;
+  justify-content: left;
+  align-content: left;
   z-index: 1000;
 }
 
@@ -136,7 +137,7 @@
   overflow-y: auto;
   position: relative;
   margin: 20px;
-  align-self: center;
+  align-self: left;
 }
 
 .close-button {
