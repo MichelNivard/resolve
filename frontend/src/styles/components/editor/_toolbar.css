@@ -111,7 +111,7 @@
   border: 1px solid rgba(0, 0, 0, 0.08);
   border-radius: 6px;
   background-color: #f8f9fa;
-  color: rgb(141, 141, 141);
+  color: rgb(40, 136, 56);
   font-size: 11px;
   font-weight: 500;
   cursor: pointer;
@@ -128,17 +128,18 @@
 
 .track-changes-btn:active,
 .share-btn:active {
-  background-color: #36ff47;
+  background-color: #c8f3cc;
 }
 
 .track-changes-btn.active {
-  background-color: #36ff47;
+  background-color: #c8f3cc;
   border: 1px solid rgba(0, 0, 0, 0.12);
 }
 
 .track-changes-btn span,
 .share-btn span {
-  font-size: 0.95rem;
+  font-size: 0.75rem;
+  color: rgb(117, 117, 117);
 }
 
 .toolbar-item {
