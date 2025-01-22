@@ -16,7 +16,6 @@ const LoginButton = () => {
   };
 
   return (
-    <div className="login-container">
       <div className="login-card">
       <p>
         Resolve is your seamless solution for collaborating on Quarto and Jupyter (`.ipynb`) documents. To get started, please sign in with your GitHub account.
@@ -118,8 +117,7 @@ const LoginButton = () => {
           </div>
         </div>
       </div>
-    </div>
-    </div>  
+    </div> 
   );
 };
 
