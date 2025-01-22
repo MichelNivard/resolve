@@ -116,10 +116,15 @@
   right: 0;
   bottom: 0;
   background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  display: none;  /* Hide by default */
+  justify-content: left;
+  align-items: left;
   z-index: 1000;
+}
+
+.privacy-modal[style*="display: block"],
+.privacy-modal:not([style*="display: none"]) {
+  display: flex;  /* Only show when active */
 }
 
 .privacy-modal-content {
