@@ -77,7 +77,7 @@ app.options('*', cors(corsOptions));
 app.use(session({
   store: new FileStoreSession({
     path: './sessions',
-    ttl: 86400, // 1 day in seconds
+    ttl: 43200, // 12 hours in seconds
     retries: 0,
     reapInterval: 3600, // 1 hour in seconds
     logFn: () => {}, // Disable verbose logging
@@ -90,7 +90,7 @@ app.use(session({
   cookie: {
     secure: true, // Always use secure in production
     httpOnly: true,
-    maxAge: 24 * 60 * 60 * 1000, // 24 hours
+    maxAge: 12 * 60 * 60 * 1000, // 12 hours
     sameSite: 'none', // Required for cross-domain
     domain: '.resolve.pub' // Allow sharing between subdomains
   },

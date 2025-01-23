@@ -44,7 +44,7 @@ export const sessionConfig = {
         secure: true,
         sameSite: 'none',
         domain: '.resolve.pub',
-        maxAge: 24 * 60 *60 * 1000 // 24 hours
+        maxAge: 12 * 60 *60 * 1000 // 12 hours
     }
 };
 
