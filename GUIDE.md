@@ -47,7 +47,7 @@
    - The system will automatically update your `references.bib` file
 
    <p align="center">
-   <img src="assets/image.png" alt="citation">
+   <img src="https://github.com/MichelNivard/resolve/blob/master/assets/image.png?raw=true" alt="citation">
    </p>
 
 ### Citation Syntax
@@ -62,19 +62,19 @@
    - Select text and a comment icon will appear
 
    <p align="center">
-   <img src="assets/image-1.png" alt="Comment icon appears on text selection">
+   <img src="https://github.com/MichelNivard/resolve/blob/master/assets/image-1.png?raw=true" alt="Comment icon appears on text selection">
    </p>
 
    - Enter your comment in the textfield
 
    <p align="center">
-   <img src="assets/image-2.png" alt="Comment text field">
+   <img src="https://github.com/MichelNivard/resolve/blob/master/assets/image-2.png?raw=true" alt="Comment text field">
    </p>
 
    - The comment will be added to the selected text and appear in the sidebar.
 
    <p align="center">
-   <img src="assets/image-3.png" alt="Comment in sidebar">
+   <img src="https://github.com/MichelNivard/resolve/blob/master/assets/image-3.png?raw=true" alt="Comment in sidebar">
    </p>
 
 
@@ -88,7 +88,7 @@ Resolve does **not** support simultaneous collaborative editing. Instead:
 - Only one user should edit the document at a time
 
 <p align="center">
-<img src="assets/image-4.png" alt="User presence indication">
+<img src="https://github.com/MichelNivard/resolve/blob/master/assets/image-4.png?raw=true" alt="User presence indication">
 </p>
 
 ### Track Changes
@@ -98,7 +98,7 @@ Resolve does **not** support simultaneous collaborative editing. Instead:
    - Track changes mode is indicated by a highlighted icon in the toolbar
 
    <p align="center">
-   <img src="assets/image-5.png" alt="Track changes activation">
+   <img src="https://github.com/MichelNivard/resolve/blob/master/assets/image-5.png?raw=true" alt="Track changes activation">
    </p>
 
 2. **Working with Track Changes**
@@ -106,7 +106,7 @@ Resolve does **not** support simultaneous collaborative editing. Instead:
    - Deleted text appears struck through (in red)
 
 <p align="center">
-<img src="assets/image-6.png" alt="Track changes example">
+<img src="https://github.com/MichelNivard/resolve/blob/master/assets/image-6.png?raw=true" alt="Track changes example">
 </p>
 
 3. **Reviewing Changes**
@@ -123,7 +123,7 @@ Resolve does **not** support simultaneous collaborative editing. Instead:
    - Share direct links to the document
 
 <p align="center">
-<img src="assets/image-7.png" alt="Share document dialog">
+<img src="https://github.com/MichelNivard/resolve/blob/master/assets/image-7.png?raw=true" alt="Share document dialog">
 </p>
 
 ## Best Practices
