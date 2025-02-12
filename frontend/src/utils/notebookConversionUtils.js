@@ -81,7 +81,8 @@ export function ipynbToTiptapDoc(ipynb, editor) {
     } else if (cell.type === 'markdown') {
       if (cell.tiptapContent) {
         console.log('Raw tiptapContent:', cell.tiptapContent);
-        const content = cell.tiptapContent.content.map((node, pos) => {
+        // Process each node in the tiptapContent while preserving its original structure
+        const processNodes = (nodes) => nodes.map((node, pos) => {
           console.log('Processing node:', node);
           const processedNode = { ...node };
           
@@ -89,41 +90,37 @@ export function ipynbToTiptapDoc(ipynb, editor) {
             console.log('Processing marks for node:', node.marks);
             processedNode.marks = node.marks.map(mark => {
               console.log('Processing mark:', mark);
-              if (mark.type === 'comment' || mark.type === 'insertion' || mark.type === 'deletion') {
-                console.log('Found mark of type:', mark.type, 'with attrs:', mark.attrs);
-                const markType = editor.schema.marks[mark.type];
-                if (!markType) {
-                  console.error('Mark type not found in schema:', mark.type);
-                  return null;
-                }
-                
-                if (mark.type === 'comment') {
-                  const attrs = {
-                    commentId: mark.attrs.commentId || `comment-${Date.now()}-${Math.random().toString(36).substr(2, 9)}-${pos}`,
-                    username: mark.attrs.username || 'Unknown',
-                    avatarUrl: mark.attrs.avatarUrl || '',
-                    text: mark.attrs.text || '',
-                    timestamp: mark.attrs.timestamp || new Date().toISOString(),
-                    resolved: mark.attrs.resolved || false,
-                    ...mark.attrs
-                  };
-                  return {
-                    type: markType.name,
-                    attrs
-                  };
-                }
-                
+              // Special handling for comment marks
+              if (mark.type === 'comment') {
+                const attrs = {
+                  commentId: mark.attrs.commentId || `comment-${Date.now()}-${Math.random().toString(36).substr(2, 9)}-${pos}`,
+                  username: mark.attrs.username || 'Unknown',
+                  avatarUrl: mark.attrs.avatarUrl || '',
+                  text: mark.attrs.text || '',
+                  timestamp: mark.attrs.timestamp || new Date().toISOString(),
+                  resolved: mark.attrs.resolved || false,
+                  ...mark.attrs
+                };
                 return {
                   type: mark.type,
-                  attrs: mark.attrs
+                  attrs
                 };
               }
+              // For all other marks, preserve them as is
               return mark;
             }).filter(Boolean);
           }
+          
+          // Recursively process any nested content
+          if (node.content) {
+            processedNode.content = processNodes(node.content);
+          }
+          
           return processedNode;
         });
-        docNodes.push(...content);
+        
+        // Process and add the nodes while maintaining their original structure
+        docNodes.push(...processNodes(cell.tiptapContent.content));
       } else {
         // Convert markdown to HTML, then to TipTap JSON
         const html = markdownToHtml(cell.content);
