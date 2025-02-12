@@ -242,7 +242,12 @@ export function tiptapDocToIpynb(editor, originalIpynb) {
       cells.push({ 
         cell_type: 'markdown',  
         source: processedContent.split('\n').map(line => line + '\n'),  
-        metadata: {}  
+        metadata: {
+          tiptapContent: {
+            type: 'doc',
+            content: currentMarkdownNodes
+          }
+        }   
       });
       currentMarkdownNodes = [];
     }
