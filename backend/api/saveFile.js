@@ -37,21 +37,29 @@ router.post('/', async (req, res) => {
 
     const octokit = new Octokit({ auth: token });
 
-    // Try to get the current file to get its SHA
-    let sha;
-    try {
-      const { data: existingFile } = await octokit.repos.getContent({
-        owner,
-        repo,
-        path: sanitizedPath,
-      });
-      sha = existingFile.sha;
-    } catch (error) {
-      if (error.status !== 404) {
-        throw error;
-      }
-      // File doesn't exist yet, which is fine
-    }
+    // Get default branch
+    const { data: repo_data } = await octokit.repos.get({
+      owner,
+      repo
+    });
+    const defaultBranch = repo_data.default_branch;
+
+    // Get the latest commit SHA from the default branch
+    const { data: ref } = await octokit.git.getRef({
+      owner,
+      repo,
+      ref: `heads/${defaultBranch}`
+    });
+    const baseSha = ref.object.sha;
+
+    // Create a new branch
+    const newBranchName = `update-${sanitizedPath.replace(/\//g, '-')}-${Date.now()}`;
+    await octokit.git.createRef({
+      owner,
+      repo,
+      ref: `refs/heads/${newBranchName}`,
+      sha: baseSha
+    });
 
     // Prepare the content
     let fileContent;
@@ -66,19 +74,51 @@ router.post('/', async (req, res) => {
       return res.status(400).json({ error: 'Invalid content format' });
     }
 
-    // Create or update file
-    const response = await octokit.repos.createOrUpdateFileContents({
+    // Create or update file in the new branch
+    await octokit.repos.createOrUpdateFileContents({
       owner,
       repo,
       path: sanitizedPath,
-      message: sha ? 'Update notebook' : 'Create notebook',
+      message: 'Update content',
       content: Buffer.from(fileContent).toString('base64'),
-      ...(sha && { sha })
+      branch: newBranchName
     });
+
+    // Create a pull request
+    const { data: pr } = await octokit.pulls.create({
+      owner,
+      repo,
+      title: `Update ${sanitizedPath}`,
+      head: newBranchName,
+      base: defaultBranch,
+      body: 'Automated update of content'
+    });
+
+
+
+    // If there are no conflicts, merge immediately
+    const { data: prCheck } = await octokit.pulls.get({
+      owner,
+      repo,
+      pull_number: pr.number
+    });
+
+    if (prCheck.mergeable && !prCheck.merged) {
+      await octokit.pulls.merge({
+        owner,
+        repo,
+        pull_number: pr.number,
+        merge_method: 'squash'
+      });
+    }
 
     res.json({ 
       success: true, 
-      data: response.data
+      data: {
+        pr_url: pr.html_url,
+        branch: newBranchName,
+        status: prCheck.mergeable ? 'merged' : 'pending_review'
+      }
     });
 
   } catch (error) {
