@@ -33,7 +33,7 @@ export function ipynbToTiptapDoc(ipynb, editor) {
   
   const wasEnabled = trackChangeExtension?.options.enabled;
   if (wasEnabled) {
-    editor.commands.setTrackChangeStatus(false);
+  //  editor.commands.setTrackChangeStatus(false);
   }
 
   // Parse ipynb if it's a string
