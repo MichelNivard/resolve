@@ -6,11 +6,7 @@ const router = express.Router();
 // Redirect user to GitHub OAuth
 router.get('/', (req, res) => {
   try {
-    console.log('Environment variables check:', {
-      hasClientId: !!process.env.GITHUB_CLIENT_ID,
-      hasRedirectUri: !!process.env.REDIRECT_URI,
-      redirectUri: process.env.REDIRECT_URI
-    });
+    console.log('Initiating GitHub OAuth flow');
 
     const params = new URLSearchParams({
       client_id: process.env.GITHUB_CLIENT_ID,
@@ -18,21 +14,17 @@ router.get('/', (req, res) => {
       scope: 'repo'
     }).toString();
     
-    console.log('Redirecting to GitHub with params:', params);
+    console.log('Redirecting to GitHub with params');
     res.redirect(`https://github.com/login/oauth/authorize?${params}`);
   } catch (error) {
-    console.error('Error in auth redirect:', error);
+    console.error('Error in auth redirect:', error.message);
     res.status(500).json({ error: 'Failed to initiate GitHub OAuth' });
   }
 });
 
 // Add a route to check session status
 router.get('/check', (req, res) => {
-  console.log('Session check:', {
-    hasSession: !!req.session,
-    sessionID: req.sessionID,
-    githubToken: !!req.session?.githubToken
-  });
+  console.log('Processing session check request');
   res.json({ 
     authenticated: !!req.session?.githubToken,
     sessionID: req.sessionID
@@ -67,7 +59,7 @@ router.get('/callback', async (req, res) => {
     const { access_token } = tokenResponse.data;
 
     if (!access_token) {
-      console.error('No access token received:', tokenResponse.data);
+      console.error('GitHub OAuth: Failed to get access token');
       return res.status(400).json({ error: 'Failed to get access token' });
     }
 
@@ -77,14 +69,13 @@ router.get('/callback', async (req, res) => {
     // Save session explicitly
     req.session.save((err) => {
       if (err) {
-        console.error('Error saving session:', err);
+        console.error('Error saving session:', err.message);
         return res.status(500).json({ error: 'Failed to save session' });
       }
       
-      console.log('Session saved successfully:', {
-        sessionID: req.sessionID,
-        hasToken: !!req.session.githubToken
-      });
+      console.log('Session saved successfully');
+
+      console.log('Authentication successful');
 
       // Redirect to frontend
       const frontendUrl = process.env.FRONTEND_URL || 'https://resolve.pub';
@@ -92,25 +83,23 @@ router.get('/callback', async (req, res) => {
       res.redirect(frontendUrl);
     });
   } catch (error) {
-    console.error('Error in auth callback:', error);
+    console.error('Error in auth callback:', error.message);
     res.status(500).json({ error: 'Authentication failed' });
   }
 });
 
 // Add logout endpoint
 router.post('/logout', (req, res) => {
-  console.log('Logging out user:', {
-    sessionID: req.sessionID,
-    hasToken: !!req.session?.githubToken
-  });
+  console.log('Processing logout request');
 
   req.session.destroy((err) => {
     if (err) {
-      console.error('Error destroying session:', err);
-      return res.status(500).json({ error: 'Failed to logout' });
+      console.error('Error during logout:', err.message);
+      return res.status(500).json({ error: 'Logout failed' });
     }
+    console.log('User logged out successfully');
     res.clearCookie('sessionId');
-    res.json({ message: 'Logged out successfully' });
+    res.json({ success: true });
   });
 });
 
