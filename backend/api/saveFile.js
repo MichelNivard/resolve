@@ -108,20 +108,41 @@ router.post('/', async (req, res) => {
       body: 'Automated update of content'
     });
 
-    // If there are no conflicts, merge immediately
-    const { data: prCheck } = await octokit.pulls.get({
-      owner,
-      repo,
-      pull_number: pr.number
-    });
+    // Function to check PR status with retries
+    const checkPRStatus = async (maxRetries = 3, delay = 1000) => {
+      for (let i = 0; i < maxRetries; i++) {
+        const { data: prCheck } = await octokit.pulls.get({
+          owner,
+          repo,
+          pull_number: pr.number
+        });
 
-    if (prCheck.mergeable && !prCheck.merged) {
-      await octokit.pulls.merge({
-        owner,
-        repo,
-        pull_number: pr.number,
-        merge_method: 'squash'
-      });
+        // If mergeable is null, GitHub is still computing the status
+        if (prCheck.mergeable === null) {
+          await new Promise(resolve => setTimeout(resolve, delay));
+          continue;
+        }
+
+        return prCheck;
+      }
+      return null;
+    };
+
+    // Check PR status with retries
+    const prCheck = await checkPRStatus();
+
+    if (prCheck?.mergeable && !prCheck.merged) {
+      try {
+        await octokit.pulls.merge({
+          owner,
+          repo,
+          pull_number: pr.number,
+          merge_method: 'squash'
+        });
+        console.log('Pull request merged successfully');
+      } catch (mergeError) {
+        console.error('Error merging pull request:', mergeError.message);
+      }
     }
 
     res.json({ 
@@ -129,7 +150,7 @@ router.post('/', async (req, res) => {
       data: {
         pr_url: pr.html_url,
         branch: newBranchName,
-        status: prCheck.mergeable ? 'merged' : 'pending_review'
+        status: prCheck?.mergeable ? 'merged' : 'pending_review'
       }
     });
 
