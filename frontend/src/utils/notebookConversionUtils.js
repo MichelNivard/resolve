@@ -48,8 +48,8 @@ export function ipynbToTiptapDoc(ipynb, editor) {
   const docNodes = [];
 
   // Create a transaction to set content with marks preserved
-  const tr = editor.state.tr;
-  tr.setMeta('trackManualChanged', true);
+ //  const tr = editor.state.tr;
+ // tr.setMeta('trackManualChanged', true);
 
   for (const cell of cells) {
     if (cell.type === 'raw') {
