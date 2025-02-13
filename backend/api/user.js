@@ -4,11 +4,7 @@ import { Octokit } from '@octokit/rest';
 const router = express.Router();
 
 router.get('/', async (req, res) => {
-  console.log('Incoming request to /api/user with session:', {
-    hasSession: !!req.session,
-    sessionID: req.sessionID,
-    hasToken: !!req.session?.githubToken
-  });
+  console.log('Incoming request to /api/user with session');
   
   const token = req.session?.githubToken;
   
@@ -22,7 +18,6 @@ router.get('/', async (req, res) => {
 
     // Fetch the authenticated user's details
     const { data } = await octokit.users.getAuthenticated();
-    console.log('GitHub user data:', data);
 
     // Send back the user information
     res.json({ 

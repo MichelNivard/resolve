@@ -29,11 +29,7 @@ router.post('/', async (req, res) => {
       return res.status(400).json({ error: 'Invalid file path' });
     }
 
-    console.log('Saving file with session token:', {
-      sessionID: req.sessionID,
-      path: sanitizedPath,
-      repository: `${owner}/${repo}`
-    });
+    console.log('Saving file with session token');
 
     const octokit = new Octokit({ auth: token });
 

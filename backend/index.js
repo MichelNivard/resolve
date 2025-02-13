@@ -13,16 +13,12 @@ import { createRateLimiter, secureCookies, validateToken } from './middleware/se
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const envPath = path.resolve(__dirname, '.env');
-console.log('Loading .env file from:', envPath);
+console.log('Loading .env file');
 dotenv.config({ path: envPath });
 
 const FileStoreSession = FileStore(session);
 
-console.log('Environment variables loaded:', {
-  hasGithubClientId: !!process.env.GITHUB_CLIENT_ID,
-  hasGithubClientSecret: !!process.env.GITHUB_CLIENT_SECRET,
-  hasRedirectUri: !!process.env.REDIRECT_URI
-});
+console.log('Environment variables loaded');
 
 const authRoute = await import('./api/auth.js');
 const userRoute = await import('./api/user.js');
@@ -129,11 +125,6 @@ app.use((req, res, next) => {
 
 // Debug middleware for session
 app.use((req, res, next) => {
-  console.log('Session Debug:', {
-    hasSession: !!req.session,
-    sessionID: req.sessionID,
-    githubToken: !!req.session?.githubToken
-  });
   next();
 });
 
@@ -185,4 +176,4 @@ app.use((err, req, res, next) => {
 });
 
 const PORT = process.env.PORT || 3001;
-app.listen(PORT, () => console.log(`Backend running on port ${PORT}`));
+app.listen(PORT, () => console.log(`Backend running`));
