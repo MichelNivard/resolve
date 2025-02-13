@@ -109,10 +109,13 @@ export function ipynbToTiptapDoc(ipynb, editor) {
               // Special handling for track change marks
               if (mark.type === 'insertion' || mark.type === 'deletion') {
                 console.log('Processing track change mark:', mark);
+                const date = typeof mark.attrs['data-op-date'] === 'number' 
+                  ? new Date(mark.attrs['data-op-date']).toISOString()
+                  : mark.attrs['data-op-date'] || '';
                 const attrs = {
                   'data-op-user-id': mark.attrs['data-op-user-id'] || 'Unknown',
                   'data-op-user-nickname': mark.attrs['data-op-user-nickname'] || 'Unknown User',
-                  'data-op-date': mark.attrs['data-op-date'] || '',  
+                  'data-op-date': date,
                   ...mark.attrs
                 };
                 console.log('Processed track change attrs:', attrs);
