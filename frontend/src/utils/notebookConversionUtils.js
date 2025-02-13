@@ -106,6 +106,21 @@ export function ipynbToTiptapDoc(ipynb, editor) {
                   attrs
                 };
               }
+              // Special handling for track change marks
+              if (mark.type === 'insertion' || mark.type === 'deletion') {
+                console.log('Processing track change mark:', mark);
+                const attrs = {
+                  'data-op-user-id': mark.attrs['data-op-user-id'] || 'Unknown',
+                  'data-op-user-nickname': mark.attrs['data-op-user-nickname'] || 'Unknown User',
+                  'data-op-date': mark.attrs['data-op-date'] || new Date().toISOString(),
+                  ...mark.attrs
+                };
+                console.log('Processed track change attrs:', attrs);
+                return {
+                  type: mark.type,
+                  attrs
+                };
+              }
               // For all other marks, preserve them as is
               return mark;
             }).filter(Boolean);
