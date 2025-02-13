@@ -119,6 +119,7 @@ export function ipynbToTiptapDoc(ipynb, editor) {
                   'data-op-user-nickname': mark.attrs['data-op-user-nickname'] || 'Unknown User',
                   'data-op-date': date,  // Use the processed date
                 };
+                console.log('Final attrs:', attrs);
                 return {
                   type: mark.type,
                   attrs
