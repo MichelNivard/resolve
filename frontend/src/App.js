@@ -98,10 +98,7 @@ function App() {
         TableRow,
         TableCell,
         TableHeader,
-        TrackChangeExtension.configure({
-          enabled: false,
-          onStatusChange: handleTrackChangesToggle
-        }),
+        TrackChangeExtension,
         CommentMark.configure({
           HTMLAttributes: {
             class: 'comment-mark',
@@ -121,7 +118,7 @@ function App() {
       const updatedEditors = ipynb.metadata.active_editors.filter(
         editor => isWithin30Minutes(editor.timestamp)
       );
-      
+
       if (updatedEditors.length < ipynb.metadata.active_editors.length) {
         const updatedIpynb = { ...ipynb };
         updatedIpynb.metadata.active_editors = updatedEditors;
