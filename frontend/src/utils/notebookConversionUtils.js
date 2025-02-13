@@ -115,8 +115,7 @@ export function ipynbToTiptapDoc(ipynb, editor) {
                 const attrs = {
                   'data-op-user-id': mark.attrs['data-op-user-id'] || 'Unknown',
                   'data-op-user-nickname': mark.attrs['data-op-user-nickname'] || 'Unknown User',
-                  'data-op-date': '',
-                  ...mark.attrs
+                  'data-op-date': ''
                 };
                 console.log('Processed track change attrs:', attrs);
                 return {
