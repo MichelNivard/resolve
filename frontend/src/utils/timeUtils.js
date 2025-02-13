@@ -1,9 +1,9 @@
 // Utility function to get the current time in ISO format
-export const getCurrentTime = () => "2024-12-23T14:45:29+01:00";
+export const getCurrentTime = () => new Date().toISOString();
 
 // Utility function to check if a timestamp is within the last 30 minutes
 export const isWithin30Minutes = (timestamp) => {
-  const now = new Date(getCurrentTime());
+  const now = new Date();
   const time = new Date(timestamp);
   const diffMinutes = (now.getTime() - time.getTime()) / (1000 * 60);
   return diffMinutes <= 30;
@@ -11,7 +11,7 @@ export const isWithin30Minutes = (timestamp) => {
 
 // Get timestamp from 30 minutes ago
 export const get30MinutesAgo = () => {
-  const now = new Date(getCurrentTime());
+  const now = new Date();
   return new Date(now.getTime() - 30 * 60 * 1000).toISOString();
 };
 

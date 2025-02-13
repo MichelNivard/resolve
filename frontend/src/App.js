@@ -3,7 +3,7 @@ import { AuthContext } from './contexts/AuthContext';
 import { fetchNotebook, fetchRepositories, fetchUser, handleSharedDocument } from './utils/api';
 import { tiptapDocToIpynb } from './utils/notebookConversionUtils';
 import { saveToGitHub } from './utils/savetoGitHub';
-import { getCurrentTime, get30MinutesAgo } from './utils/timeUtils';
+import { getCurrentTime, isWithin30Minutes } from './utils/timeUtils';
 import './styles/main.css';
 import 'katex/dist/katex.min.css';
 import EditorWrapper from './components/Editor/EditorWrapper';
@@ -118,10 +118,10 @@ function App() {
     if (!ipynb?.metadata?.active_editors || !isAuthenticated || !user || !filePath || !selectedRepo?.fullName) return;
 
     const cleanup = () => {
-      const thirtyMinutesAgo = get30MinutesAgo();
       const updatedEditors = ipynb.metadata.active_editors.filter(
-        editor => editor.timestamp > thirtyMinutesAgo
+        editor => isWithin30Minutes(editor.timestamp)
       );
+      
       if (updatedEditors.length < ipynb.metadata.active_editors.length) {
         const updatedIpynb = { ...ipynb };
         updatedIpynb.metadata.active_editors = updatedEditors;
@@ -177,12 +177,12 @@ function App() {
   }, [owner, repo, isAuthenticated, location.pathname]);
 
   const checkLastEditor = (notebook) => {
-    if (!notebook?.metadata?.last_editor) return null;
-    const lastEdit = new Date(notebook.metadata.last_editor.timestamp);
+    if (!notebook?.metadata?.active_editors) return null;
+    const lastEdit = new Date(notebook.metadata.active_editors.timestamp);
     const now = new Date(getCurrentTime());
     const diffMinutes = (now - lastEdit) / (1000 * 60);
     if (diffMinutes <= 30) {
-      return notebook.metadata.last_editor;
+      return notebook.metadata.active_editors.name;
     }
     return null;
   };
@@ -224,9 +224,8 @@ function App() {
         notebook.metadata.active_editors = [];
       }
 
-      const thirtyMinutesAgo = get30MinutesAgo();
       notebook.metadata.active_editors = notebook.metadata.active_editors.filter(
-        editor => editor.timestamp > thirtyMinutesAgo
+        editor => isWithin30Minutes(editor.timestamp)
       );
 
       const existingEditorIndex = notebook.metadata.active_editors.findIndex(

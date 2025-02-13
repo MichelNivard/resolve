@@ -1,4 +1,4 @@
-import { getCurrentTime, get30MinutesAgo } from './timeUtils';
+import { getCurrentTime, get30MinutesAgo, isWithin30Minutes } from './timeUtils';
 import { saveNotebook } from './api';
 
 export async function saveToGitHub(newIpynb, filePath, selectedRepo, user) {
@@ -17,12 +17,10 @@ export async function saveToGitHub(newIpynb, filePath, selectedRepo, user) {
     if (!newIpynb.metadata.active_editors) {
       newIpynb.metadata.active_editors = [];
     }
-
-    const thirtyMinutesAgo = get30MinutesAgo();
     
     // Remove editors that are older than 30 minutes
     newIpynb.metadata.active_editors = newIpynb.metadata.active_editors.filter(editor => 
-      editor.timestamp > thirtyMinutesAgo
+      isWithin30Minutes(editor.timestamp)
     );
 
     // Check if this user is already in the list
