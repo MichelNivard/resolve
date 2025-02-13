@@ -61,6 +61,23 @@ router.post('/', async (req, res) => {
       sha: baseSha
     });
 
+    // Get the current file's SHA if it exists
+    let sha;
+    try {
+      const { data: existingFile } = await octokit.repos.getContent({
+        owner,
+        repo,
+        path: sanitizedPath,
+        ref: newBranchName
+      });
+      sha = existingFile.sha;
+    } catch (error) {
+      if (error.status !== 404) {
+        throw error;
+      }
+      // File doesn't exist yet, which is fine
+    }
+
     // Prepare the content
     let fileContent;
     try {
@@ -81,7 +98,8 @@ router.post('/', async (req, res) => {
       path: sanitizedPath,
       message: 'Update content',
       content: Buffer.from(fileContent).toString('base64'),
-      branch: newBranchName
+      branch: newBranchName,
+      ...(sha && { sha }) // Include SHA if we have it
     });
 
     // Create a pull request
@@ -93,8 +111,6 @@ router.post('/', async (req, res) => {
       base: defaultBranch,
       body: 'Automated update of content'
     });
-
-
 
     // If there are no conflicts, merge immediately
     const { data: prCheck } = await octokit.pulls.get({
