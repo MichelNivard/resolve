@@ -118,7 +118,6 @@ export function ipynbToTiptapDoc(ipynb, editor) {
                   'data-op-user-id': mark.attrs['data-op-user-id'] || 'Unknown',
                   'data-op-user-nickname': mark.attrs['data-op-user-nickname'] || 'Unknown User',
                   'data-op-date': date,  // Use the processed date
-                  ...mark.attrs  // This might override our defaults
                 };
                 console.log('Final attrs before spread:', {
                   'data-op-user-id': mark.attrs['data-op-user-id'] || 'Unknown',
