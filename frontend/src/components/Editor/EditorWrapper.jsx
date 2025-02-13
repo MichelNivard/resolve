@@ -94,10 +94,7 @@ const EditorWrapper = ({
       TableCell,
       TableHeader,
       TableRow,
-      TrackChangeExtension.configure({
-        enabled: false,
-        onStatusChange: handleTrackChangesToggle
-      }),
+      TrackChangeExtension,
       CommentMark.configure({
         HTMLAttributes: {
           class: 'comment-mark',
