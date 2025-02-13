@@ -49,7 +49,7 @@ export function ipynbToTiptapDoc(ipynb, editor) {
 
   // Create a transaction to set content with marks preserved
   const tr = editor.state.tr;
-  tr.setMeta('trackManualChanged', false);
+  tr.setMeta('trackManualChanged', true);
 
   for (const cell of cells) {
     if (cell.type === 'raw') {
@@ -170,6 +170,7 @@ export function ipynbToTiptapDoc(ipynb, editor) {
 
   // Set the content
   editor.commands.setContent(doc);
+  console.log('Editor content after setting:', editor.getJSON());
 
   // Re-enable track changes if it was enabled
   if (wasEnabled) {
