@@ -47,10 +47,6 @@ export function ipynbToTiptapDoc(ipynb, editor) {
   console.log('Parsed cells:', cells);
   const docNodes = [];
 
-  // Create a transaction to set content with marks preserved
- //  const tr = editor.state.tr;
- // tr.setMeta('trackManualChanged', true);
-
   for (const cell of cells) {
     if (cell.type === 'raw') {
       console.log('Creating raw cell with data:', cell);
@@ -187,8 +183,13 @@ export function ipynbToTiptapDoc(ipynb, editor) {
 
   console.log('Final doc before setting content:', doc);
 
-  // Set the content
-  editor.commands.setContent(doc);
+  // Set the content using a transaction that preserves track changes
+  const tr = editor.state.tr;
+  tr.setMeta('trackManualChanged', true);  // Mark this as a manual change to preserve track changes
+  tr.setMeta('loading', true);  // Additional flag to indicate this is a loading operation
+  tr.replaceWith(0, editor.state.doc.content.size, editor.schema.nodeFromJSON(doc));
+  editor.view.dispatch(tr);
+  
   console.log('Editor content after setting:', editor.getJSON());
 
   // Re-enable track changes if it was enabled
