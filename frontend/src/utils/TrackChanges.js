@@ -25,7 +25,7 @@ export const TRACK_COMMAND_REJECT_ALL = "reject-all"
 // insert mark
 export const InsertionMark = Mark.create({
   name: MARK_INSERTION,
-  priority: 1000, // High priority to ensure it's applied
+  priority: 1000000000000, // High priority to ensure it's applied
   addAttributes() {
     return {
       "data-op-user-id": {
@@ -56,7 +56,7 @@ export const InsertionMark = Mark.create({
 // delete mark
 export const DeletionMark = Mark.create({
   name: MARK_DELETION,
-  priority: 1000, // High priority to ensure it's applied
+  priority: 10000000000000, // High priority to ensure it's applied
   addAttributes() {
     return {
       "data-op-user-id": {
