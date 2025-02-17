@@ -19,6 +19,7 @@ import EditorToolbar from './EditorToolbar';
 import { CommentsSidebar } from '../Comments/CommentsSidebar';
 import LoginButton from '../Auth/LoginButton';
 import { fetchNotebooksInRepo } from '../../utils/api';
+import InlineMath from '../../utils/InlineMath/inlineMath';
 
 const ReferencesList = ({ references }) => {
   if (!references || references.length === 0) return null;
@@ -95,13 +96,14 @@ const EditorWrapper = ({
       TableHeader,
       TableRow,
       TrackChangeExtension,
+      Mathematics,
+      InlineMath,
       CommentMark.configure({
         HTMLAttributes: {
           class: 'comment-mark',
         },
         onUpdate: handleCommentMarkUpdate
       }),
-      Mathematics,
       CitationMark,
     ],
     content: '',

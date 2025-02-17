@@ -22,6 +22,7 @@ import TableHeader from '@tiptap/extension-table-header';
 import Underline from '@tiptap/extension-underline';
 import Highlight from '@tiptap/extension-highlight';
 import Mathematics from 'tiptap-math';
+import InlineMath from './utils/InlineMath/inlineMath';
 
 // Import custom extensions
 import { RawCell } from './cells/rawCell';
@@ -106,6 +107,7 @@ function App() {
           onUpdate: handleCommentMarkUpdate
         }),
         Mathematics,
+        InlineMath,
         CitationMark,
       ]);
     }

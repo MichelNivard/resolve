@@ -7,6 +7,7 @@ import TableHeader from '@tiptap/extension-table-header';
 import Underline from '@tiptap/extension-underline';
 import Highlight from '@tiptap/extension-highlight';
 import Mathematics from 'tiptap-math';
+import InlineMath from './InlineMath/inlineMath';
 import 'katex/dist/katex.min.css';
 
 import { parseIpynb, serializeIpynb } from './ipynbUtils';
@@ -154,6 +155,7 @@ export function ipynbToTiptapDoc(ipynb, editor) {
               'data-latex': '{{ node.attrs.content }}'
             }
           }),
+          InlineMath,
           CitationMark,
           Table,
           TableRow,
@@ -247,6 +249,7 @@ export function tiptapDocToIpynb(editor, originalIpynb) {
               'data-latex': '{{ node.attrs.content }}'
             }
           }),
+          InlineMath,
           CitationMark,
           Table,
           TableRow,
