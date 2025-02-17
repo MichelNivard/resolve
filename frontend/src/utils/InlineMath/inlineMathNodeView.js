@@ -11,71 +11,46 @@ class InlineMathNodeView {
   }
 
   mount() {
-    // Create clean elements
     const parent = document.createElement("span");
-    const content = document.createElement("span");
-    const katexWrapper = document.createElement("span");
+    const katexNode = document.createElement("span");
+    const span = document.createElement("span");
 
-    // Set up content element
-    content.textContent = this.node.textContent; // Use textContent instead of innerHTML
-    content.classList.add("inline-math-content");
-    content.setAttribute("contenteditable", "true");
-    content.style.cssText = "opacity: 0; position: absolute; pointer-events: none;";
+    span.innerHTML = this.node.textContent;
+    span.classList.add("inline-math-content");
+    if (!span.innerText.trim()) {
+      span.classList.add("inline-math-content-empty");
+    }
 
-    // Set up katex wrapper
-    katexWrapper.classList.add("katex-wrapper");
-    this.renderKatex(katexWrapper);
-
-    // Set up parent
+    parent.append(span);
     parent.classList.add("inline-math");
-    parent.setAttribute("draggable", "true");
 
-    // Build DOM in correct order
-    parent.appendChild(content);
-    parent.appendChild(katexWrapper);
-
-    // Store references
-    this.renderer = parent;
-    this.content = content;
-    this.katexNode = katexWrapper;
-
-    // Add click handler
-    const handleClick = (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      this.selectNode();
-    };
-
-    parent.addEventListener("click", handleClick);
-    
-    // Clean up on destroy
-    this.cleanup = () => {
-      parent.removeEventListener("click", handleClick);
-      this.editor.off("selectionUpdate", this.handleSelectionUpdate.bind(this));
-    };
-
-    // Add selection handler
-    this.editor.on("selectionUpdate", this.handleSelectionUpdate.bind(this));
-
-    console.log('Mount structure:', {
-      parentHTML: parent.outerHTML,
-      contentText: content.textContent,
-      hasKatex: katexWrapper.querySelector('.katex') !== null
-    });
-  }
-
-  renderKatex(node) {
-    try {
-      // Clear any existing content
-      node.innerHTML = '';
-      katex.render(this.node.textContent, node, {
+    if (this.showRendered) {
+      katexNode.setAttribute("contentEditable", "false");
+      katex.render(this.node.textContent, katexNode, {
         displayMode: false,
         throwOnError: false,
       });
-    } catch (error) {
-      console.warn('KaTeX rendering error:', error);
-      node.textContent = this.node.textContent;
+      parent.append(katexNode);
+      span.setAttribute(
+        "style",
+        "opacity: 0; overflow: hidden; position: absolute; width: 0px; height: 0px;"
+      );
+
+      parent.addEventListener("click", () => {
+        this.selectNode();
+      });
+
+      parent.setAttribute("draggable", "true");
+    } else {
+      katexNode.setAttribute("style", "display:none;");
+      parent.classList.add("inline-math-selected");
     }
+
+    this.editor.on("selectionUpdate", this.handleSelectionUpdate.bind(this));
+
+    this.renderer = parent;
+    this.content = span;
+    this.katexNode = katexNode;
   }
 
   get dom() {
@@ -194,7 +169,7 @@ class InlineMathNodeView {
   }
 
   destroy() {
-    this.cleanup();
+    this.editor.off("selectionUpdate", this.handleSelectionUpdate.bind(this));
   }
 }
 
