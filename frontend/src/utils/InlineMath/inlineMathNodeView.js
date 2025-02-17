@@ -66,10 +66,10 @@ class InlineMathNodeView {
     const { from, to } = this.editor.state.selection;
 
     if (from >= pos && to <= pos + this.node.nodeSize) {
-      if (this.showRendered) {
+   //   if (this.showRendered) {
         this.selectNode();
-      }
-    } else if (!this.showRendered) {
+     // }
+    } else { // if (!this.showRendered) {
       this.deselectNode();
     }
   }
