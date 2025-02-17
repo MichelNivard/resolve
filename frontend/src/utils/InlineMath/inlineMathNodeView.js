@@ -62,15 +62,21 @@ class InlineMathNodeView {
 
   handleSelectionUpdate() {
     const pos = this.getPos();
-    if (pos == undefined) return;
+    if (pos === undefined) return;
+    
     const { from, to } = this.editor.state.selection;
-
-    if (from >= pos && to <= pos + this.node.nodeSize) {
-     if (this.showRendered) {
-        this.selectNode();
+    const nodeFrom = pos;
+    const nodeTo = pos + this.node.nodeSize;
+  
+    // First check if we're inside the node
+    if (from >= nodeFrom && to <= nodeTo) {
+      // Remove the showRendered check - always trigger selectNode when cursor is inside
+      this.selectNode();
+    } else {
+      // Only deselect if we're actually selected
+      if (this.selected) {
+        this.deselectNode();
       }
-    } else if (!this.showRendered) {
-      this.deselectNode();
     }
   }
 
