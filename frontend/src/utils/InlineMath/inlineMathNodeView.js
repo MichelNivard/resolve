@@ -50,6 +50,7 @@ class InlineMathNodeView {
 
     this.renderer = parent;
     this.content = span;
+    this.katexNode = katexNode;
   }
 
   get dom() {
@@ -100,13 +101,14 @@ class InlineMathNodeView {
     this.selected = true;
     this.showRendered = false;
     
+    // First hide KaTeX
     if (this.katexNode) {
-      this.katexNode.style.display = "none";
+      this.katexNode.style.cssText = 'display: none !important; opacity: 0 !important;';
     }
     
+    // Then show content
     if (this.content) {
-      this.content.removeAttribute("style");
-      this.content.style.display = "inline";
+      this.content.style.cssText = 'display: inline !important; opacity: 1 !important; position: static !important; pointer-events: auto !important;';
       this.content.focus();
     }
     
