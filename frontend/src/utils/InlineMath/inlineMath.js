@@ -3,15 +3,13 @@ import { TextSelection } from "@tiptap/pm/state";
 import InlineMathNodeView from "./inlineMathNodeView";
 
 const NODE_CLASS = "inline-math";
-const INPUT_REGEX = /\$([^\$]*)\$/gi;
+const INPUT_REGEX = /\$([^\$]*)\$/gi; // matches for text inside single $
 
 const InlineMath = Node.create({
   name: "inlineMath",
   content: "text*",
   group: "inline",
   inline: true,
-  selectable: true,
-  atom: true,
   marks: "",
   draggable: true,
 
@@ -42,33 +40,11 @@ const InlineMath = Node.create({
     return {
       toggleInlineMath:
         () =>
-        ({ commands, chain }) => {
-          return chain()
-            .focus()
-            .toggleNode(this.name, "text", {
-              showRendered: false,
-            })
-            .run();
+        ({ commands }) => {
+          return commands.toggleNode(this.name, "text", {
+            showRendered: false,
+          });
         },
-    };
-  },
-
-  addKeyboardShortcuts() {
-    return {
-      Enter: ({ editor }) => {
-        const { empty, $anchor } = editor.state.selection;
-        if (!empty || $anchor.parent.type.name !== this.name) {
-          return false;
-        }
-        return editor.commands.command(({ tr, dispatch }) => {
-          if (dispatch) {
-            const pos = $anchor.after();
-            tr.replaceWith(pos - 1, pos, editor.schema.text(" "));
-            return true;
-          }
-          return false;
-        });
-      },
     };
   },
 
@@ -77,17 +53,14 @@ const InlineMath = Node.create({
       {
         find: INPUT_REGEX,
         type: this.type,
-        handler({ range, match, chain }) {
+        handler({ range, match, chain, state }) {
           const start = range.from;
           const end = range.to;
           if (match[1]) {
+            const text = state.schema.text(match[1]);
             chain()
-              .focus()
               .command(({ tr }) => {
-                const node = this.type.create(null, [
-                  { type: "text", text: match[1] }
-                ]);
-                tr.replaceRangeWith(start, end, node);
+                tr.replaceRangeWith(start, end, this.type.create(null, text));
                 return true;
               })
               .run();

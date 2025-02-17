@@ -6,7 +6,6 @@ class InlineMathNodeView {
     this.editor = props.editor;
     this.node = props.node;
     this.getPos = props.getPos;
-    this.selected = false;
     this.showRendered = this.node.textContent.trim() && this.node.attrs.showRendered;
     this.mount();
   }
@@ -18,8 +17,6 @@ class InlineMathNodeView {
 
     span.innerHTML = this.node.textContent;
     span.classList.add("inline-math-content");
-    span.setAttribute("contenteditable", "true");
-    
     if (!span.innerText.trim()) {
       span.classList.add("inline-math-content-empty");
     }
@@ -28,7 +25,11 @@ class InlineMathNodeView {
     parent.classList.add("inline-math");
 
     if (this.showRendered) {
-      this.renderKatex(katexNode);
+      katexNode.setAttribute("contentEditable", "false");
+      katex.render(this.node.textContent, katexNode, {
+        displayMode: false,
+        throwOnError: false,
+      });
       parent.append(katexNode);
       span.setAttribute(
         "style",
@@ -47,43 +48,8 @@ class InlineMathNodeView {
 
     this.editor.on("selectionUpdate", this.handleSelectionUpdate.bind(this));
 
-    // Store references
     this.renderer = parent;
     this.content = span;
-    this.katexNode = katexNode;
-
-    // Add input handler for the closing $ sign
-    this.content.addEventListener('input', this.handleInput.bind(this));
-    this.content.addEventListener('keydown', this.handleKeyDown.bind(this));
-  }
-
-  renderKatex(node) {
-    node.setAttribute("contentEditable", "false");
-    try {
-      katex.render(this.node.textContent, node, {
-        displayMode: false,
-        throwOnError: false,
-      });
-    } catch (error) {
-      console.warn('KaTeX rendering error:', error);
-      node.textContent = this.node.textContent;
-    }
-  }
-
-  handleInput(event) {
-    const text = this.content.textContent;
-    if (text.endsWith('$')) {
-      // Remove the closing $ and update content
-      this.content.textContent = text.slice(0, -1);
-      this.deselectNode();
-    }
-  }
-
-  handleKeyDown(event) {
-    if (event.key === 'Enter') {
-      event.preventDefault();
-      this.deselectNode();
-    }
   }
 
   get dom() {
@@ -96,80 +62,60 @@ class InlineMathNodeView {
 
   handleSelectionUpdate() {
     const pos = this.getPos();
-    if (pos === undefined) return;
-    
+    if (pos == undefined) return;
     const { from, to } = this.editor.state.selection;
-    const nodeFrom = pos;
-    const nodeTo = pos + this.node.nodeSize;
 
-    if (from >= nodeFrom && to <= nodeTo) {
+    if (from >= pos && to <= pos + this.node.nodeSize) {
       if (this.showRendered) {
         this.selectNode();
       }
+    } else if (!this.showRendered) {
+      this.deselectNode();
     }
   }
 
   selectNode() {
-    if (this.selected) return;
-    
-    this.selected = true;
+    const pos = this.getPos();
+    if (pos == undefined) return;
+    const nodeAfter = this.editor.state.tr.doc.resolve(pos).nodeAfter;
+    if (nodeAfter?.type.name != "inlineMath") return;
+
     this.showRendered = false;
     this.renderer.classList.add("inline-math-selected");
-    
-    if (this.katexNode) {
-      this.katexNode.style.display = "none";
+    const katexNode = this.renderer.querySelector(
+      ":not(.inline-math-content)"
+    );
+    if (katexNode) {
+      katexNode.style.display = "none";
     }
-    
-    if (this.content) {
-      this.content.removeAttribute("style");
-      this.content.focus();
-    }
-
-    // Set cursor to end of content
-    const selection = window.getSelection();
-    const range = document.createRange();
-    range.selectNodeContents(this.content);
-    range.collapse(false);
-    selection.removeAllRanges();
-    selection.addRange(range);
+    const contentNode = this.content;
+    contentNode.removeAttribute("style");
   }
 
   deselectNode() {
-    if (!this.selected) return;
-
-    this.selected = false;
     this.showRendered = true;
     this.renderer.classList.remove("inline-math-selected");
-    
-    if (this.katexNode) {
-      this.renderKatex(this.katexNode);
-      this.katexNode.removeAttribute("style");
+    const katexNode = this.renderer.querySelector(
+      ":not(.inline-math-content)"
+    );
+    if (katexNode) {
+      katexNode.removeAttribute("style");
     }
-    
-    if (this.content) {
-      this.content.setAttribute(
-        "style",
-        "opacity: 0; overflow: hidden; position: absolute; width: 0px; height: 0px;"
-      );
-    }
+    const contentNode = this.content;
+    contentNode.setAttribute(
+      "style",
+      "opacity: 0; overflow: hidden; position: absolute; width: 0px; height: 0px;"
+    );
   }
 
   update(node) {
     if (node.type.name !== this.node.type.name) return false;
     this.node = node;
-    
-    if (this.katexNode && this.showRendered) {
-      this.renderKatex(this.katexNode);
-    }
     return true;
   }
 
   destroy() {
     this.editor.off("selectionUpdate", this.handleSelectionUpdate.bind(this));
-    if (this.content) {
-      this.content.removeEventListener('input', this.handleInput.bind(this));
-      this.content.removeEventListener('keydown', this.handleKeyDown.bind(this));
-    }
   }
 }
 
