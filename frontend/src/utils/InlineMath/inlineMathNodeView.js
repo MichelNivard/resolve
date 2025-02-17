@@ -67,53 +67,97 @@ class InlineMathNodeView {
     const { from, to } = this.editor.state.selection;
     const nodeFrom = pos;
     const nodeTo = pos + this.node.nodeSize;
+
+    console.log('Selection Update:', {
+      from,
+      to,
+      nodeFrom,
+      nodeTo,
+      selected: this.selected,
+      showRendered: this.showRendered,
+      content: this.content?.textContent,
+      isInside: from >= nodeFrom && to <= nodeTo
+    });
   
-    // First check if we're inside the node
     if (from >= nodeFrom && to <= nodeTo) {
-      // Remove the showRendered check - always trigger selectNode when cursor is inside
       this.selectNode();
-    } else {
-      // Only deselect if we're actually selected
-      if (this.selected) {
-        this.deselectNode();
-      }
+    } else if (this.selected) {
+      this.deselectNode();
     }
   }
 
   selectNode() {
-    // Remove the early return - force state update
+    console.log('Select Node:', {
+      beforeState: {
+        selected: this.selected,
+        showRendered: this.showRendered,
+        content: this.content?.textContent,
+        katexVisible: this.katexNode?.style.display !== 'none',
+        contentStyle: this.content?.getAttribute('style')
+      }
+    });
+
     this.selected = true;
     this.showRendered = false;
     
-    // Force immediate visibility changes
     if (this.katexNode) {
       this.katexNode.style.display = "none";
     }
     
     if (this.content) {
       this.content.removeAttribute("style");
-      this.content.style.display = "inline"; // Force visibility
+      this.content.style.display = "inline";
       this.content.focus();
     }
     
     this.renderer.classList.add("inline-math-selected");
+
+    console.log('After Select:', {
+      afterState: {
+        selected: this.selected,
+        showRendered: this.showRendered,
+        content: this.content?.textContent,
+        katexVisible: this.katexNode?.style.display !== 'none',
+        contentStyle: this.content?.getAttribute('style')
+      }
+    });
   }
-  
 
   deselectNode() {
+    console.log('Deselect Node:', {
+      beforeState: {
+        selected: this.selected,
+        showRendered: this.showRendered,
+        content: this.content?.textContent,
+        katexVisible: this.katexNode?.style.display !== 'none',
+        contentStyle: this.content?.getAttribute('style')
+      }
+    });
+
     this.showRendered = true;
+    this.selected = false;
     this.renderer.classList.remove("inline-math-selected");
-    const katexNode = this.renderer.querySelector(
-      ":not(.inline-math-content)"
-    );
-    if (katexNode) {
-      katexNode.removeAttribute("style");
+    
+    if (this.katexNode) {
+      this.katexNode.removeAttribute("style");
     }
-    const contentNode = this.content;
-    contentNode.setAttribute(
-      "style",
-      "opacity: 0; overflow: hidden; position: absolute; width: 0px; height: 0px;"
-    );
+    
+    if (this.content) {
+      this.content.setAttribute(
+        "style",
+        "opacity: 0; overflow: hidden; position: absolute; width: 0px; height: 0px;"
+      );
+    }
+
+    console.log('After Deselect:', {
+      afterState: {
+        selected: this.selected,
+        showRendered: this.showRendered,
+        content: this.content?.textContent,
+        katexVisible: this.katexNode?.style.display !== 'none',
+        contentStyle: this.content?.getAttribute('style')
+      }
+    });
   }
 
   update(node) {
