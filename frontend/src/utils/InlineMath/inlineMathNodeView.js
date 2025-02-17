@@ -28,16 +28,7 @@ class InlineMathNodeView {
     parent.classList.add("inline-math");
 
     if (this.showRendered) {
-      katexNode.setAttribute("contentEditable", "false");
-      try {
-        katex.render(this.node.textContent, katexNode, {
-          displayMode: false,
-          throwOnError: false,
-        });
-      } catch (error) {
-        console.warn('KaTeX rendering error:', error);
-        katexNode.textContent = this.node.textContent;
-      }
+      this.renderKatex(katexNode);
       parent.append(katexNode);
       span.setAttribute(
         "style",
@@ -55,22 +46,42 @@ class InlineMathNodeView {
     }
 
     this.editor.on("selectionUpdate", this.handleSelectionUpdate.bind(this));
-    this.editor.on("focus", this.handleFocus.bind(this));
-    this.editor.on("blur", this.handleBlur.bind(this));
 
+    // Store references
     this.renderer = parent;
     this.content = span;
     this.katexNode = katexNode;
+
+    // Add input handler for the closing $ sign
+    this.content.addEventListener('input', this.handleInput.bind(this));
+    this.content.addEventListener('keydown', this.handleKeyDown.bind(this));
   }
 
-  handleFocus() {
-    if (this.selected) {
-      this.content.focus();
+  renderKatex(node) {
+    node.setAttribute("contentEditable", "false");
+    try {
+      katex.render(this.node.textContent, node, {
+        displayMode: false,
+        throwOnError: false,
+      });
+    } catch (error) {
+      console.warn('KaTeX rendering error:', error);
+      node.textContent = this.node.textContent;
     }
   }
 
-  handleBlur() {
-    if (!this.editor.isDestroyed) {
+  handleInput(event) {
+    const text = this.content.textContent;
+    if (text.endsWith('$')) {
+      // Remove the closing $ and update content
+      this.content.textContent = text.slice(0, -1);
+      this.deselectNode();
+    }
+  }
+
+  handleKeyDown(event) {
+    if (event.key === 'Enter') {
+      event.preventDefault();
       this.deselectNode();
     }
   }
@@ -91,22 +102,16 @@ class InlineMathNodeView {
     const nodeFrom = pos;
     const nodeTo = pos + this.node.nodeSize;
 
-    // Check if selection is inside this node
     if (from >= nodeFrom && to <= nodeTo) {
       if (this.showRendered) {
         this.selectNode();
       }
-    } else if (!this.showRendered) {
-      this.deselectNode();
     }
   }
 
   selectNode() {
     if (this.selected) return;
     
-    const pos = this.getPos();
-    if (pos === undefined) return;
-
     this.selected = true;
     this.showRendered = false;
     this.renderer.classList.add("inline-math-selected");
@@ -137,16 +142,8 @@ class InlineMathNodeView {
     this.renderer.classList.remove("inline-math-selected");
     
     if (this.katexNode) {
+      this.renderKatex(this.katexNode);
       this.katexNode.removeAttribute("style");
-      try {
-        katex.render(this.node.textContent, this.katexNode, {
-          displayMode: false,
-          throwOnError: false,
-        });
-      } catch (error) {
-        console.warn('KaTeX rendering error:', error);
-        this.katexNode.textContent = this.node.textContent;
-      }
     }
     
     if (this.content) {
@@ -162,23 +159,17 @@ class InlineMathNodeView {
     this.node = node;
     
     if (this.katexNode && this.showRendered) {
-      try {
-        katex.render(this.node.textContent, this.katexNode, {
-          displayMode: false,
-          throwOnError: false,
-        });
-      } catch (error) {
-        console.warn('KaTeX rendering error:', error);
-        this.katexNode.textContent = this.node.textContent;
-      }
+      this.renderKatex(this.katexNode);
     }
     return true;
   }
 
   destroy() {
     this.editor.off("selectionUpdate", this.handleSelectionUpdate.bind(this));
-    this.editor.off("focus", this.handleFocus.bind(this));
-    this.editor.off("blur", this.handleBlur.bind(this));
+    if (this.content) {
+      this.content.removeEventListener('input', this.handleInput.bind(this));
+      this.content.removeEventListener('keydown', this.handleKeyDown.bind(this));
+    }
   }
 }
 
