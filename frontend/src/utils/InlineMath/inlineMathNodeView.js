@@ -66,31 +66,33 @@ class InlineMathNodeView {
     const { from, to } = this.editor.state.selection;
 
     if (from >= pos && to <= pos + this.node.nodeSize) {
-   //   if (this.showRendered) {
+     if (this.showRendered) {
         this.selectNode();
-     // }
-    } else { // if (!this.showRendered) {
+      }
+    } else if (!this.showRendered) {
       this.deselectNode();
     }
   }
 
   selectNode() {
-    const pos = this.getPos();
-    if (pos == undefined) return;
-    const nodeAfter = this.editor.state.tr.doc.resolve(pos).nodeAfter;
-    if (nodeAfter?.type.name != "inlineMath") return;
-
+    // Remove the early return - force state update
+    this.selected = true;
     this.showRendered = false;
-    this.renderer.classList.add("inline-math-selected");
-    const katexNode = this.renderer.querySelector(
-      ":not(.inline-math-content)"
-    );
-    if (katexNode) {
-      katexNode.style.display = "none";
+    
+    // Force immediate visibility changes
+    if (this.katexNode) {
+      this.katexNode.style.display = "none";
     }
-    const contentNode = this.content;
-    contentNode.removeAttribute("style");
+    
+    if (this.content) {
+      this.content.removeAttribute("style");
+      this.content.style.display = "inline"; // Force visibility
+      this.content.focus();
+    }
+    
+    this.renderer.classList.add("inline-math-selected");
   }
+  
 
   deselectNode() {
     this.showRendered = true;
