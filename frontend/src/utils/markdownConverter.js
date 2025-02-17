@@ -102,16 +102,45 @@ md.block.ruler.before('paragraph', 'math_block', (state, startLine, endLine, sil
   return true;
 });
 
-// Render rules that preserve the LaTeX
-md.renderer.rules.math_block = (tokens, idx) => {
-  const token = tokens[idx];
-  return `<div class="block-math">${token.content}</div>`;
+// Custom rule for inline math ($...$)
+md.inline.ruler.before('emphasis', 'math_inline', (state, silent) => {
+  if (state.src[state.pos] !== '$') return false;
+
+  let pos = state.pos + 1;
+  let found = false;
+
+  // Find the closing $
+  while (pos < state.src.length) {
+    if (state.src[pos] === '$') {
+      found = true;
+      break;
+    }
+    pos++;
+  }
+
+  if (!found) return false;
+
+  const content = state.src.slice(state.pos + 1, pos);
+  if (!content) return false;
+
+  if (!silent) {
+    const token = state.push('math_inline', 'span', 0);
+    token.content = content;
+    token.markup = '$';
+    token.meta = { type: 'inlineMath' };
+  }
+
+  state.pos = pos + 1;
+  return true;
+});
+
+// Render rules for math
+md.renderer.rules.math_block = function(tokens, idx) {
+  return `<div class="block-math">${tokens[idx].content}</div>`;
 };
 
-md.renderer.rules.math_inline = (tokens, idx) => {
-  const token = tokens[idx];
-  // Just keep inline math as markdown since the plugin doesn't support it
-  return `$${token.content}$`;
+md.renderer.rules.math_inline = function(tokens, idx) {
+  return `<span class="inline-math">${tokens[idx].content}</span>`;
 };
 
 // Initialize Turndown with options to preserve tags
@@ -149,15 +178,14 @@ turndownService.addRule('bibMention', {
 // Add custom HTML to Markdown conversion rules
 turndownService.addRule('math', {
   filter: node => 
-    node.classList.contains('block-math') || 
-    node.classList.contains('inline-math') ||
-    node.nodeName === 'SPAN' && node.getAttribute('data-type') === 'math',
+    (node.tagName === 'DIV' && node.classList.contains('block-math')) ||
+    (node.tagName === 'SPAN' && node.classList.contains('inline-math')),
   replacement: (content, node) => {
-    // Preserve the original math content without escaping
-    const mathContent = node.getAttribute('data-latex') || node.textContent;
-    return node.classList.contains('block-math') ? 
-      `\n$$${mathContent}$$\n` : 
-      `$${mathContent}$`;
+    if (node.classList.contains('block-math')) {
+      return `\n\n$$${content}$$\n\n`;
+    } else {
+      return `$${content}$`;
+    }
   }
 });
 
