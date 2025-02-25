@@ -42,7 +42,6 @@ function App() {
   const [selectedRepo, setSelectedRepo] = useState(null);
   const [ipynb, setIpynb] = useState(null);
   const [referenceManager, setReferenceManager] = useState(null);
-  const [references, setReferences] = useState([]); // Added references state
   const [saveMessage, setSaveMessage] = useState('');
   const [editorExtensions, setEditorExtensions] = useState(null);
   const [activeEditor, setActiveEditor] = useState(null);
@@ -258,14 +257,11 @@ function App() {
       console.log("Reference manager initialized:", manager); // ADDED
       setReferenceManager(manager);
       console.log("Reference manager state updated:", manager); // ADDED
-      const refs = manager.getReferences();
-      console.log("Setting references:", refs); // Added debug log
-      setReferences(refs);
 
-      setSaveMessage('File and references loaded successfully');
+      setSaveMessage('File loaded successfully');
       setTimeout(() => setSaveMessage(''), 3000);
     } catch (error) {
-      console.error('Error loading file or references:', error);
+      console.error('Error loading file:', error);
       if (error.response?.status === 404) {
         setSaveMessage('File not found');
       } else {
@@ -374,7 +370,6 @@ function App() {
             selectedRepo={selectedRepo}
             setSelectedRepo={setSelectedRepo}
             extensions={editorExtensions}
-            references={references} // Added references prop
           />
         </>
       )}
