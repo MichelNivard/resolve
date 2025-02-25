@@ -203,9 +203,62 @@ const EditorWrapper = ({
           // If we have a reference manager, update citations after content is loaded
           if (editor.referenceManager) {
             setTimeout(() => {
-              // This will trigger the useEffect above which will update the citations
-              // Force a re-render of the reference manager to trigger the useEffect
-              setReferenceManager(prev => ({...prev}));
+              // Directly update citations without trying to reset the reference manager
+              console.log('Updating citations after content load');
+              
+              // Find all citation marks in the document
+              const { doc, tr } = editor.state;
+              let transaction = tr;
+              let updated = false;
+              
+              // Use doc.descendants to find all citation nodes
+              doc.descendants((node, pos) => {
+                if (node.isText) {
+                  // Check if the text node has citation marks
+                  const marks = node.marks.filter(mark => mark.type.name === 'citation');
+                  
+                  for (const mark of marks) {
+                    const { citationKey } = mark.attrs;
+                    if (!citationKey) continue;
+                    
+                    // Get reference details from reference manager
+                    const reference = editor.referenceManager.getReference(citationKey);
+                    if (!reference) continue;
+                    
+                    const { entryTags = {} } = reference;
+                    const { AUTHOR, YEAR, TITLE, JOURNAL } = entryTags;
+                    const referenceDetails = JSON.stringify({ AUTHOR, YEAR, TITLE, JOURNAL });
+                    
+                    // Only update if reference details have changed
+                    if (mark.attrs.referenceDetails !== referenceDetails) {
+                      console.log(`Updating citation ${citationKey} with reference details after load`);
+                      
+                      // Create a new mark with updated attributes
+                      const newAttrs = {
+                        ...mark.attrs,
+                        referenceDetails
+                      };
+                      
+                      // Remove the old mark and add the new one
+                      transaction = transaction
+                        .removeMark(pos, pos + node.nodeSize, mark.type)
+                        .addMark(
+                          pos,
+                          pos + node.nodeSize,
+                          editor.schema.marks.citation.create(newAttrs)
+                        );
+                      
+                      updated = true;
+                    }
+                  }
+                }
+                return true; // Continue traversal
+              });
+              
+              // Apply the transaction if any citations were updated
+              if (updated) {
+                editor.view.dispatch(transaction);
+              }
             }, 500);
           }
         } catch (err) {
@@ -214,39 +267,6 @@ const EditorWrapper = ({
       });
     }
   }, [editor, ipynb]);
-
-  useEffect(() => {
-    const loadNotebooks = async () => {
-      if (selectedRepo) {
-        try {
-          // Format repository as "owner/repo"
-          const repository = `${selectedRepo.owner.login}/${selectedRepo.name}`;
-          const notebookList = await fetchNotebooksInRepo(repository);
-          setNotebooks(notebookList);
-          
-          if (filePath && !ipynb) {
-            // If filePath exists in the list, load it
-            if (notebookList.includes(filePath)) {
-              handleLoadFile(filePath);
-            }
-          } else if (notebookList.length > 0 && !ipynb) {
-            // No filePath or not found - set first notebook as default
-            setFilePath(notebookList[0]);
-          }
-        } catch (err) {
-          setError('Failed to load notebooks');
-          console.error('Error loading notebooks:', err);
-        }
-      }
-    };
-    loadNotebooks();
-  }, [selectedRepo]);
-
-  useEffect(() => {
-    if (filePath && selectedRepo && !ipynb) {
-      handleLoadFile(filePath);
-    }
-  }, [filePath, selectedRepo]);
 
  const onLoadFile = async () => {
     try {
