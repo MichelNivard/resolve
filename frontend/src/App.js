@@ -262,6 +262,13 @@ function App() {
       // Update references state when reference manager changes
       const refs = manager.getReferences();
       console.log("Setting references:", refs);
+      refs.forEach((ref, index) => {
+        console.log(`Reference ${index} from manager:`, {
+          citationKey: ref.citationKey,
+          entryType: ref.entryType,
+          entryTags: ref.entryTags
+        });
+      });
       setReferences(refs);
 
       setSaveMessage('File loaded successfully');

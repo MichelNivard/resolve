@@ -33,8 +33,11 @@ const ReferencesList = ({ references }) => {
       <h2>References</h2>
       <div className="references-list">
         {references.map((ref, index) => {
+          console.log(`Reference ${index}:`, ref); // Log each reference
           const { entryTags = {} } = ref;
+          console.log(`EntryTags for reference ${index}:`, entryTags); // Log entry tags
           const { author, year, title, journal, doi, url } = entryTags;
+          console.log(`Extracted fields for reference ${index}:`, { author, year, title, journal, doi, url }); // Log extracted fields
           
           return (
             <div key={index} className="reference-item">
