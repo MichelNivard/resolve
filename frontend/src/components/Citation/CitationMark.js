@@ -68,67 +68,110 @@ export const CitationMark = Mark.create({
       new Plugin({
         key: new PluginKey('citation-tooltip'),
         view(editorView) {
+          // Keep track of elements that already have tooltips
+          const tippyInstances = new WeakMap();
+          
+          // Function to create a tooltip for a single citation element
+          const createTooltipForElement = (element) => {
+            // Skip if already has a tooltip
+            if (tippyInstances.has(element)) return;
+            
+            const instance = tippy(element, {
+              content: 'Loading...',
+              allowHTML: true,
+              delay: [200, 0], // Show after 200ms, hide immediately
+              placement: 'top',
+              arrow: true,
+              theme: 'light-border',
+              interactive: true,
+              appendTo: document.body,
+              // Only compute content when the tooltip is shown
+              onShow(instance) {
+                const referenceDetails = element.getAttribute('data-reference-details');
+                let refData;
+                
+                if (referenceDetails) {
+                  // Parse the stored reference details
+                  try {
+                    refData = JSON.parse(referenceDetails);
+                  } catch (e) {
+                    console.error('Failed to parse reference details:', e);
+                  }
+                }
+                
+                if (!refData) {
+                  // Fallback to reference manager
+                  const citationKey = element.getAttribute('data-citation-key');
+                  const reference = editorView.state.schema.cached.referenceManager?.getReference(citationKey);
+                  if (reference) {
+                    refData = reference.entryTags;
+                  }
+                }
+
+                if (refData) {
+                  const { AUTHOR, YEAR, TITLE, JOURNAL } = refData;
+                  // Format authors (remove any '{' and '}' from BibTeX formatting)
+                  const authors = AUTHOR ? AUTHOR.replace(/[{}]/g, '') : '';
+                  
+                  // Construct citation in academic format
+                  const parts = [];
+                  if (authors) parts.push(authors);
+                  if (YEAR) parts.push(`(${YEAR})`);
+                  if (TITLE) parts.push(TITLE.replace(/[{}]/g, ''));
+                  if (JOURNAL) parts.push(`<em>${JOURNAL.replace(/[{}]/g, '')}</em>`);
+                  
+                  instance.setContent(`<div class="citation-tooltip">${parts.join(', ')}</div>`);
+                } else {
+                  instance.setContent('Reference details not available');
+                }
+              }
+            });
+            
+            // Store the instance
+            tippyInstances.set(element, instance);
+          };
+
+          // Use MutationObserver to detect new citation elements
+          const observer = new MutationObserver(mutations => {
+            for (const mutation of mutations) {
+              if (mutation.type === 'childList') {
+                // Check for new citation elements
+                mutation.addedNodes.forEach(node => {
+                  if (node.nodeType === Node.ELEMENT_NODE) {
+                    // Check the node itself
+                    if (node.classList && node.classList.contains('citation')) {
+                      createTooltipForElement(node);
+                    }
+                    // Check children
+                    node.querySelectorAll('.citation').forEach(createTooltipForElement);
+                  }
+                });
+              }
+            }
+          });
+
+          // Start observing
+          observer.observe(editorView.dom, { 
+            childList: true, 
+            subtree: true 
+          });
+
+          // Initialize tooltips for existing citations
+          editorView.dom.querySelectorAll('.citation').forEach(createTooltipForElement);
+
           return {
             update(view, prevState) {
-              // Remove existing tooltips
-              const elements = document.querySelectorAll('.citation');
-              elements.forEach(element => {
-                if (!element._tippy) {
-                  tippy(element, {
-                    content: () => {
-                      const referenceDetails = element.getAttribute('data-reference-details');
-                      let refData;
-                      
-                      if (referenceDetails) {
-                        // Parse the stored reference details
-                        try {
-                          refData = JSON.parse(referenceDetails);
-                        } catch (e) {
-                          console.error('Failed to parse reference details:', e);
-                        }
-                      }
-                      
-                      if (!refData) {
-                        // Fallback to reference manager
-                        const citationKey = element.getAttribute('data-citation-key');
-                        const reference = view.state.schema.cached.referenceManager?.getReference(citationKey);
-                        if (reference) {
-                          refData = reference.entryTags;
-                        }
-                      }
-
-                      if (refData) {
-                        const { AUTHOR, YEAR, TITLE, JOURNAL } = refData;
-                        // Format authors (remove any '{' and '}' from BibTeX formatting)
-                        const authors = AUTHOR ? AUTHOR.replace(/[{}]/g, '') : '';
-                        
-                        // Construct citation in academic format
-                        const parts = [];
-                        if (authors) parts.push(authors);
-                        if (YEAR) parts.push(`(${YEAR})`);
-                        if (TITLE) parts.push(TITLE.replace(/[{}]/g, ''));
-                        if (JOURNAL) parts.push(`<em>${JOURNAL.replace(/[{}]/g, '')}</em>`);
-                        
-                        return `<div class="citation-tooltip">${parts.join(', ')}</div>`;
-                      }
-                      
-                      return 'Reference details not available';
-                    },
-                    allowHTML: true,
-                    delay: [200, 0], // Show after 200ms, hide immediately
-                    placement: 'top',
-                    arrow: true,
-                    theme: 'light-border'
-                  });
-                }
-              });
+              // No need to do anything here, the MutationObserver handles new elements
             },
             destroy() {
-              // Clean up tooltips
-              const elements = document.querySelectorAll('.citation');
-              elements.forEach(element => {
-                if (element._tippy) {
-                  element._tippy.destroy();
+              // Stop observing
+              observer.disconnect();
+              
+              // Clean up all tooltips
+              document.querySelectorAll('.citation').forEach(element => {
+                const instance = tippyInstances.get(element);
+                if (instance) {
+                  instance.destroy();
                 }
               });
             }
