@@ -540,7 +540,10 @@
 }
 
 .references-section {
-  margin-top: 2rem;
+  margin-top: 1.8em;  /* Match the line-height of main text */
+  font-family: var(--editor-current-font);
+  font-size: 11pt;  /* Match main text size */
+  line-height: 1.8;  /* Match main text line height */
   padding: 1rem 2rem;
   background: #f8f9fa;
   border-radius: 8px;
@@ -548,14 +551,15 @@
 }
 
 .references-section h2 {
-  font-size: 1.5rem;
-  margin-bottom: 1rem;
+  font-family: var(--editor-current-font);
+  font-size: 11pt;  /* Match main text size */
+  font-weight: bold;
+  margin-bottom: 0.9em;  /* Half of line-height */
   color: #2d2d2d;
-  font-weight: 500;
 }
 
 .reference-item {
-  margin-bottom: 1rem;
+  margin-bottom: 0.9em;  /* Half of line-height */
   line-height: 1.6;
   font-size: 0.95rem;
   color: #2d2d2d;
