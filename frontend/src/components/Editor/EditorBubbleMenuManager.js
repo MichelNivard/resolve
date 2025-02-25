@@ -113,6 +113,15 @@ export default function EditorBubbleMenuManager({ editor }) {
       const citationKey = await editor.referenceManager.addReferenceFromDOI(`doi:${doi}`);
       console.log('Got citation key:', citationKey);
 
+      // Get reference details
+      const reference = editor.referenceManager.getReference(citationKey);
+      let referenceDetails = '';
+      if (reference) {
+        const { entryTags = {} } = reference;
+        const { AUTHOR, YEAR, TITLE, JOURNAL } = entryTags;
+        referenceDetails = JSON.stringify({ AUTHOR, YEAR, TITLE, JOURNAL });
+      }
+
       // Get the current selection end position
       const { to } = editor.state.selection;
 
@@ -131,7 +140,8 @@ export default function EditorBubbleMenuManager({ editor }) {
               isInBrackets: true,
               prefix: '',
               suffix: '',
-              locator: ''
+              locator: '',
+              referenceDetails
             }
           }],
           text: `[@${citationKey.toLowerCase()}]`

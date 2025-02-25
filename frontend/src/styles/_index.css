@@ -193,6 +193,28 @@
   text-decoration: underline;
 }
 
+/* Citation Tooltips */
+.citation-tooltip {
+  padding: 8px;
+  max-width: 300px;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.citation-tooltip strong {
+  color: #2563eb;
+}
+
+.tippy-box[data-theme~='light-border'] {
+  background-color: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+}
+
+.tippy-box[data-theme~='light-border'] .tippy-arrow {
+  color: #e5e7eb;
+}
 
 .citation {
   color: #2563eb; /* or your preferred citation color */

@@ -1,4 +1,7 @@
 import { Mark } from '@tiptap/core';
+import { Plugin, PluginKey } from 'prosemirror-state';
+import tippy from 'tippy.js';
+import 'tippy.js/dist/tippy.css';
 
 export const CitationMark = Mark.create({
   name: 'citation',
@@ -15,7 +18,8 @@ export const CitationMark = Mark.create({
       prefix: { default: null },
       suffix: { default: null },
       locator: { default: null },
-      isInBrackets: { default: false }
+      isInBrackets: { default: false },
+      referenceDetails: { default: null }
     }
   },
 
@@ -28,7 +32,8 @@ export const CitationMark = Mark.create({
           prefix: element.getAttribute('data-prefix'),
           suffix: element.getAttribute('data-suffix'),
           locator: element.getAttribute('data-locator'),
-          isInBrackets: element.getAttribute('data-in-brackets') === 'true'
+          isInBrackets: element.getAttribute('data-in-brackets') === 'true',
+          referenceDetails: element.getAttribute('data-reference-details')
         })
       }
     ]
@@ -38,6 +43,7 @@ export const CitationMark = Mark.create({
     const attrs = {
       class: 'citation',
       'data-citation-key': HTMLAttributes.citationKey,
+      'data-reference-details': HTMLAttributes.referenceDetails
     };
 
     if (HTMLAttributes.prefix) {
@@ -55,6 +61,63 @@ export const CitationMark = Mark.create({
     }
 
     return ['span', attrs, 0]
+  },
+
+  addProseMirrorPlugins() {
+    return [
+      new Plugin({
+        key: new PluginKey('citation-tooltip'),
+        view(editorView) {
+          return {
+            update(view, prevState) {
+              // Remove existing tooltips
+              const elements = document.querySelectorAll('.citation');
+              elements.forEach(element => {
+                if (!element._tippy) {
+                  tippy(element, {
+                    content: () => {
+                      const referenceDetails = element.getAttribute('data-reference-details');
+                      if (!referenceDetails) {
+                        const citationKey = element.getAttribute('data-citation-key');
+                        // Try to get reference details from editor's reference manager
+                        const reference = view.state.schema.cached.referenceManager?.getReference(citationKey);
+                        if (reference) {
+                          const { entryTags = {} } = reference;
+                          const { AUTHOR, YEAR, TITLE, JOURNAL } = entryTags;
+                          return `
+                            <div class="citation-tooltip">
+                              ${AUTHOR ? `<strong>${AUTHOR}</strong>` : ''}
+                              ${YEAR ? ` (${YEAR})` : ''}
+                              ${TITLE ? `<br>${TITLE}` : ''}
+                              ${JOURNAL ? `<br><em>${JOURNAL}</em>` : ''}
+                            </div>
+                          `;
+                        }
+                      }
+                      return referenceDetails || 'Reference details not available';
+                    },
+                    allowHTML: true,
+                    delay: [200, 0], // Show after 200ms, hide immediately
+                    placement: 'top',
+                    arrow: true,
+                    theme: 'light-border'
+                  });
+                }
+              });
+            },
+            destroy() {
+              // Clean up tooltips
+              const elements = document.querySelectorAll('.citation');
+              elements.forEach(element => {
+                if (element._tippy) {
+                  element._tippy.destroy();
+                }
+              });
+            }
+          };
+        }
+      })
+    ];
   },
 
   // Regular expressions for citation patterns
