@@ -4,7 +4,67 @@ import TurndownService from 'turndown';
 import { tables, strikethrough } from 'turndown-plugin-gfm';
 
 function markdownItCitations(md) {
-  md.inline.ruler.before('emphasis', 'quarto_citations', (state, silent) => {
+  // Regular expressions for citation patterns
+  const citationRegex = /@([a-zA-Z0-9_][a-zA-Z0-9_:.#$%&\-+?<>~/]*|\{[^}]+\})/;
+  const locatorTerms = /\b(p|pp|page|pages|chapter|chap|section|sec|paragraph|para|figure|fig|volume|vol)\b\.?\s+([0-9]+(?:\s*[-–]\s*[0-9]+)?)/i;
+
+  // Helper function to parse a single citation
+  function parseCitation(text) {
+    const match = text.match(citationRegex);
+    if (!match) return null;
+
+    let citationKey = match[1];
+    if (citationKey.startsWith('{') && citationKey.endsWith('}')) {
+      citationKey = citationKey.slice(1, -1);
+    }
+
+    const parts = text.slice(match[0].length).split(',');
+    const prefix = parts.length > 1 ? parts[0].trim() : '';
+    const remainder = parts.slice(1).join(',').trim();
+
+    const locatorMatch = remainder.match(locatorTerms);
+    const locator = locatorMatch ? locatorMatch[0] : '';
+    const suffix = locatorMatch ? remainder.replace(locatorMatch[0], '').trim() : remainder;
+
+    return { citationKey, prefix, locator, suffix };
+  }
+
+  // Rule for standalone citations (@key)
+  md.inline.ruler.before('emphasis', 'standalone_citation', (state, silent) => {
+    const start = state.pos;
+    if (state.src[start] !== '@') {
+      return false;
+    }
+
+    const match = state.src.slice(start).match(citationRegex);
+    if (!match) {
+      return false;
+    }
+
+    if (!silent) {
+      const citation = parseCitation(state.src.slice(start));
+      if (citation) {
+        const token = state.push('citation_open', 'span', 1);
+        token.attrs = [
+          ['class', 'citation'],
+          ['data-citation-key', citation.citationKey],
+          ['data-prefix', citation.prefix],
+          ['data-suffix', citation.suffix],
+          ['data-locator', citation.locator],
+          ['data-in-brackets', 'false']
+        ];
+
+        state.push('text', '', 0).content = '@' + citation.citationKey;
+        state.push('citation_close', 'span', -1);
+      }
+    }
+
+    state.pos += match[0].length;
+    return true;
+  });
+
+  // Rule for bracketed citations [@key] or [see @key, p. 23]
+  md.inline.ruler.before('emphasis', 'bracketed_citations', (state, silent) => {
     const start = state.pos;
     if (state.src[start] !== '[') {
       return false;
@@ -16,59 +76,58 @@ function markdownItCitations(md) {
     }
 
     const content = state.src.slice(start + 1, end);
-
-    const citations = content.split(/;/);
-
+    const citations = content.split(';').map(part => part.trim());
+    
     let anyCitations = false;
-    const parsedCitations = [];
-    for (let part of citations) {
-      part = part.trim();
-
-      const citationMatch = part.match(/^(.*?)@\s*([A-Za-z0-9_][A-Za-z0-9_:.\#$%&+\-?<>~\/]*)\s*(.*)$/);
-      if (citationMatch) {
+    for (const citation of citations) {
+      const match = citation.match(citationRegex);
+      if (match) {
         anyCitations = true;
-        const prefix = citationMatch[1].trim();
-        const key = citationMatch[2];
-        const suffix = citationMatch[3].trim();
-        parsedCitations.push({ prefix, key, suffix });
-      } else {
-        parsedCitations.push({ prefix: part, key: null, suffix: '' });
+        break;
       }
     }
 
-    if (!anyCitations && !silent) {
+    if (!anyCitations) {
       return false;
     }
 
     if (!silent) {
-      state.pos = end + 1;
-      const token = state.push('quarto_citations', '', 0);
-      token.content = parsedCitations;
+      for (let i = 0; i < citations.length; i++) {
+        const citation = parseCitation(citations[i]);
+        if (citation) {
+          if (i > 0) {
+            state.push('text', '', 0).content = '; ';
+          }
+
+          const token = state.push('citation_open', 'span', 1);
+          token.attrs = [
+            ['class', 'citation citation-bracketed'],
+            ['data-citation-key', citation.citationKey],
+            ['data-prefix', citation.prefix],
+            ['data-suffix', citation.suffix],
+            ['data-locator', citation.locator],
+            ['data-in-brackets', 'true']
+          ];
+
+          if (citation.prefix) {
+            state.push('text', '', 0).content = citation.prefix + ' ';
+          }
+          state.push('text', '', 0).content = '@' + citation.citationKey;
+          if (citation.locator) {
+            state.push('text', '', 0).content = ', ' + citation.locator;
+          }
+          if (citation.suffix) {
+            state.push('text', '', 0).content = ' ' + citation.suffix;
+          }
+          state.push('citation_close', 'span', -1);
+        }
+      }
     }
 
+    state.pos = end + 1;
     return true;
   });
-
-  md.renderer.rules.quarto_citations = (tokens, idx) => {
-    const citations = tokens[idx].content;
-
-    const htmlPieces = citations.map(c => {
-      if (c.key) {
-        let fullText = '';
-        if (c.prefix) fullText += `${c.prefix} `;
-        fullText += `@${c.key}`;
-        if (c.suffix) fullText += ` ${c.suffix}`;
-
-        return `[<span class="bib-mention" data-bib-key="${c.key}">${fullText}</span>]`;
-      } else {
-        return c.prefix; // fallback for non-citation text
-      }
-    });
-
-    return htmlPieces.join('; ');
-  };
 }
-
 
 // Initialize markdown-it with plugins to support <ins> tags and tables
 const md = new MarkdownIt({
@@ -189,14 +248,31 @@ turndownService.addRule('math', {
   }
 });
 
+// Add custom HTML to Markdown conversion rules for citations
+turndownService.addRule('citation', {
+  filter: node => 
+    node.tagName === 'SPAN' && node.classList.contains('citation'),
+  replacement: (content, node) => {
+    const citationKey = node.getAttribute('data-citation-key') || '';
+    const prefix = node.getAttribute('data-prefix') || '';
+    const locator = node.getAttribute('data-locator') || '';
+    const suffix = node.getAttribute('data-suffix') || '';
+    const inBrackets = node.getAttribute('data-in-brackets') === 'true';
 
+    if (inBrackets) {
+      return `[${prefix} @${citationKey}${locator ? `, ${locator}` : ''}${suffix ? ` ${suffix}` : ''}]`;
+    } else {
+      return `@${citationKey}`;
+    }
+  }
+});
 
-export function markdownToHtml(markdown) {  const html = md.render(markdown);
+export function markdownToHtml(markdown) {  
+  const html = md.render(markdown);
   return html;
 }
 
 export function htmlToMarkdown(html) {
-
   const markdown = turndownService.turndown(html);
   return markdown;
 }
