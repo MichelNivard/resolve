@@ -187,6 +187,7 @@ function App() {
   };
 
   const handleLoadFile = async () => {
+    console.log("handleLoadFile called"); // ADDED
     if (!filePath) {
       setSaveMessage('Please enter a file path');
       return;
@@ -251,8 +252,11 @@ function App() {
         filePath,
         selectedRepo.owner.login
       );
+      console.log("Initializing reference manager..."); // ADDED
       await manager.init();
+      console.log("Reference manager initialized:", manager); // ADDED
       setReferenceManager(manager);
+      console.log("Reference manager state updated:", manager); // ADDED
 
       setSaveMessage('File and references loaded successfully');
       setTimeout(() => setSaveMessage(''), 3000);
