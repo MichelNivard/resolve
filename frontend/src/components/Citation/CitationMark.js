@@ -138,7 +138,7 @@ export const CitationMark = Mark.create({
                     console.log('CitationMark: reference entry tags:', refData);
                   }
                 }
-
+                
                 if (refData) {
                   const { AUTHOR, YEAR, TITLE, JOURNAL } = refData;
                   console.log('CitationMark: extracted citation data:', { AUTHOR, YEAR, TITLE, JOURNAL });
