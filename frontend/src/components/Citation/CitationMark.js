@@ -77,28 +77,42 @@ export const CitationMark = Mark.create({
                   tippy(element, {
                     content: () => {
                       const referenceDetails = element.getAttribute('data-reference-details');
-                      if (!referenceDetails) {
-                        const citationKey = element.getAttribute('data-citation-key');
-                        // Try to get reference details from editor's reference manager
-                        const reference = view.state.schema.cached.referenceManager?.getReference(citationKey);
-                        if (reference) {
-                          const { entryTags = {} } = reference;
-                          const { AUTHOR, YEAR, TITLE, JOURNAL } = entryTags;
-                          
-                          // Format authors (remove any '{' and '}' from BibTeX formatting)
-                          const authors = AUTHOR ? AUTHOR.replace(/[{}]/g, '') : '';
-                          
-                          // Construct citation in academic format
-                          const parts = [];
-                          if (authors) parts.push(authors);
-                          if (YEAR) parts.push(`(${YEAR})`);
-                          if (TITLE) parts.push(TITLE.replace(/[{}]/g, ''));
-                          if (JOURNAL) parts.push(`<em>${JOURNAL.replace(/[{}]/g, '')}</em>`);
-                          
-                          return `<div class="citation-tooltip">${parts.join(', ')}</div>`;
+                      let refData;
+                      
+                      if (referenceDetails) {
+                        // Parse the stored reference details
+                        try {
+                          refData = JSON.parse(referenceDetails);
+                        } catch (e) {
+                          console.error('Failed to parse reference details:', e);
                         }
                       }
-                      return referenceDetails || 'Reference details not available';
+                      
+                      if (!refData) {
+                        // Fallback to reference manager
+                        const citationKey = element.getAttribute('data-citation-key');
+                        const reference = view.state.schema.cached.referenceManager?.getReference(citationKey);
+                        if (reference) {
+                          refData = reference.entryTags;
+                        }
+                      }
+
+                      if (refData) {
+                        const { AUTHOR, YEAR, TITLE, JOURNAL } = refData;
+                        // Format authors (remove any '{' and '}' from BibTeX formatting)
+                        const authors = AUTHOR ? AUTHOR.replace(/[{}]/g, '') : '';
+                        
+                        // Construct citation in academic format
+                        const parts = [];
+                        if (authors) parts.push(authors);
+                        if (YEAR) parts.push(`(${YEAR})`);
+                        if (TITLE) parts.push(TITLE.replace(/[{}]/g, ''));
+                        if (JOURNAL) parts.push(`<em>${JOURNAL.replace(/[{}]/g, '')}</em>`);
+                        
+                        return `<div class="citation-tooltip">${parts.join(', ')}</div>`;
+                      }
+                      
+                      return 'Reference details not available';
                     },
                     allowHTML: true,
                     delay: [200, 0], // Show after 200ms, hide immediately
