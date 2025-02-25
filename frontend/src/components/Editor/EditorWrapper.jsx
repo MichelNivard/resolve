@@ -29,37 +29,35 @@ const ReferencesList = ({ references }) => {
   }
 
   return (
-    <div className="content-block">
-      <h2 className="content-block-title">References</h2>
-      <div className="content-block-content">
-        <ul className="content-list">
-          {references.map((ref, index) => {
-            console.log(`Reference ${index}:`, ref);
-            const { entryTags = {} } = ref;
-            console.log(`EntryTags for reference ${index}:`, entryTags);
-            const { AUTHOR, YEAR, TITLE, JOURNAL, DOI, URL } = entryTags;
-            console.log(`Extracted fields for reference ${index}:`, { AUTHOR, YEAR, TITLE, JOURNAL, DOI, URL });
-            
-            return (
-              <li key={index} className="content-list-item">
-                {AUTHOR && `${AUTHOR}. `}
-                {YEAR && `(${YEAR}). `}
-                {TITLE && `${TITLE}. `}
-                {JOURNAL && <em>{JOURNAL}</em>}
-                {DOI && (
-                  <a href={`https://doi.org/${DOI}`} target="_blank" rel="noopener noreferrer">
-                    {` doi:${DOI}`}
-                  </a>
-                )}
-                {!DOI && URL && (
-                  <a href={URL} target="_blank" rel="noopener noreferrer">
-                    {` ${URL}`}
-                  </a>
-                )}
-              </li>
-            );
-          })}
-        </ul>
+    <div className="references-section">
+      <h2>References</h2>
+      <div>
+        {references.map((ref, index) => {
+          console.log(`Reference ${index}:`, ref);
+          const { entryTags = {} } = ref;
+          console.log(`EntryTags for reference ${index}:`, entryTags);
+          const { AUTHOR, YEAR, TITLE, JOURNAL, DOI, URL } = entryTags;
+          console.log(`Extracted fields for reference ${index}:`, { AUTHOR, YEAR, TITLE, JOURNAL, DOI, URL });
+          
+          return (
+            <div key={index} className="reference-item">
+              {AUTHOR && `${AUTHOR}. `}
+              {YEAR && `(${YEAR}). `}
+              {TITLE && `${TITLE}. `}
+              {JOURNAL && <em>{JOURNAL}</em>}
+              {DOI && (
+                <a href={`https://doi.org/${DOI}`} target="_blank" rel="noopener noreferrer">
+                  {` doi:${DOI}`}
+                </a>
+              )}
+              {!DOI && URL && (
+                <a href={URL} target="_blank" rel="noopener noreferrer">
+                  {` ${URL}`}
+                </a>
+              )}
+            </div>
+          );
+        })}
       </div>
     </div>
   );
