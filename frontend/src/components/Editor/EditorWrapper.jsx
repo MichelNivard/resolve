@@ -138,8 +138,8 @@ const EditorWrapper = ({
         let transaction = tr;
         let updated = false;
         
-        // Function to process a node and its descendants
-        const processNode = (node, pos) => {
+        // Use a simpler approach - find all citation nodes using editor.state.doc.descendants
+        doc.descendants((node, pos) => {
           if (node.isText) {
             // Check if the text node has citation marks
             const marks = node.marks.filter(mark => mark.type.name === 'citation');
@@ -179,19 +179,8 @@ const EditorWrapper = ({
               }
             }
           }
-          
-          // Process child nodes
-          if (node.content) {
-            let childPos = pos + 1; // Account for the node start token
-            node.content.forEach(child => {
-              processNode(child, childPos);
-              childPos += child.nodeSize;
-            });
-          }
-        };
-        
-        // Start processing from the document root
-        processNode(doc, 0);
+          return true; // Continue traversal
+        });
         
         // Apply the transaction if any citations were updated
         if (updated) {
