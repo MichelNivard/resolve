@@ -73,6 +73,7 @@ const EditorWrapper = ({
   selectedRepo,
   setSelectedRepo,
   extensions,
+  references,
 }) => {
   const [showComments, setShowComments] = useState(false);
   const [notebooks, setNotebooks] = useState([]);
@@ -276,7 +277,7 @@ const EditorWrapper = ({
                 <div className="editor-content-container">
                   <EditorContent editor={editor} />
                   <div className="references-container">
-                    <ReferencesList references={referenceManager?.getReferences()} />
+                    <ReferencesList references={references || referenceManager?.getReferences()} />
                   </div>
                 </div>
               </div>
