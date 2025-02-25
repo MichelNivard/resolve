@@ -126,7 +126,78 @@ const EditorWrapper = ({
   // Attach referenceManager to editor when both are available
   useEffect(() => {
     if (editor && referenceManager) {
+      console.log('Attaching reference manager to editor');
       editor.referenceManager = referenceManager;
+      
+      // Also make it available globally for tooltips
+      window.editorReferenceManager = referenceManager;
+      
+      // Store in schema.cached for ProseMirror plugins
+      if (editor.schema.cached) {
+        editor.schema.cached.referenceManager = referenceManager;
+      }
+      
+      // Update citation marks with reference details
+      const updateCitations = () => {
+        console.log('Updating citations with reference details');
+        
+        // Find all citation marks in the document
+        const { doc, tr } = editor.state;
+        let transaction = tr;
+        let updated = false;
+        
+        // Use doc.descendants to find all citation nodes
+        doc.descendants((node, pos) => {
+          if (node.isText) {
+            // Check if the text node has citation marks
+            const marks = node.marks.filter(mark => mark.type.name === 'citation');
+            
+            for (const mark of marks) {
+              const { citationKey } = mark.attrs;
+              if (!citationKey) continue;
+              
+              // Get reference details from reference manager
+              const reference = referenceManager.getReference(citationKey);
+              if (!reference) continue;
+              
+              const { entryTags = {} } = reference;
+              const { AUTHOR, YEAR, TITLE, JOURNAL } = entryTags;
+              const referenceDetails = JSON.stringify({ AUTHOR, YEAR, TITLE, JOURNAL });
+              
+              // Only update if reference details have changed
+              if (mark.attrs.referenceDetails !== referenceDetails) {
+                console.log(`Updating citation ${citationKey} with reference details`);
+                
+                // Create a new mark with updated attributes
+                const newAttrs = {
+                  ...mark.attrs,
+                  referenceDetails
+                };
+                
+                // Remove the old mark and add the new one
+                transaction = transaction
+                  .removeMark(pos, pos + node.nodeSize, mark.type)
+                  .addMark(
+                    pos,
+                    pos + node.nodeSize,
+                    editor.schema.marks.citation.create(newAttrs)
+                  );
+                
+                updated = true;
+              }
+            }
+          }
+          return true; // Continue traversal
+        });
+        
+        // Apply the transaction if any citations were updated
+        if (updated) {
+          editor.view.dispatch(transaction);
+        }
+      };
+      
+      // Update citations after a short delay to ensure everything is loaded
+      setTimeout(updateCitations, 500);
     }
   }, [editor, referenceManager]);
 
