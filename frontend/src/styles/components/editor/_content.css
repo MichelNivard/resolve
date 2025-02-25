@@ -553,7 +553,7 @@
 
 .references-section h2 {
   font-family: var(--editor-current-font);
-  font-size: 2em;  /* Match main text size */
+  font-size: 1.5em;  /* Match main text size */
   margin-bottom: 0.9em;  /* Half of line-height */
   color: #2d2d2d;
 }
