@@ -543,6 +543,7 @@
   margin-top: 1.8em;  /* Match the line-height of main text */
   font-family: var(--editor-current-font);
   font-size: 11pt;  /* Match main text size */
+  font-weight: 200;
   line-height: 1.8;  /* Match main text line height */
   padding: 1rem 2rem;
   background: #ffffff;
