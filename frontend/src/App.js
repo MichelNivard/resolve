@@ -258,7 +258,9 @@ function App() {
       console.log("Reference manager initialized:", manager); // ADDED
       setReferenceManager(manager);
       console.log("Reference manager state updated:", manager); // ADDED
-      setReferences(manager.getReferences()); // Added to update references state
+      const refs = manager.getReferences();
+      console.log("Setting references:", refs); // Added debug log
+      setReferences(refs);
 
       setSaveMessage('File and references loaded successfully');
       setTimeout(() => setSaveMessage(''), 3000);

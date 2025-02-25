@@ -22,7 +22,11 @@ import { fetchNotebooksInRepo } from '../../utils/api';
 import InlineMath from '../../utils/InlineMath/inlineMath';
 
 const ReferencesList = ({ references }) => {
-  if (!references || references.length === 0) return null;
+  console.log("ReferencesList received references:", references);
+  if (!references || references.length === 0) {
+    console.log("No references to display");
+    return null;
+  }
 
   return (
     <div className="references-section">
