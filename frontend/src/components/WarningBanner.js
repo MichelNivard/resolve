@@ -18,17 +18,17 @@ const WarningBanner = ({ editors, currentUser }) => {
 
   const renderMessage = () => {
     if (isFirstUser) {
-      return `You started editing this file ${Math.round((now.getTime() - new Date(activeEditors[0].timestamp).getTime()) / (1000 * 60))} minutes ago.`;
+      return `You are the only recent editor of this file.`;
     } else if (otherEditors.length > 0) {
       return (
         <>
-          <strong>Warning:</strong> {activeEditors[0].name} and {otherEditors.length} other{otherEditors.length === 1 ? '' : 's'} have this file open. Concurrent editing will create conflicts. Feel free to read and browse.
+          <strong>Warning:</strong> {activeEditors[0].name} and {otherEditors.length} other{otherEditors.length === 1 ? '' : 's'} have this file open. Concurrent editing might create conflicts. Feel free to read and browse.
         </>
       );
     } else {
       return (
         <>
-          <strong>Warning:</strong> {activeEditors[0].name} started editing {Math.round((now.getTime() - new Date(activeEditors[0].timestamp).getTime()) / (1000 * 60))} minutes ago. This file might currently be in use.
+          <strong>Warning:</strong> {activeEditors[0].name} started editing {Math.round((now.getTime() - new Date(activeEditors[0].timestamp).getTime()) / (1000 * 60))} minutes ago. Concurrent editing might create conflicts
         </>
       );
     }
