@@ -192,3 +192,16 @@
 .privacy-text a:hover {
   text-decoration: underline;
 }
+
+
+.citation {
+  color: #2563eb; /* or your preferred citation color */
+}
+
+.citation-bracketed::before {
+  content: '[';
+}
+
+.citation-bracketed::after {
+  content: ']';
+}
