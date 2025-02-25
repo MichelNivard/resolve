@@ -33,26 +33,26 @@ const ReferencesList = ({ references }) => {
       <h2>References</h2>
       <div className="references-list">
         {references.map((ref, index) => {
-          console.log(`Reference ${index}:`, ref); // Log each reference
+          console.log(`Reference ${index}:`, ref);
           const { entryTags = {} } = ref;
-          console.log(`EntryTags for reference ${index}:`, entryTags); // Log entry tags
-          const { author, year, title, journal, doi, url } = entryTags;
-          console.log(`Extracted fields for reference ${index}:`, { author, year, title, journal, doi, url }); // Log extracted fields
+          console.log(`EntryTags for reference ${index}:`, entryTags);
+          const { AUTHOR, YEAR, TITLE, JOURNAL, DOI, URL } = entryTags;
+          console.log(`Extracted fields for reference ${index}:`, { AUTHOR, YEAR, TITLE, JOURNAL, DOI, URL });
           
           return (
             <div key={index} className="reference-item">
-              {author && `${author}. `}
-              {year && `(${year}). `}
-              {title && `${title}. `}
-              {journal && <em>{journal}</em>}
-              {doi && (
-                <a href={`https://doi.org/${doi}`} target="_blank" rel="noopener noreferrer">
-                  {` doi:${doi}`}
+              {AUTHOR && `${AUTHOR}. `}
+              {YEAR && `(${YEAR}). `}
+              {TITLE && `${TITLE}. `}
+              {JOURNAL && <em>{JOURNAL}</em>}
+              {DOI && (
+                <a href={`https://doi.org/${DOI}`} target="_blank" rel="noopener noreferrer">
+                  {` doi:${DOI}`}
                 </a>
               )}
-              {!doi && url && (
-                <a href={url} target="_blank" rel="noopener noreferrer">
-                  {` ${url}`}
+              {!DOI && URL && (
+                <a href={URL} target="_blank" rel="noopener noreferrer">
+                  {` ${URL}`}
                 </a>
               )}
             </div>
