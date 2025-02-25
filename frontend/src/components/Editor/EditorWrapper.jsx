@@ -126,9 +126,105 @@ const EditorWrapper = ({
   // Attach referenceManager to editor when both are available
   useEffect(() => {
     if (editor && referenceManager) {
+      console.log('Attaching reference manager to editor');
       editor.referenceManager = referenceManager;
+      
+      // Simple function to update citation marks with reference details
+      const updateCitationsWithReferences = () => {
+        console.log('Updating citations with reference details');
+        
+        // Find all citation marks in the document
+        const { doc, tr } = editor.state;
+        let transaction = tr;
+        let updated = false;
+        
+        // Function to process a node and its descendants
+        const processNode = (node, pos) => {
+          if (node.isText) {
+            // Check if the text node has citation marks
+            const marks = node.marks.filter(mark => mark.type.name === 'citation');
+            
+            for (const mark of marks) {
+              const { citationKey } = mark.attrs;
+              if (!citationKey) continue;
+              
+              // Get reference details from reference manager
+              const reference = referenceManager.getReference(citationKey);
+              if (!reference) continue;
+              
+              const { entryTags = {} } = reference;
+              const { AUTHOR, YEAR, TITLE, JOURNAL } = entryTags;
+              const referenceDetails = JSON.stringify({ AUTHOR, YEAR, TITLE, JOURNAL });
+              
+              // Only update if reference details have changed
+              if (mark.attrs.referenceDetails !== referenceDetails) {
+                console.log(`Updating citation ${citationKey} with reference details`);
+                
+                // Create a new mark with updated attributes
+                const newAttrs = {
+                  ...mark.attrs,
+                  referenceDetails
+                };
+                
+                // Remove the old mark and add the new one
+                transaction = transaction
+                  .removeMark(pos, pos + node.nodeSize, mark.type)
+                  .addMark(
+                    pos,
+                    pos + node.nodeSize,
+                    editor.schema.marks.citation.create(newAttrs)
+                  );
+                
+                updated = true;
+              }
+            }
+          }
+          
+          // Process child nodes
+          if (node.content) {
+            let childPos = pos + 1; // Account for the node start token
+            node.content.forEach(child => {
+              processNode(child, childPos);
+              childPos += child.nodeSize;
+            });
+          }
+        };
+        
+        // Start processing from the document root
+        processNode(doc, 0);
+        
+        // Apply the transaction if any citations were updated
+        if (updated) {
+          editor.view.dispatch(transaction);
+        }
+      };
+      
+      // Update citations after a short delay to ensure everything is loaded
+      setTimeout(updateCitationsWithReferences, 500);
     }
   }, [editor, referenceManager]);
+
+  useEffect(() => {
+    if (editor && ipynb) {
+      // Use requestAnimationFrame to schedule the update outside of React's rendering cycle
+      requestAnimationFrame(() => {
+        try {
+          ipynbToTiptapDoc(ipynb, editor);
+          
+          // If we have a reference manager, update citations after content is loaded
+          if (editor.referenceManager) {
+            setTimeout(() => {
+              // This will trigger the useEffect above which will update the citations
+              // Force a re-render of the reference manager to trigger the useEffect
+              setReferenceManager(prev => ({...prev}));
+            }, 500);
+          }
+        } catch (err) {
+          setError(err.message);
+        }
+      });
+    }
+  }, [editor, ipynb]);
 
   useEffect(() => {
     const loadNotebooks = async () => {
@@ -184,17 +280,12 @@ const EditorWrapper = ({
   const isError = saveMessage && saveMessage.toLowerCase().includes('error');
 
   useEffect(() => {
-    if (editor && ipynb) {
-      // Use requestAnimationFrame to schedule the update outside of React's rendering cycle
-      requestAnimationFrame(() => {
-        try {
-          ipynbToTiptapDoc(ipynb, editor);
-        } catch (err) {
-          setError(err.message);
-        }
-      });
+    if (editor) {
+      // Object.entries(citationCommands).forEach(([name, command]) => {
+      //   editor.commands[name] = command;
+      // });
     }
-  }, [editor, ipynb]);
+  }, [editor]);
 
   // Handle editor cleanup
   useEffect(() => {
@@ -203,14 +294,6 @@ const EditorWrapper = ({
         editor.destroy();
       }
     };
-  }, [editor]);
-
-  useEffect(() => {
-    if (editor) {
-      // Object.entries(citationCommands).forEach(([name, command]) => {
-      //   editor.commands[name] = command;
-      // });
-    }
   }, [editor]);
 
   if (!editor) {
