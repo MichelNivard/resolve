@@ -545,15 +545,14 @@
   font-size: 11pt;  /* Match main text size */
   line-height: 1.8;  /* Match main text line height */
   padding: 1rem 2rem;
-  background: #f8f9fa;
+  background: #ffffff;
   border-radius: 8px;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
 }
 
 .references-section h2 {
   font-family: var(--editor-current-font);
-  font-size: 11pt;  /* Match main text size */
-  font-weight: bold;
+  font-size: 2em;  /* Match main text size */
   margin-bottom: 0.9em;  /* Half of line-height */
   color: #2d2d2d;
 }
