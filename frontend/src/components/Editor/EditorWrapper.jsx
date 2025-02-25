@@ -126,147 +126,42 @@ const EditorWrapper = ({
   // Attach referenceManager to editor when both are available
   useEffect(() => {
     if (editor && referenceManager) {
-      console.log('Attaching reference manager to editor');
       editor.referenceManager = referenceManager;
-      
-      // Simple function to update citation marks with reference details
-      const updateCitationsWithReferences = () => {
-        console.log('Updating citations with reference details');
-        
-        // Find all citation marks in the document
-        const { doc, tr } = editor.state;
-        let transaction = tr;
-        let updated = false;
-        
-        // Use a simpler approach - find all citation nodes using editor.state.doc.descendants
-        doc.descendants((node, pos) => {
-          if (node.isText) {
-            // Check if the text node has citation marks
-            const marks = node.marks.filter(mark => mark.type.name === 'citation');
-            
-            for (const mark of marks) {
-              const { citationKey } = mark.attrs;
-              if (!citationKey) continue;
-              
-              // Get reference details from reference manager
-              const reference = referenceManager.getReference(citationKey);
-              if (!reference) continue;
-              
-              const { entryTags = {} } = reference;
-              const { AUTHOR, YEAR, TITLE, JOURNAL } = entryTags;
-              const referenceDetails = JSON.stringify({ AUTHOR, YEAR, TITLE, JOURNAL });
-              
-              // Only update if reference details have changed
-              if (mark.attrs.referenceDetails !== referenceDetails) {
-                console.log(`Updating citation ${citationKey} with reference details`);
-                
-                // Create a new mark with updated attributes
-                const newAttrs = {
-                  ...mark.attrs,
-                  referenceDetails
-                };
-                
-                // Remove the old mark and add the new one
-                transaction = transaction
-                  .removeMark(pos, pos + node.nodeSize, mark.type)
-                  .addMark(
-                    pos,
-                    pos + node.nodeSize,
-                    editor.schema.marks.citation.create(newAttrs)
-                  );
-                
-                updated = true;
-              }
-            }
-          }
-          return true; // Continue traversal
-        });
-        
-        // Apply the transaction if any citations were updated
-        if (updated) {
-          editor.view.dispatch(transaction);
-        }
-      };
-      
-      // Update citations after a short delay to ensure everything is loaded
-      setTimeout(updateCitationsWithReferences, 500);
     }
   }, [editor, referenceManager]);
 
   useEffect(() => {
-    if (editor && ipynb) {
-      // Use requestAnimationFrame to schedule the update outside of React's rendering cycle
-      requestAnimationFrame(() => {
+    const loadNotebooks = async () => {
+      if (selectedRepo) {
         try {
-          ipynbToTiptapDoc(ipynb, editor);
+          // Format repository as "owner/repo"
+          const repository = `${selectedRepo.owner.login}/${selectedRepo.name}`;
+          const notebookList = await fetchNotebooksInRepo(repository);
+          setNotebooks(notebookList);
           
-          // If we have a reference manager, update citations after content is loaded
-          if (editor.referenceManager) {
-            setTimeout(() => {
-              // Directly update citations without trying to reset the reference manager
-              console.log('Updating citations after content load');
-              
-              // Find all citation marks in the document
-              const { doc, tr } = editor.state;
-              let transaction = tr;
-              let updated = false;
-              
-              // Use doc.descendants to find all citation nodes
-              doc.descendants((node, pos) => {
-                if (node.isText) {
-                  // Check if the text node has citation marks
-                  const marks = node.marks.filter(mark => mark.type.name === 'citation');
-                  
-                  for (const mark of marks) {
-                    const { citationKey } = mark.attrs;
-                    if (!citationKey) continue;
-                    
-                    // Get reference details from reference manager
-                    const reference = editor.referenceManager.getReference(citationKey);
-                    if (!reference) continue;
-                    
-                    const { entryTags = {} } = reference;
-                    const { AUTHOR, YEAR, TITLE, JOURNAL } = entryTags;
-                    const referenceDetails = JSON.stringify({ AUTHOR, YEAR, TITLE, JOURNAL });
-                    
-                    // Only update if reference details have changed
-                    if (mark.attrs.referenceDetails !== referenceDetails) {
-                      console.log(`Updating citation ${citationKey} with reference details after load`);
-                      
-                      // Create a new mark with updated attributes
-                      const newAttrs = {
-                        ...mark.attrs,
-                        referenceDetails
-                      };
-                      
-                      // Remove the old mark and add the new one
-                      transaction = transaction
-                        .removeMark(pos, pos + node.nodeSize, mark.type)
-                        .addMark(
-                          pos,
-                          pos + node.nodeSize,
-                          editor.schema.marks.citation.create(newAttrs)
-                        );
-                      
-                      updated = true;
-                    }
-                  }
-                }
-                return true; // Continue traversal
-              });
-              
-              // Apply the transaction if any citations were updated
-              if (updated) {
-                editor.view.dispatch(transaction);
-              }
-            }, 500);
+          if (filePath && !ipynb) {
+            // If filePath exists in the list, load it
+            if (notebookList.includes(filePath)) {
+              handleLoadFile(filePath);
+            }
+          } else if (notebookList.length > 0 && !ipynb) {
+            // No filePath or not found - set first notebook as default
+            setFilePath(notebookList[0]);
           }
         } catch (err) {
-          setError(err.message);
+          setError('Failed to load notebooks');
+          console.error('Error loading notebooks:', err);
         }
-      });
+      }
+    };
+    loadNotebooks();
+  }, [selectedRepo]);
+
+  useEffect(() => {
+    if (filePath && selectedRepo && !ipynb) {
+      handleLoadFile(filePath);
     }
-  }, [editor, ipynb]);
+  }, [filePath, selectedRepo]);
 
  const onLoadFile = async () => {
     try {
@@ -289,12 +184,17 @@ const EditorWrapper = ({
   const isError = saveMessage && saveMessage.toLowerCase().includes('error');
 
   useEffect(() => {
-    if (editor) {
-      // Object.entries(citationCommands).forEach(([name, command]) => {
-      //   editor.commands[name] = command;
-      // });
+    if (editor && ipynb) {
+      // Use requestAnimationFrame to schedule the update outside of React's rendering cycle
+      requestAnimationFrame(() => {
+        try {
+          ipynbToTiptapDoc(ipynb, editor);
+        } catch (err) {
+          setError(err.message);
+        }
+      });
     }
-  }, [editor]);
+  }, [editor, ipynb]);
 
   // Handle editor cleanup
   useEffect(() => {
