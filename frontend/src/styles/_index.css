@@ -194,11 +194,26 @@
 }
 
 /* Citation Tooltips */
+.citation {
+  color: #2563eb; /* or your preferred citation color */
+  cursor: pointer;
+}
+
+/* Add brackets for bracketed citations */
+.citation-bracketed::before {
+  content: '[';
+  color: inherit;
+}
+
+.citation-bracketed::after {
+  content: ']';
+  color: inherit;
+}
+
 .citation-tooltip {
   padding: 8px;
   max-width: 300px;
   font-size: 14px;
-  color: #333;
   line-height: 1.4;
 }
 
@@ -215,16 +230,4 @@
 
 .tippy-box[data-theme~='light-border'] .tippy-arrow {
   color: #e5e7eb;
-}
-
-.citation {
-  color: #2563eb; /* or your preferred citation color */
-}
-
-.citation-bracketed::before {
-  content: '[';
-}
-
-.citation-bracketed::after {
-  content: ']';
 }

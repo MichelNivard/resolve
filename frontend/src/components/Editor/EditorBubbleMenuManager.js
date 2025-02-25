@@ -126,6 +126,10 @@ export default function EditorBubbleMenuManager({ editor }) {
       const { to } = editor.state.selection;
 
       console.log('Inserting citation into editor at position:', to);
+      
+      // Format the citation text without brackets - the CSS will add them
+      const citationText = `@${citationKey.toLowerCase()}`;
+      
       editor.chain()
         .focus()
         // Move to end of selection
@@ -144,7 +148,7 @@ export default function EditorBubbleMenuManager({ editor }) {
               referenceDetails
             }
           }],
-          text: `[@${citationKey.toLowerCase()}]`
+          text: citationText
         })
         .run();
       console.log('Citation inserted successfully');
