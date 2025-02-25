@@ -84,14 +84,18 @@ export const CitationMark = Mark.create({
                         if (reference) {
                           const { entryTags = {} } = reference;
                           const { AUTHOR, YEAR, TITLE, JOURNAL } = entryTags;
-                          return `
-                            <div class="citation-tooltip">
-                              ${AUTHOR ? `<strong>${AUTHOR}</strong>` : ''}
-                              ${YEAR ? ` (${YEAR})` : ''}
-                              ${TITLE ? `<br>${TITLE}` : ''}
-                              ${JOURNAL ? `<br><em>${JOURNAL}</em>` : ''}
-                            </div>
-                          `;
+                          
+                          // Format authors (remove any '{' and '}' from BibTeX formatting)
+                          const authors = AUTHOR ? AUTHOR.replace(/[{}]/g, '') : '';
+                          
+                          // Construct citation in academic format
+                          const parts = [];
+                          if (authors) parts.push(authors);
+                          if (YEAR) parts.push(`(${YEAR})`);
+                          if (TITLE) parts.push(TITLE.replace(/[{}]/g, ''));
+                          if (JOURNAL) parts.push(`<em>${JOURNAL.replace(/[{}]/g, '')}</em>`);
+                          
+                          return `<div class="citation-tooltip">${parts.join(', ')}</div>`;
                         }
                       }
                       return referenceDetails || 'Reference details not available';
