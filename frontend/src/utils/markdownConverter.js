@@ -9,7 +9,7 @@ function markdownItCitations(md) {
   const locatorTerms = /\b(p|pp|page|pages|chapter|chap|section|sec|paragraph|para|figure|fig|volume|vol)\b\.?\s+([0-9]+(?:\s*[-–]\s*[0-9]+)?)/i;
 
   // Helper function to parse a single citation
-  function parseCitation(text) {
+  function parseCitation(text, state) {
     const match = text.match(citationRegex);
     if (!match) return null;
 
@@ -26,7 +26,17 @@ function markdownItCitations(md) {
     const locator = locatorMatch ? locatorMatch[0] : '';
     const suffix = locatorMatch ? remainder.replace(locatorMatch[0], '').trim() : remainder;
 
-    return { citationKey, prefix, locator, suffix };
+    // Get reference details from the editor's reference manager
+    let referenceDetails = null;
+    if (state.env.referenceManager) {
+      const reference = state.env.referenceManager.getReference(citationKey);
+      if (reference && reference.entryTags) {
+        const { AUTHOR, YEAR, TITLE, JOURNAL } = reference.entryTags;
+        referenceDetails = JSON.stringify({ AUTHOR, YEAR, TITLE, JOURNAL });
+      }
+    }
+
+    return { citationKey, prefix, locator, suffix, referenceDetails };
   }
 
   // Rule for standalone citations (@key)
@@ -42,7 +52,7 @@ function markdownItCitations(md) {
     }
 
     if (!silent) {
-      const citation = parseCitation(state.src.slice(start));
+      const citation = parseCitation(state.src.slice(start), state);
       if (citation) {
         const token = state.push('citation_open', 'span', 1);
         token.attrs = [
@@ -53,6 +63,10 @@ function markdownItCitations(md) {
           ['data-locator', citation.locator],
           ['data-in-brackets', 'false']
         ];
+        
+        if (citation.referenceDetails) {
+          token.attrs.push(['data-reference-details', citation.referenceDetails]);
+        }
 
         state.push('text', '', 0).content = '@' + citation.citationKey;
         state.push('citation_close', 'span', -1);
@@ -93,7 +107,7 @@ function markdownItCitations(md) {
 
     if (!silent) {
       for (let i = 0; i < citations.length; i++) {
-        const citation = parseCitation(citations[i]);
+        const citation = parseCitation(citations[i], state);
         if (citation) {
           if (i > 0) {
             state.push('text', '', 0).content = '; ';
@@ -108,6 +122,10 @@ function markdownItCitations(md) {
             ['data-locator', citation.locator],
             ['data-in-brackets', 'true']
           ];
+
+          if (citation.referenceDetails) {
+            token.attrs.push(['data-reference-details', citation.referenceDetails]);
+          }
 
           if (citation.prefix) {
             state.push('text', '', 0).content = citation.prefix + ' ';
@@ -258,6 +276,7 @@ turndownService.addRule('citation', {
     const locator = node.getAttribute('data-locator') || '';
     const suffix = node.getAttribute('data-suffix') || '';
     const inBrackets = node.getAttribute('data-in-brackets') === 'true';
+    const referenceDetails = node.getAttribute('data-reference-details') || '';
 
     if (inBrackets) {
       return `[${prefix} @${citationKey}${locator ? `, ${locator}` : ''}${suffix ? ` ${suffix}` : ''}]`;
