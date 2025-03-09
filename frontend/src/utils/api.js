@@ -35,9 +35,7 @@ api.interceptors.response.use(
 
 export const checkAuth = async () => {
   try {
-    console.log('Checking auth with URL:', `${API_BASE_URL}/api/auth/check`);
     const res = await api.get('/api/auth/check');
-    console.log('Auth check response:', res.data);
     return res.data.authenticated;
   } catch (err) {
     console.error('Error checking auth:', err);
