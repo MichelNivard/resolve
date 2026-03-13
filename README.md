@@ -14,18 +14,91 @@ QuartoReview is a local macOS desktop app for editing `.qmd` (Quarto Markdown) f
 
 ---
 
-## Overview of the setup
+## Quick start
 
-Setting up QuartoReview takes about 10 minutes and has four parts:
+There are two ways to use QuartoReview:
 
-1. **Install Node.js** — the runtime that powers the app build (one-time)
-2. **Install the app's dependencies** — download the desktop, backend, and frontend packages (one-time)
-3. **Connect GitHub** — use the in-app onboarding flow to authorize QuartoReview with your own GitHub account
-4. **Launch the desktop app** — QuartoReview runs as a standalone macOS application
+1. **Recommended for most users:** download a packaged macOS app from **GitHub Releases**
+2. **For contributors or testers:** build the app from source with Node.js
+
+If a packaged release is available, use that first. The source build path is mainly for development and testing.
 
 ---
 
-## Step 1 — Install Node.js
+## Install From Releases
+
+1. Open the [Releases](https://github.com/Lakens/QuartoReview/releases) page
+2. Download either:
+   - `QuartoReview-...arm64.dmg` for the standard macOS installer experience
+   - `QuartoReview-...arm64-mac.zip` if you prefer a zipped app bundle
+3. Open the app
+4. On first launch, QuartoReview opens the GitHub setup dialog automatically if GitHub is not configured yet
+
+**Notes**
+
+- Current builds are macOS desktop builds
+- If macOS warns that the app is unsigned, use right-click -> **Open** the first time
+- Apple Silicon (`arm64`) builds are the primary target at the moment
+
+---
+
+## Connect GitHub
+
+QuartoReview does **not** use a shared central GitHub login. Each user connects the app to **their own GitHub account** and explicitly authorizes access themselves.
+
+On first launch, QuartoReview opens an in-app GitHub setup dialog automatically if the app has not been configured yet.
+
+You can connect GitHub in two ways.
+
+### Option A — Personal access token
+
+This is the fastest setup path for a single-user local install.
+
+1. In QuartoReview, click **"Connect GitHub"**
+2. Choose **"Personal token"**
+3. Click **"Open GitHub token page"**
+4. Create a token on **your own GitHub account** with repository access
+5. Paste the token into QuartoReview
+6. Click **"Save token and sign in"**
+
+QuartoReview validates the token and stores it locally on that Mac.
+
+### Option B — GitHub OAuth App
+
+Use this if you want GitHub to show the explicit app authorization screen during sign-in.
+
+1. In QuartoReview, click **"Connect GitHub"**
+2. Choose **"GitHub OAuth app"**
+3. Click **"Open GitHub OAuth settings"**
+4. Create a GitHub OAuth app on **your own GitHub account** with these values:
+
+   | Field | Value |
+   |-------|-------|
+   | Application name | `QuartoReview` (or anything you like) |
+   | Homepage URL | `http://localhost:3001` |
+   | Authorization callback URL | `http://localhost:3001/api/auth/callback` |
+
+5. Copy the **Client ID** and **Client Secret** into the QuartoReview setup dialog
+6. Leave the default redirect URI as `http://localhost:3001/api/auth/callback`
+7. Click **"Save and continue to GitHub"**
+
+GitHub then shows the standard authorization page for your OAuth app, and you sign in with your own account.
+
+### Advanced option — edit the local config file manually
+
+If needed, QuartoReview stores its local desktop configuration here:
+
+`~/Library/Application Support/QuartoReview/.env`
+
+Most users should not need to edit this file directly, because the app now manages it through the GUI onboarding flow.
+
+---
+
+## Build From Source
+
+Use this if you want the latest code from git or want to modify the app yourself.
+
+### Step 1 — Install Node.js
 
 Download and install Node.js **version 18 or later** from https://nodejs.org
 Choose the **LTS** version. Accept all defaults during installation.
@@ -34,7 +107,7 @@ Choose the **LTS** version. Accept all defaults during installation.
 
 ---
 
-## Step 2 — Get the code and install dependencies
+### Step 2 — Get the code and install dependencies
 
 **Get the code:**
 
@@ -51,57 +124,7 @@ The script checks that Node.js is installed and downloads the desktop, backend, 
 
 ---
 
-## Step 3 — Connect GitHub
-
-On first launch, QuartoReview opens an in-app GitHub setup dialog automatically if the app has not been configured yet.
-
-You can connect GitHub in two ways:
-
-### Option A — Personal access token (fastest for a local install)
-
-This is the simplest route for a single-user desktop install.
-
-1. In QuartoReview, click **"Connect GitHub"**
-2. Choose **"Personal token"**
-3. Click **"Open GitHub token page"**
-4. Create a token with repository access on your own GitHub account
-5. Paste the token into QuartoReview
-6. Click **"Save token and sign in"**
-
-QuartoReview validates the token and stores it locally on that Mac.
-
-### Option B — GitHub OAuth App (keeps the explicit authorization flow)
-
-Use this if you want GitHub to show an explicit app authorization screen when signing in.
-
-1. In QuartoReview, click **"Connect GitHub"**
-2. Choose **"GitHub OAuth app"**
-3. Click **"Open GitHub OAuth settings"**
-4. Create a GitHub OAuth app on your own GitHub account with these values:
-
-   | Field | Value |
-   |-------|-------|
-   | Application name | `QuartoReview` (or anything you like) |
-   | Homepage URL | `http://localhost:3001` |
-   | Authorization callback URL | `http://localhost:3001/api/auth/callback` |
-
-5. Copy the **Client ID** and **Client Secret** into the QuartoReview setup dialog
-6. Leave the default redirect URI as `http://localhost:3001/api/auth/callback`
-7. Click **"Save and continue to GitHub"**
-
-GitHub will then show the standard authorization page for your OAuth app, and you sign in with your own GitHub account.
-
-### Advanced option — edit the local config file manually
-
-If needed, QuartoReview stores its local desktop configuration here:
-
-`~/Library/Application Support/QuartoReview/.env`
-
-Most users should not need to edit this file directly, because the app now manages it through the GUI onboarding flow.
-
----
-
-## Step 4 — Launch the desktop app
+### Step 3 — Launch the desktop app
 
 Run:
 
@@ -112,14 +135,14 @@ chmod +x start.sh
 
 This builds the frontend, starts the embedded backend, and opens the Electron desktop app.
 
-**First launch behavior:**
+**First launch behavior**
 
 1. QuartoReview opens
 2. If GitHub has not been configured yet, the app shows the setup dialog automatically
 3. Choose either **"Personal token"** or **"GitHub OAuth app"**
 4. Complete the setup flow and continue into the editor
 
-To build a distributable macOS app bundle and disk image, run:
+To build a distributable macOS app bundle and disk image from source, run:
 
 ```bash
 npm run dist
